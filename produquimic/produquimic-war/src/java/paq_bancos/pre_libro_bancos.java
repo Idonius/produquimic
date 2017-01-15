@@ -84,6 +84,9 @@ public class pre_libro_bancos extends Pantalla {
     private Combo com_tipo_identificacion;
     private AreaTexto ate_observacion;
     private String str_ide_geper;
+    private Texto tex_num_comprobante;
+    private Calendario cal_fecha_efectivo;
+    private Radio rad_hace_asiento;
 
     private Dialogo dia_modifica = new Dialogo();
     private Tabla tab_tabla2;
@@ -140,7 +143,7 @@ public class pre_libro_bancos extends Pantalla {
         agregarComponente(asc_asiento);
 
         dia_modifica.setId("dia_modifica");
-        dia_modifica.setHeight("50%");
+        dia_modifica.setHeight("55%");
         dia_modifica.setWidth("40%");
         dia_modifica.setTitle("MODIFICAR MOVIMIENTO");
         dia_modifica.getBot_aceptar().setMetodo("aceptarModificar");
@@ -257,6 +260,10 @@ public class pre_libro_bancos extends Pantalla {
         tab_tabla2.getColumna("numero_teclb").setNombreVisual("NUM. DOCUMENTO");
         tab_tabla2.getColumna("observacion_teclb").setVisible(true);
         tab_tabla2.getColumna("observacion_teclb").setNombreVisual("OBSERVACIÓN");
+        tab_tabla2.getColumna("fec_cam_est_teclb").setVisible(true);
+        tab_tabla2.getColumna("fec_cam_est_teclb").setNombreVisual("FECHA EFECTIVIZA");
+        tab_tabla2.getColumna("num_comprobante_teclb").setVisible(true);
+        tab_tabla2.getColumna("num_comprobante_teclb").setNombreVisual("NUM. COMOPOBANTE");
 
         tab_tabla2.dibujar();
         PanelTabla pt = new PanelTabla();
@@ -617,7 +624,7 @@ public class pre_libro_bancos extends Pantalla {
         grid1.setColumns(3);
         grid1.getChildren().add(new Etiqueta("<strong>BENEFICIARIO : </strong><span style='color:red;font-weight: bold;'>*</span>"));
         grid1.getChildren().add(new Etiqueta("<strong>FECHA : </strong><span style='color:red;font-weight: bold;'>*</span>"));
-        grid1.getChildren().add(new Etiqueta());
+        grid1.getChildren().add(new Etiqueta("<strong>NUM. COMPROBANTE : </strong>"));
 
         tex_beneficiario = new Texto();
         tex_beneficiario.setId("tex_beneficiario");
@@ -627,7 +634,6 @@ public class pre_libro_bancos extends Pantalla {
 
         aut_persona = new AutoCompletar();
         aut_persona.setId("aut_persona");
-        aut_persona.setMetodoChange("cargarCuentasporPagar");
         aut_persona.setAutocompletarContenido();
         aut_persona.setAutoCompletar(ser_tesoreria.getSqlComboBeneficiario());
         aut_persona.setSize(70);
@@ -636,11 +642,14 @@ public class pre_libro_bancos extends Pantalla {
         cal_fecha_pago = new Calendario();
         cal_fecha_pago.setFechaActual();
         grid1.getChildren().add(cal_fecha_pago);
-        grid1.getChildren().add(new Etiqueta());
+
+        tex_num_comprobante = new Texto();
+        tex_num_comprobante.setSoloEnteros();
+        grid1.getChildren().add(tex_num_comprobante);
 
         grid1.getChildren().add(new Etiqueta("<strong>CUENTA : </strong> <span style='color:red;font-weight: bold;'>*</span>"));
         grid1.getChildren().add(new Etiqueta("<strong>TRANSACCIÓN : </strong><span style='color:red;font-weight: bold;'>*</span>"));
-        grid1.getChildren().add(new Etiqueta("<strong>NUM. DOCUMENTO : </strong>"));
+        grid1.getChildren().add(new Etiqueta("<strong>NUM.DOC.TRANSACCIÓN : </strong>"));
 
         aut_cuenta = new AutoCompletar();
         aut_cuenta.setId("aut_cuenta");
@@ -657,8 +666,20 @@ public class pre_libro_bancos extends Pantalla {
         grid1.getChildren().add(com_tip_tran);
 
         tex_num = new Texto();
+        tex_num.setSoloNumeros();
         tex_num.setId("tex_num");
         grid1.getChildren().add(tex_num);
+
+        grid1.getChildren().add(new Etiqueta("<strong>FECHA EFECTIVIZA : </strong>"));
+        grid1.getChildren().add(new Etiqueta());
+        grid1.getChildren().add(new Etiqueta());
+
+        cal_fecha_efectivo = new Calendario();
+        cal_fecha_efectivo.setId("cal_fecha_efectivo");
+        cal_fecha_efectivo.setDisabled(true);  //desactivado cuando no es cheque
+        grid1.getChildren().add(cal_fecha_efectivo);
+        grid1.getChildren().add(new Etiqueta());
+        grid1.getChildren().add(new Etiqueta());
 
         Grid gri3 = new Grid();
         gri3.setColumns(1);
@@ -666,6 +687,15 @@ public class pre_libro_bancos extends Pantalla {
         ate_observacion.setCols(90);
         gri3.getChildren().add(new Etiqueta("<strong>OBSERVACIÓN : </strong> <span style='color:red;font-weight: bold;'>*</span>"));
         gri3.getChildren().add(ate_observacion);
+
+        Grid gri = new Grid();
+        gri.setColumns(2);
+        gri.getChildren().add(new Etiqueta("<div style='font-size:12px;font-weight: bold;'> <img src='imagenes/im_pregunta.gif' />  GENERAR ASIENTO CONTABLE ? </div>"));
+        rad_hace_asiento = new Radio();
+        rad_hace_asiento.setRadio(utilitario.getListaPregunta());
+        rad_hace_asiento.setValue(true);
+        gri.getChildren().add(rad_hace_asiento);
+        gri3.setFooter(gri);
 
         PanelGrid gri4 = new PanelGrid();
         gri4.setColumns(2);
@@ -1020,8 +1050,12 @@ public class pre_libro_bancos extends Pantalla {
         aut_persona.onSelect(evt);
         tab_tabla1.setSql(ser_proveedor.getSqlCuentasPorPagar(aut_persona.getValor()));
         tab_tabla1.ejecutarSql();
-        tex_diferencia.setValue(utilitario.getFormatoNumero(0));
-        tex_valor_pagar.setValue(utilitario.getFormatoNumero(0));
+        if (tex_diferencia != null) {
+            tex_diferencia.setValue(utilitario.getFormatoNumero(0));
+        }
+        if (tex_valor_pagar != null) {
+            tex_valor_pagar.setValue(utilitario.getFormatoNumero(0));
+        }
         if (tab_tabla1.isEmpty()) {
             utilitario.agregarMensajeError("El Proveedor seleccionado no tiene cuentas por pagar", "");
         }
@@ -1089,9 +1123,14 @@ public class pre_libro_bancos extends Pantalla {
                 tex_identificacion.setValue(aut_persona.getValorArreglo(1));
             }
 
-            String ide_teclb = ser_tesoreria.generarLibroBanco(tex_beneficiario.getValue().toString(), cal_fecha_pago.getFecha(),
-                    com_tip_tran.getValue().toString(), aut_cuenta.getValor(), Double.parseDouble(tex_valor_pagar.getValue().toString()), ate_observacion.getValue().toString(), tex_num.getValue().toString());
-            generarAsiento(ide_teclb);
+            String ide_teclb = ser_tesoreria.generarLibroBancoOtros(tex_beneficiario.getValue().toString(), cal_fecha_pago.getFecha(),
+                    com_tip_tran.getValue().toString(), aut_cuenta.getValor(), Double.parseDouble(tex_valor_pagar.getValue().toString()), ate_observacion.getValue().toString(), tex_num.getValue().toString(), String.valueOf(tex_num_comprobante.getValue()), String.valueOf(cal_fecha_efectivo.getFecha()));
+            if (rad_hace_asiento.getValue().toString().equals("true")) {
+                generarAsiento(ide_teclb);
+
+            } else {
+                guardarPantalla();
+            }
             dibujarOtros();
         }
     }
@@ -1476,6 +1515,14 @@ public class pre_libro_bancos extends Pantalla {
                 aut_cuenta.limpiar();
                 tex_num.limpiar();
             }
+            if (com_tip_tran.getValue().toString().equals("2")) {
+                //activa fecha efectiviza
+                cal_fecha_efectivo.setDisabled(false);
+            } else {
+                cal_fecha_efectivo.limpiar();
+                cal_fecha_efectivo.setDisabled(true);
+            }
+            utilitario.addUpdate("cal_fecha_efectivo");
         }
         utilitario.addUpdate("tex_num,aut_cuenta");
     }

@@ -52,7 +52,6 @@ public class pre_contabilidad extends Pantalla {
 
     private final MenuPanel mep_menu = new MenuPanel();
     private AutoCompletar aut_cuenta;
-    private AutoCompletar aut_persona;
 
     private Tabla tab_consulta;
 
@@ -174,7 +173,6 @@ public class pre_contabilidad extends Pantalla {
      */
     public void seleccionarCuenta(SelectEvent evt) {
         aut_cuenta.onSelect(evt);
-        aut_persona.limpiar();
         actualizarLibroMayor();
     }
 
@@ -189,7 +187,7 @@ public class pre_contabilidad extends Pantalla {
         aut_cuenta = new AutoCompletar();
         aut_cuenta.setId("aut_cuenta");
         aut_cuenta.setAutoCompletar(ser_contabilidad.getSqlCuentasHijas());
-        aut_cuenta.setSize(75);        
+        aut_cuenta.setSize(75);
         aut_cuenta.setAutocompletarContenido(); // no startWith para la busqueda
         aut_cuenta.setMetodoChange("seleccionarCuenta");
         aut_cuenta.setGlobal(true);
@@ -199,15 +197,6 @@ public class pre_contabilidad extends Pantalla {
         bot_clean.setTitle("Limpiar");
         bot_clean.setMetodo("limpiar");
         gp.getChildren().add(bot_clean);
-
-        gp.getChildren().add(new Etiqueta("<strong>BENEFICIARIO : </strong>"));
-        aut_persona = new AutoCompletar();
-        aut_persona.setId("aut_persona");        
-        aut_persona.setSize(75);
-        aut_persona.setAutocompletarContenido(); // no startWith para la busqueda
-        aut_persona.setMetodoChange("seleccionarPersona");
-        aut_persona.setGlobal(true);
-        gp.getChildren().add(aut_persona);
 
         fis_consulta.getChildren().add(gp);
 
@@ -238,7 +227,7 @@ public class pre_contabilidad extends Pantalla {
         tab_consulta = new Tabla();
         tab_consulta.setNumeroTabla(-1);
         tab_consulta.setId("tab_consulta");
-        tab_consulta.setSql(ser_contabilidad.getSqlMovimientosCuenta(aut_cuenta.getValor(), cal_fecha_inicio.getFecha(), cal_fecha_fin.getFecha(), ""));
+        tab_consulta.setSql(ser_contabilidad.getSqlMovimientosCuenta(aut_cuenta.getValor(), cal_fecha_inicio.getFecha(), cal_fecha_fin.getFecha()));
         tab_consulta.setLectura(true);
         tab_consulta.getColumna("ide_cnccc").setNombreVisual("N. ASIENTO");
         tab_consulta.getColumna("ide_cnccc").setFiltro(true);
@@ -269,28 +258,13 @@ public class pre_contabilidad extends Pantalla {
         mep_menu.dibujar(1, "LIBRO MAYOR", gru_grupo);
     }
 
-    public void seleccionarPersona(SelectEvent evt) {
-        aut_persona.onSelect(evt);
-        actualizarLibroMayor();
-    }
-
     /**
      * Actualiza libro mayor segun las fechas selecionadas
      */
     public void actualizarLibroMayor() {
         if (isCuentaSeleccionada()) {
-            tab_consulta.setSql(ser_contabilidad.getSqlMovimientosCuenta(aut_cuenta.getValor(), cal_fecha_inicio.getFecha(), cal_fecha_fin.getFecha(), aut_persona.getValor()));
+            tab_consulta.setSql(ser_contabilidad.getSqlMovimientosCuenta(aut_cuenta.getValor(), cal_fecha_inicio.getFecha(), cal_fecha_fin.getFecha()));
             tab_consulta.ejecutarSql();
-
-            if (aut_persona.getValor() == null) {
-                String ide_geper = tab_consulta.getStringColumna("ide_geper");
-                if (ide_geper != null) {
-                    if (ide_geper.isEmpty() == false) {
-                        aut_persona.setAutoCompletar("select ide_geper,identificac_geper,nom_geper from gen_persona where ide_geper in (" + ide_geper + ")");
-                    }
-                }
-            }
-
             actualizarSaldosLibroMayor();
         }
     }
@@ -713,9 +687,6 @@ public class pre_contabilidad extends Pantalla {
      */
     public void limpiar() {
         aut_cuenta.limpiar();
-        if (aut_persona != null) {
-            aut_persona.limpiar();
-        }
         tab_consulta.limpiar();
     }
 
@@ -1265,14 +1236,6 @@ public class pre_contabilidad extends Pantalla {
 
     public void setDia_cerrar_periodo(Dialogo dia_cerrar_periodo) {
         this.dia_cerrar_periodo = dia_cerrar_periodo;
-    }
-
-    public AutoCompletar getAut_persona() {
-        return aut_persona;
-    }
-
-    public void setAut_persona(AutoCompletar aut_persona) {
-        this.aut_persona = aut_persona;
     }
 
 }

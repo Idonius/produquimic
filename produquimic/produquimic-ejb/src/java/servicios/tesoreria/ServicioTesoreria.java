@@ -97,7 +97,7 @@ public class ServicioTesoreria {
 
     public String getSqlTransaccionesCuenta(String ide_tecba, String fechaInicio, String fechaFin) {
         return "select fecha_trans_teclb,numero_teclb,ide_cnccc,nombre_tettb,beneficiari_teclb,"
-                + "case when signo_tettb = 1 THEN valor_teclb  end as INGRESOS,case when signo_tettb = -1 THEN valor_teclb end as EGRESOS, '' SALDO,observacion_teclb,ide_teclb,conciliado_teclb as conciliado "
+                + "case when signo_tettb = 1 THEN valor_teclb  end as INGRESOS,case when signo_tettb = -1 THEN valor_teclb end as EGRESOS, '' SALDO,observacion_teclb,ide_teclb,fec_cam_est_teclb AS FECHA_EFECTI,num_comprobante_teclb AS NUM_COMPROBANTE,conciliado_teclb as conciliado "
                 + "from tes_cab_libr_banc a "
                 + "inner join tes_tip_tran_banc b on a.ide_tettb=b.ide_tettb "
                 + "where ide_tecba=" + ide_tecba + " "
@@ -228,6 +228,32 @@ public class ServicioTesoreria {
 
     public String generarLibroBanco(String beneficiario, String fecha, String ide_tettb, String ide_tecba, double valor, String observacion, String numero) {
         return generarTablaLibroBanco(beneficiario, fecha, ide_tettb, ide_tecba, valor, observacion, numero).getValor("ide_teclb");
+    }
+
+    public String generarLibroBancoOtros(String beneficiario, String fecha, String ide_tettb, String ide_tecba, double valor, String observacion, String numero, String num_comprobante, String fecha_efectivo) {
+        TablaGenerica tab_cab_libro_banco = new TablaGenerica();
+        tab_cab_libro_banco.setTabla("tes_cab_libr_banc", "ide_teclb", -1);
+        tab_cab_libro_banco.setCondicion("ide_teclb=-1");
+        tab_cab_libro_banco.ejecutarSql();
+        if (numero == null || numero.isEmpty()) {
+            numero = "000000";
+        }
+        tab_cab_libro_banco.insertar();
+        tab_cab_libro_banco.setValor("ide_teelb", utilitario.getVariable("p_tes_estado_lib_banco_normal"));
+        tab_cab_libro_banco.setValor("valor_teclb", utilitario.getFormatoNumero(valor));
+        tab_cab_libro_banco.setValor("numero_teclb", numero);
+        tab_cab_libro_banco.setValor("fecha_trans_teclb", fecha);
+        tab_cab_libro_banco.setValor("fecha_venci_teclb", fecha);
+        tab_cab_libro_banco.setValor("beneficiari_teclb", beneficiario);
+        tab_cab_libro_banco.setValor("ide_tecba", ide_tecba);//Cuenta bancaria
+        tab_cab_libro_banco.setValor("ide_tettb", ide_tettb);
+        tab_cab_libro_banco.setValor("observacion_teclb", observacion);
+        tab_cab_libro_banco.setValor("conciliado_teclb", "false");
+        tab_cab_libro_banco.setValor("num_comprobante_teclb", num_comprobante);
+        tab_cab_libro_banco.setValor("fec_cam_est_teclb", fecha_efectivo);
+        tab_cab_libro_banco.guardar();
+
+        return tab_cab_libro_banco.getValor("ide_teclb");
     }
 
     public TablaGenerica generarTablaLibroBanco(String beneficiario, String fecha, String ide_tettb, String ide_tecba, double valor, String observacion, String numero) {
@@ -543,11 +569,17 @@ public class ServicioTesoreria {
                 + "WHERE  ccc.ide_cneco in (" + utilitario.getVariable("p_con_estado_comp_inicial") + "," + utilitario.getVariable("p_con_estado_comprobante_normal") + "," + utilitario.getVariable("p_con_estado_comp_final") + ") \n"
                 + "and dpc.ide_cndpc=a.ide_cndpc\n"
                 + "GROUP BY dpc.ide_cndpc ) as saldo_contable, \n"
-                + "(select sum(valor_teclb * signo_tettb) as valor \n"
+                + "coalesce((select sum(valor_teclb * signo_tettb) as valor \n"
                 + "from tes_cab_libr_banc aa \n"
                 + "inner join tes_tip_tran_banc bb on aa.ide_tettb=bb.ide_tettb \n"
                 + "where ide_tecba=a.ide_tecba and ide_teelb=" + utilitario.getVariable("p_tes_estado_lib_banco_normal") + "\n"
-                + "group by ide_tecba) as saldo_disponible \n"
+                + "group by ide_tecba),0.00) as saldo_registrado, \n"
+                + "coalesce((select sum(valor_teclb * signo_tettb) as valor \n"
+                + "from tes_cab_libr_banc aa \n"
+                + "inner join tes_tip_tran_banc bb on aa.ide_tettb=bb.ide_tettb \n"
+                + "where ide_tecba=a.ide_tecba and ide_teelb=" + utilitario.getVariable("p_tes_estado_lib_banco_normal") + "\n"
+                + "and (fec_cam_est_teclb is null or  fec_cam_est_teclb <='" + utilitario.getFechaActual() + "' )\n"
+                + "group by ide_tecba),0.00) as saldo_disponible "
                 + "from tes_cuenta_banco a\n"
                 + "inner join tes_banco b on a.ide_teban= b.ide_teban\n"
                 + "inner join tes_tip_cuen_banc c on a.ide_tetcb = c.ide_tetcb\n"

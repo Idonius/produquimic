@@ -29,6 +29,7 @@ import org.primefaces.event.SelectEvent;
 import servicios.contabilidad.ServicioContabilidadGeneral;
 import servicios.cuentas_x_cobrar.ServicioCliente;
 import servicios.cuentas_x_cobrar.ServicioFacturaCxC;
+import servicios.escritorio.ServicioIntegracion;
 import servicios.prestamo.ServicioPrestamo;
 import sistema.aplicacion.Pantalla;
 
@@ -63,6 +64,9 @@ public class pre_clientes extends Pantalla {
     @EJB
     private final ServicioPrestamo ser_prestamo = (ServicioPrestamo) utilitario.instanciarEJB(ServicioPrestamo.class);
 
+    @EJB
+    private final ServicioIntegracion ser_integra = (ServicioIntegracion) utilitario.instanciarEJB(ServicioIntegracion.class);
+
     /*INFOMRES*/
     private GraficoCartesiano gca_grafico;
     private Combo com_periodo;
@@ -87,6 +91,7 @@ public class pre_clientes extends Pantalla {
         mep_menu.setMenuPanel("OPCIONES CLIENTE", "20%");
         mep_menu.agregarItem("Información Cliente", "dibujarCliente", "ui-icon-person");
         mep_menu.agregarItem("Clasificación Clientes", "dibujarEstructura", "ui-icon-arrow-4-diag");
+        mep_menu.agregarItem("Importar Clientes", "dibujarImportar", "ui-icon-refresh");
         mep_menu.agregarSubMenu("TRANSACCIONES");
         mep_menu.agregarItem("Transacciones Cliente", "dibujarTransacciones", "ui-icon-contact");
         mep_menu.agregarItem("Ingresar Transacción", "dibujarIngresarTransacciones", "ui-icon-contact");
@@ -104,6 +109,11 @@ public class pre_clientes extends Pantalla {
         agregarComponente(mep_menu);
         asc_asiento.setId("asc_asiento");
         agregarComponente(asc_asiento);
+    }
+
+    public void dibujarImportar() {
+        mep_menu.dibujar(13, "IMPORTAR CLIENTES", new Etiqueta("Se importa los clientes del sistema de facturación"));
+        ser_integra.importarClientes();
     }
 
     /**

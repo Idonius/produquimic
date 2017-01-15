@@ -109,15 +109,7 @@ public class ServicioContabilidadGeneral {
      * @param ide_geper filtar por beneficiario
      * @return
      */
-    public String getSqlMovimientosCuenta(String ide_cndpc, String fechaInicio, String fechaFin, String ide_geper) {
-        if (ide_geper == null) {
-            ide_geper = "";
-        }
-        ide_geper = ide_geper.trim();
-        if (!ide_geper.isEmpty()) {
-            ide_geper = " AND CAB.ide_geper IN (" + ide_geper + ") ";
-        }
-
+    public String getSqlMovimientosCuenta(String ide_cndpc, String fechaInicio, String fechaFin) {
         return "SELECT CAB.fecha_trans_cnccc,CAB.ide_cnccc ,PERSO.nom_geper as BENEFICIARIO, "
                 + "DETA.ide_cnlap,'' as DEBE, '' as HABER, "
                 + "(DETA.valor_cndcc * sc.signo_cnscu) as valor_cndcc,'' as SALDO, CAB.observacion_cnccc as OBSERVACION,CAB.ide_geper "
@@ -129,7 +121,6 @@ public class ServicioContabilidadGeneral {
                 + "inner join con_signo_cuenta sc on tc.ide_cntcu=sc.ide_cntcu and DETA.ide_cnlap=sc.ide_cnlap "
                 + "WHERE CUENTA.ide_cndpc=" + ide_cndpc + " and fecha_trans_cnccc BETWEEN '" + fechaInicio + "' and '" + fechaFin + "' "
                 + "and ide_cneco in (" + utilitario.getVariable("p_con_estado_comp_inicial") + "," + utilitario.getVariable("p_con_estado_comprobante_normal") + "," + utilitario.getVariable("p_con_estado_comp_final") + ") "
-                + ide_geper
                 + "and cab.ide_sucu=" + utilitario.getVariable("ide_sucu") + " ORDER BY CAB.fecha_trans_cnccc,cab.ide_cnccc asc";
     }
 
