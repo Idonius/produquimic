@@ -22,7 +22,7 @@ public class ServicioIntegracion extends ServicioBase {
 
         TablaGenerica tab_cod = new TablaGenerica();
         tab_cod.setTabla("gen_persona", "ide_geper", -1);
-        tab_cod.setCondicion("es_cliente_geper=true and gen_ide_geper=5"); //antes 572
+        tab_cod.setCondicion("es_cliente_geper=true and gen_ide_geper=572");
         tab_cod.setGenerarPrimaria(false);
         tab_cod.ejecutarSql();
         tab_cod.getColumna("ide_geper").setExterna(false);
@@ -66,7 +66,7 @@ public class ServicioIntegracion extends ServicioBase {
             }
             tab_cod.insertar();
             tab_cod.setValor("ide_geper", String.valueOf(int_maximo_cliente));
-            tab_cod.setValor("gen_ide_geper", "5"); //antes 572
+            tab_cod.setValor("gen_ide_geper", "572");
             tab_cod.setValor("ide_empr", "0");
             tab_cod.setValor("ide_sucu", "0");
             String ide_getid = tab_clie.getValor(i, "cedula");
