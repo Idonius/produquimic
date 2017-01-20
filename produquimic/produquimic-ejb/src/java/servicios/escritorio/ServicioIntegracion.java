@@ -162,7 +162,8 @@ public class ServicioIntegracion extends ServicioBase {
     }
 
     public void importarFacturas() {
-        //cabeceras
+
+//cabeceras
         TablaGenerica tab_temp_cabecera = new TablaGenerica();
         tab_temp_cabecera.setTabla("cxc_cabece_factura", "ide_cccfa", 0);
         tab_temp_cabecera.setCondicion("ide_cccfa=-1");
