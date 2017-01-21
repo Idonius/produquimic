@@ -6,9 +6,11 @@
 package servicios.escritorio;
 
 import framework.aplicacion.TablaGenerica;
+import javax.ejb.EJB;
 import javax.ejb.Stateless;
 import persistencia.Conexion;
 import servicios.ServicioBase;
+import servicios.inventario.ServicioInventario;
 
 /**
  *
@@ -18,11 +20,15 @@ import servicios.ServicioBase;
 
 public class ServicioIntegracion extends ServicioBase {
 
-    public void importarClientes() {
+    @EJB
+    private ServicioInventario ser_inventario;
 
+    public String importarClientes() {
+        String str_ide_geper = "";
         TablaGenerica tab_cod = new TablaGenerica();
         tab_cod.setTabla("gen_persona", "ide_geper", -1);
         tab_cod.setCondicion("es_cliente_geper=true and gen_ide_geper=572");
+        tab_cod.getColumna("identificac_geper").setQuitarCaracteresEspeciales(true);
         tab_cod.setGenerarPrimaria(false);
         tab_cod.ejecutarSql();
         tab_cod.getColumna("ide_geper").setExterna(false);
@@ -42,14 +48,14 @@ public class ServicioIntegracion extends ServicioBase {
         }
 
         tab_clie.ejecutarSql();
-        long int_maximo_cliente = utilitario.getConexion().getMaximo("gen_persona", "ide_geper", 1);
+        long int_maximo_cliente = utilitario.getConexion().getMaximo("gen_persona", "ide_geper", tab_clie.getTotalFilas());
         TablaGenerica tab_cabcxc = new TablaGenerica();
         tab_cabcxc.setTabla("cxc_cabece_transa", "ide_ccctr", -1);
         tab_cabcxc.setCondicion("ide_ccctr=-1");
         tab_cabcxc.setGenerarPrimaria(false);
         tab_cabcxc.getColumna("ide_ccctr").setExterna(false);
         tab_cabcxc.ejecutarSql();
-        long int_maximo_cab = utilitario.getConexion().getMaximo("cxc_cabece_transa", "ide_ccctr", 1);
+        long int_maximo_cab = utilitario.getConexion().getMaximo("cxc_cabece_transa", "ide_ccctr", tab_clie.getTotalFilas());
 
         TablaGenerica tab_detcxc = new TablaGenerica();
         tab_detcxc.setTabla("cxc_detall_transa", "ide_ccdtr", -1);
@@ -57,7 +63,7 @@ public class ServicioIntegracion extends ServicioBase {
         tab_detcxc.setGenerarPrimaria(false);
         tab_detcxc.getColumna("ide_ccdtr").setExterna(false);
         tab_detcxc.ejecutarSql();
-        long int_maximo_det = utilitario.getConexion().getMaximo("cxc_detall_transa", "ide_ccdtr", 1);
+        long int_maximo_det = utilitario.getConexion().getMaximo("cxc_detall_transa", "ide_ccdtr", tab_clie.getTotalFilas());
 
         for (int i = 0; i < tab_clie.getTotalFilas(); i++) {
 
@@ -66,6 +72,10 @@ public class ServicioIntegracion extends ServicioBase {
             }
             tab_cod.insertar();
             tab_cod.setValor("ide_geper", String.valueOf(int_maximo_cliente));
+            if (str_ide_geper.isEmpty() == false) {
+                str_ide_geper += ",";
+            }
+            str_ide_geper += int_maximo_cliente;
             tab_cod.setValor("gen_ide_geper", "572");
             tab_cod.setValor("ide_empr", "0");
             tab_cod.setValor("ide_sucu", "0");
@@ -151,18 +161,18 @@ public class ServicioIntegracion extends ServicioBase {
         tab_cabcxc.guardar();
         tab_detcxc.guardar();
 
-        if (utilitario.getConexion().guardarPantalla().isEmpty()) {
+        if (utilitario.getConexion().ejecutarListaSql().isEmpty()) {
             if (tab_clie.getTotalFilas() > 0) {
                 utilitario.agregarMensaje("Se importaron correctamente ", tab_clie.getTotalFilas() + " CLIENTES del sistema de facturación");
-            } else {
-                utilitario.agregarMensajeInfo("El sistema tiene todos los clientes importados", "");
             }
         }
         con_conecta.desconectar(true);
+        return str_ide_geper;
     }
 
     public void importarFacturas() {
-
+        importarClientes();
+        importarProductos();
 //cabeceras
         TablaGenerica tab_temp_cabecera = new TablaGenerica();
         tab_temp_cabecera.setTabla("cxc_cabece_factura", "ide_cccfa", 0);
@@ -180,7 +190,7 @@ public class ServicioIntegracion extends ServicioBase {
         //Importo todas las facturas desde -01-01-2015
         tab_aux_cab.setSql("select * from facturas \n"
                 + "inner join clientes on facturas.COD_CLIE=clientes.COD_CLIE\n"
-                + "where FECHA >='2017-01-01' and MIGRADA is null");
+                + "where FECHA >='2016-12-01' and MIGRADA is null");
         tab_aux_cab.ejecutarSql();
 
         long int_no_cliente = 0;
@@ -231,8 +241,8 @@ public class ServicioIntegracion extends ServicioBase {
             tab_temp_cabecera.setValor("ide_ccdaf", "0");//datos factura
             tab_temp_cabecera.setValor("fecha_emisi_cccfa", tab_aux_cab.getValor(i, "FECHA"));
             tab_temp_cabecera.setValor("fecha_trans_cccfa", utilitario.getFechaActual());
-            tab_temp_cabecera.setValor("secuencial_cccfa", tab_aux_cab.getValor(i, "NUM_FACTURA"));
-
+            tab_temp_cabecera.setValor("secuencial_cccfa", utilitario.generarCero(9 - tab_aux_cab.getValor(i, "NUM_FACTURA").length()) + tab_aux_cab.getValor(i, "NUM_FACTURA"));
+            tab_temp_cabecera.setValor("fact_mig_cccfa", tab_aux_cab.getValor(i, "NUM_FACTURA"));
             tab_temp_cabecera.setValor("direccion_cccfa", tab_aux_cab.getValor(i, "DIR_CLIE"));
             tab_temp_cabecera.setValor("observacion_cccfa", "Venta de Quimicos ");
             tab_temp_cabecera.setValor("base_no_objeto_iva_cccfa", "0");
@@ -282,9 +292,9 @@ public class ServicioIntegracion extends ServicioBase {
             //guardo correctamente
             String str_facturas = tab_aux_cab.getStringColumna("NUM_FACTURA");
             //pone estado migrado
-            if (str_facturas.isEmpty() == false) {
-                con_conecta.ejecutarSql("UPDATE facturas set MIGRADA=1 where NUM_FACTURA in (" + str_facturas + ")");
-            }
+//            if (str_facturas.isEmpty() == false) {
+//                con_conecta.ejecutarSql("UPDATE facturas set MIGRADA=1 where NUM_FACTURA in (" + str_facturas + ")");
+//            }
 
             if (tab_aux_cab.getTotalFilas() > 0) {
                 utilitario.agregarMensaje("Se importaron correctamente ", tab_aux_cab.getTotalFilas() + " FACTURAS DE VENTAS del sistema de facturación");
@@ -296,8 +306,8 @@ public class ServicioIntegracion extends ServicioBase {
         }
     }
 
-    public void importarProductos() {
-
+    public String importarProductos() {
+        String str_ide_inarti = "";
         TablaGenerica tab_cod = new TablaGenerica();
         tab_cod.setTabla("inv_articulo", "ide_inarti", -1);
         tab_cod.setCondicion("inv_ide_inarti=46");
@@ -322,14 +332,36 @@ public class ServicioIntegracion extends ServicioBase {
 
         tab_quimi.ejecutarSql();
 
-        long int_maximo_articulo = utilitario.getConexion().getMaximo("inv_articulo", "ide_inarti", 1);
+        long int_maximo_articulo = utilitario.getConexion().getMaximo("inv_articulo", "ide_inarti", tab_quimi.getTotalFilas());
+
         TablaGenerica tab_inventario = new TablaGenerica();
         tab_inventario.setTabla("inv_det_comp_inve", "ide_indci", -1);
         tab_inventario.setCondicion("ide_indci=-1");
-        tab_inventario.ejecutarSql();
-        for (int i = 0; i < tab_quimi.getTotalFilas(); i++) {
 
+        TablaGenerica tab_cab_inventario = new TablaGenerica();
+        tab_cab_inventario.setTabla("inv_cab_comp_inve", "ide_incci", -1);
+        tab_cab_inventario.setCondicion("ide_incci=-1");
+        tab_cab_inventario.ejecutarSql();
+        tab_cab_inventario.insertar();
+        tab_cab_inventario.setValor("ide_geper", "542");
+        tab_cab_inventario.setValor("ide_inepi", "1");
+        tab_cab_inventario.setValor("ide_intti", "30");
+        tab_cab_inventario.setValor("ide_sucu", "0");
+        tab_cab_inventario.setValor("ide_empr", "0");
+        tab_cab_inventario.setValor("ide_usua", utilitario.getVariable("IDE_USUA"));
+        tab_cab_inventario.setValor("ide_inbod", "1");
+        tab_cab_inventario.setValor("numero_incci", ser_inventario.getSecuencialComprobanteInventario("1"));
+        tab_cab_inventario.setValor("fecha_trans_incci", utilitario.getFechaActual());
+        tab_cab_inventario.setValor("observacion_incci", "Importa Productos Saldo inicial al " + utilitario.getFechaActual());
+        tab_cab_inventario.setValor("fecha_siste_incci", utilitario.getFechaActual());
+        tab_cab_inventario.setValor("hora_sistem_incci", utilitario.getHoraActual());
+        tab_cab_inventario.guardar();
+        for (int i = 0; i < tab_quimi.getTotalFilas(); i++) {
             tab_cod.insertar();
+            if (str_ide_inarti.isEmpty() == false) {
+                str_ide_inarti += ",";
+            }
+            str_ide_inarti += int_maximo_articulo;
             tab_cod.setValor("ide_inarti", String.valueOf(int_maximo_articulo));
             tab_cod.setValor("inv_ide_inarti", "46");
             tab_cod.setValor("ide_empr", "0");
@@ -363,11 +395,17 @@ public class ServicioIntegracion extends ServicioBase {
             tab_cod.setValor("observacion_inarti", tab_quimi.getValor(i, "observa"));
             tab_cod.setValor("nivel_inarti", "HIJO");
 
+            if (tab_quimi.getValor(i, "controla") != null && tab_quimi.getValor(i, "controla").equals("true")) {
+                tab_cod.setValor("hace_kardex_inarti", "true");
+            } else {
+                tab_cod.setValor("hace_kardex_inarti", "false");
+            }
+
             tab_inventario.insertar();
             tab_inventario.setValor("ide_inarti", String.valueOf(int_maximo_articulo));
             tab_inventario.setValor("ide_empr", "0");
             tab_inventario.setValor("ide_sucu", "0");
-            tab_inventario.setValor("ide_incci", "0");
+            tab_inventario.setValor("ide_incci", tab_cab_inventario.getValor("ide_incci"));
             tab_inventario.setValor("precio_promedio_indci", tab_quimi.getValor(i, "precio_compra"));
             tab_inventario.setValor("precio_indci", tab_quimi.getValor(i, "precio_venta"));
             tab_inventario.setValor("cantidad_indci", tab_quimi.getValor(i, "existencia"));
@@ -378,21 +416,18 @@ public class ServicioIntegracion extends ServicioBase {
             }
 
             int_maximo_articulo++;
-
         }
         tab_cod.guardar();
         tab_inventario.guardar();
 
-        if (utilitario.getConexion().guardarPantalla().isEmpty()) {
+        if (utilitario.getConexion().ejecutarListaSql().isEmpty()) {
             if (tab_quimi.getTotalFilas() > 0) {
                 utilitario.agregarMensaje("Se importaron correctamente ", tab_quimi.getTotalFilas() + " PRODUCTOS QUIMICOS del sistema de facturación");
 
-            } else {
-                utilitario.agregarMensajeInfo("El sistema tiene todos los productos importados", "");
             }
         }
-
         con_conecta.desconectar(true);
+        return str_ide_inarti;
 
     }
 

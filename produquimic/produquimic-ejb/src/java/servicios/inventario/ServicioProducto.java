@@ -57,7 +57,7 @@ public class ServicioProducto {
      * @return
      */
     public String getSqlProductosCombo() {
-        return "SELECT ide_inarti,nombre_inarti from inv_articulo arti "
+        return "SELECT ide_inarti,nombre_inarti,codigo_inarti from inv_articulo arti "
                 + "where arti.ide_empr=" + utilitario.getVariable("ide_empr") + " and nivel_inarti='HIJO' ORDER BY nombre_inarti ";
     }
 
@@ -663,6 +663,13 @@ public class ServicioProducto {
                 + "AND a.IDE_SUCU =" + utilitario.getVariable("IDE_SUCU") + "\n"
                 + "group by a.ide_inarti,b.ide_geper,nom_geper\n"
                 + "order by 3,nom_geper desc";
+    }
+
+    public String getSqlDatosProducto(String ide_inarti) {
+        return "select ide_inarti,codigo_inarti CODIGO,nombre_inarti NOMBRE, nombre_inuni UNIDAD\n"
+                + "from inv_articulo a\n"
+                + "left join inv_unidad b on a.ide_inuni= b.ide_inuni\n"
+                + "where ide_inarti in (" + ide_inarti + ") order by nombre_inarti";
     }
 
 }

@@ -16,16 +16,17 @@ import framework.componentes.Etiqueta;
 import framework.componentes.Grid;
 import framework.componentes.Grupo;
 import framework.componentes.Link;
-import framework.componentes.MarcaAgua;
 import framework.componentes.MenuPanel;
 import framework.componentes.PanelArbol;
 import framework.componentes.PanelTabla;
 import framework.componentes.Tabla;
+import framework.componentes.Texto;
 import framework.componentes.graficos.GraficoCartesiano;
 import javax.ejb.EJB;
 import javax.faces.event.ActionEvent;
 import org.primefaces.component.fieldset.Fieldset;
 import org.primefaces.event.SelectEvent;
+import servicios.contabilidad.ServicioComprobanteContabilidad;
 import servicios.contabilidad.ServicioContabilidadGeneral;
 import servicios.cuentas_x_cobrar.ServicioCliente;
 import servicios.cuentas_x_cobrar.ServicioFacturaCxC;
@@ -65,11 +66,16 @@ public class pre_clientes extends Pantalla {
     private final ServicioPrestamo ser_prestamo = (ServicioPrestamo) utilitario.instanciarEJB(ServicioPrestamo.class);
 
     @EJB
+    private final ServicioComprobanteContabilidad ser_comp_conta = (ServicioComprobanteContabilidad) utilitario.instanciarEJB(ServicioComprobanteContabilidad.class);
+    @EJB
     private final ServicioIntegracion ser_integra = (ServicioIntegracion) utilitario.instanciarEJB(ServicioIntegracion.class);
 
     /*INFOMRES*/
     private GraficoCartesiano gca_grafico;
     private Combo com_periodo;
+
+    private Combo com_fac_pendientes;
+    private Texto tex_num_asiento;
 
     public pre_clientes() {
 
@@ -91,7 +97,7 @@ public class pre_clientes extends Pantalla {
         mep_menu.setMenuPanel("OPCIONES CLIENTE", "20%");
         mep_menu.agregarItem("Información Cliente", "dibujarCliente", "ui-icon-person");
         mep_menu.agregarItem("Clasificación Clientes", "dibujarEstructura", "ui-icon-arrow-4-diag");
-        mep_menu.agregarItem("Importar Clientes", "dibujarImportar", "ui-icon-refresh");
+        mep_menu.agregarItem("Importar Clientes", "dibujarImportar", "ui-icon-circle-arrow-n");
         mep_menu.agregarSubMenu("TRANSACCIONES");
         mep_menu.agregarItem("Transacciones Cliente", "dibujarTransacciones", "ui-icon-contact");
         mep_menu.agregarItem("Ingresar Transacción", "dibujarIngresarTransacciones", "ui-icon-contact");
@@ -109,11 +115,6 @@ public class pre_clientes extends Pantalla {
         agregarComponente(mep_menu);
         asc_asiento.setId("asc_asiento");
         agregarComponente(asc_asiento);
-    }
-
-    public void dibujarImportar() {
-        mep_menu.dibujar(13, "IMPORTAR CLIENTES", new Etiqueta("Se importa los clientes del sistema de facturación"));
-        ser_integra.importarClientes();
     }
 
     /**
@@ -167,6 +168,30 @@ public class pre_clientes extends Pantalla {
         } else {
             limpiar();
         }
+    }
+
+    public void dibujarImportar() {
+        tab_tabla = new Tabla();
+        tab_tabla.setId("tab_tabla");
+        String strImporta = ser_integra.importarClientes();
+        if (strImporta.isEmpty()) {
+            strImporta = "-1";
+        }
+        tab_tabla.setSql(ser_cliente.getSqlDatosClientes(strImporta));
+        tab_tabla.setCampoPrimaria("ide_geper");
+        tab_tabla.getColumna("ide_geper").setVisible(false);
+        tab_tabla.setEmptyMessage("El sistema tiene todos los clientes importados");
+        tab_tabla.setLectura(true);
+        tab_tabla.setRows(20);
+        tab_tabla.dibujar();
+        if (tab_tabla.getTotalFilas() > 0) {
+            aut_clientes.actualizar();
+        }
+        PanelTabla pat_panel = new PanelTabla();
+        pat_panel.setPanelTabla(tab_tabla);
+        pat_panel.getMenuTabla().getItem_buscar().setRendered(false);
+        mep_menu.dibujar(13, "IMPORTAR CLIENTES DEL SISTEMA DE FACTURACIÓN", pat_panel);
+
     }
 
     public void dibujarReporteCxC() {
@@ -297,6 +322,22 @@ public class pre_clientes extends Pantalla {
             PanelTabla pat_panel2 = new PanelTabla();
             pat_panel2.setPanelTabla(tab_tabla);
             pat_panel2.getMenuTabla().setRendered(false);
+
+            com_fac_pendientes = new Combo();
+            com_fac_pendientes.setCombo(ser_cliente.getSqlComboFacturasPorCobrar(aut_clientes.getValor()));
+            Grid gris = new Grid();
+            gris.setColumns(2);
+            gris.getChildren().add(new Etiqueta("<strong> CUENTA POR COBRAR : </strong>"));
+            gris.getChildren().add(com_fac_pendientes);
+
+            tex_num_asiento = new Texto();
+            tex_num_asiento.setSize(7);
+            tex_num_asiento.setSoloEnteros();
+            gris.getChildren().add(new Etiqueta("<strong>NÚMERO DE ASIENTO : </strong>"));
+            gris.getChildren().add(tex_num_asiento);
+
+            gru_grupo.getChildren().add(gris);
+
             gru_grupo.getChildren().add(pat_panel2);
         }
         mep_menu.dibujar(10, "INGRESAR TRANSACCIÓN", gru_grupo);
@@ -882,17 +923,46 @@ public class pre_clientes extends Pantalla {
             //Classificacion de Clientes
             guardarPantalla();
         } else if (mep_menu.getOpcion() == 10) {
-            TablaGenerica tab_cab = new TablaGenerica();
-            tab_cab.setTabla("cxc_cabece_transa", "ide_ccctr");
-            tab_cab.setCondicion("ide_ccctr=-1");
-            tab_cab.ejecutarSql();
-            tab_cab.insertar();
-            tab_cab.setValor("fecha_trans_ccctr", tab_tabla.getValor("fecha_trans_ccdtr"));
-            tab_cab.setValor("ide_geper", aut_clientes.getValor());
-            tab_cab.setValor("observacion_ccctr", tab_tabla.getValor("observacion_ccdtr"));
-            tab_cab.setValor("ide_ccttr", tab_tabla.getValor("ide_ccttr"));
-            tab_cab.guardar();
-            String ide_ccctr = tab_cab.getValor("ide_ccctr");
+            String ide_cnccc = null;
+            if (tex_num_asiento.getValue() != null) {
+                if (tex_num_asiento.getValue().toString().isEmpty() == false) {
+                    TablaGenerica tab_asiento = ser_comp_conta.getCabeceraComprobante(tex_num_asiento.getValue().toString());
+                    if (tab_asiento.isEmpty()) {
+                        utilitario.agregarMensajeError("El asiento contable Num. " + tex_num_asiento.getValue() + " no existe", "");
+                        return;
+                    } else {
+                        ide_cnccc = tex_num_asiento.getValue().toString();
+                    }
+                }
+            }
+            String ide_ccctr = null;
+            String ide_cccfa = null;
+            if (com_fac_pendientes.getValue() == null) {
+                TablaGenerica tab_cab = new TablaGenerica();
+                tab_cab.setTabla("cxc_cabece_transa", "ide_ccctr");
+                tab_cab.setCondicion("ide_ccctr=-1");
+                tab_cab.ejecutarSql();
+                tab_cab.insertar();
+                tab_cab.setValor("fecha_trans_ccctr", tab_tabla.getValor("fecha_trans_ccdtr"));
+                tab_cab.setValor("ide_geper", aut_clientes.getValor());
+                tab_cab.setValor("observacion_ccctr", tab_tabla.getValor("observacion_ccdtr"));
+                tab_cab.setValor("ide_ccttr", tab_tabla.getValor("ide_ccttr"));
+                tab_cab.guardar();
+                ide_ccctr = tab_cab.getValor("ide_ccctr");
+            } else {
+                ide_ccctr = com_fac_pendientes.getValue().toString();
+                ide_cccfa = utilitario.consultar("select ide_ccctr,ide_cccfa from cxc_detall_transa where ide_ccctr=" + ide_ccctr + " and numero_pago_ccdtr=0  order by ide_ccctr").getValor("ide_cccfa");
+                tab_tabla.setValor("numero_pago_ccdtr", "1");
+                tab_tabla.setValor("ide_cccfa", ide_cccfa);
+            }
+            if (ide_cnccc != null) {
+                //Asigna num de asiento a documento cxc y a transaccion cxc
+                utilitario.getConexion().agregarSqlPantalla("UPDATE cxc_cabece_factura set ide_cnccc=" + ide_cnccc + " WHERE ide_cccfa=" + ide_cccfa);
+                if (ide_cccfa != null) {
+                    utilitario.getConexion().agregarSqlPantalla("UPDATE cxc_detall_transa set ide_cnccc=" + ide_cnccc + " WHERE ide_ccctr=" + ide_ccctr + " and ide_cnccc is null");
+                }
+            }
+
             tab_tabla.setValor("fecha_venci_ccdtr", tab_tabla.getValor("fecha_trans_ccdtr"));
             tab_tabla.setValor("ide_ccctr", ide_ccctr);
             tab_tabla.guardar();

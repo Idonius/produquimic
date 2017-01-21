@@ -28,6 +28,7 @@ import org.primefaces.event.SelectEvent;
 import servicios.contabilidad.ServicioComprobanteContabilidad;
 import servicios.contabilidad.ServicioContabilidadGeneral;
 import servicios.cuentas_x_cobrar.ServicioFacturaCxC;
+import servicios.escritorio.ServicioIntegracion;
 import servicios.inventario.ServicioProducto;
 import sistema.aplicacion.Pantalla;
 
@@ -69,6 +70,9 @@ public class pre_articulos extends Pantalla {
     private GraficoCartesiano gca_grafico;
     private Combo com_periodo;
 
+    @EJB
+    private final ServicioIntegracion ser_integra = (ServicioIntegracion) utilitario.instanciarEJB(ServicioIntegracion.class);
+
     public pre_articulos() {
         bar_botones.quitarBotonsNavegacion();
         bar_botones.agregarComponente(new Etiqueta("PRODUCTO :"));
@@ -87,6 +91,7 @@ public class pre_articulos extends Pantalla {
         mep_menu.setMenuPanel("OPCIONES PRODUCTO", "20%");
         mep_menu.agregarItem("Información Producto", "dibujarProducto", "ui-icon-cart");
         mep_menu.agregarItem("Clasificación Productos", "dibujarEstructura", "ui-icon-arrow-4-diag");
+        mep_menu.agregarItem("Importar Productos", "dibujarImportar", "ui-icon-circle-arrow-n");
         mep_menu.agregarSubMenu("TRANSACCIONES");
         mep_menu.agregarItem("Kardex", "dibujarKardex", "ui-icon-contact");
         mep_menu.agregarItem("Facturas de Ventas", "dibujarVentas", "ui-icon-calculator");
@@ -100,6 +105,30 @@ public class pre_articulos extends Pantalla {
         mep_menu.agregarItem("Últimos Precios", "dibujarPrecios", "ui-icon-cart");
 
         agregarComponente(mep_menu);
+
+    }
+
+    public void dibujarImportar() {
+        tab_tabla = new Tabla();
+        tab_tabla.setId("tab_tabla");
+        String strImporta = ser_integra.importarProductos();
+        if (strImporta.isEmpty()) {
+            strImporta = "-1";
+        }
+        tab_tabla.setSql(ser_producto.getSqlDatosProducto(strImporta));
+        tab_tabla.setCampoPrimaria("ide_inarti");
+        tab_tabla.getColumna("ide_inarti").setVisible(false);
+        tab_tabla.setEmptyMessage("El sistema tiene todos los productos importados");
+        tab_tabla.setLectura(true);
+        tab_tabla.setRows(20);
+        tab_tabla.dibujar();
+        if (tab_tabla.getTotalFilas() > 0) {
+            aut_productos.actualizar();
+        }
+        PanelTabla pat_panel = new PanelTabla();
+        pat_panel.setPanelTabla(tab_tabla);
+        pat_panel.getMenuTabla().getItem_buscar().setRendered(false);
+        mep_menu.dibujar(13, "IMPORTAR PRODUCTOS DEL SISTEMA DE FACTURACIÓN", pat_panel);
 
     }
 
