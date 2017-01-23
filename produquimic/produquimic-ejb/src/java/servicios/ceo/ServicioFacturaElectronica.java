@@ -7,7 +7,6 @@ package servicios.ceo;
 
 import framework.aplicacion.TablaGenerica;
 import javax.ejb.Stateless;
-import javax.ejb.LocalBean;
 import servicios.ServicioBase;
 
 /**
@@ -19,13 +18,7 @@ import servicios.ServicioBase;
 public class ServicioFacturaElectronica extends ServicioBase {
 
     public String generarFacturaElectronica(String ide_cccfa) {
-        String ide_srcom = null;
-        TablaGenerica tab_cabecara = new TablaGenerica();
-        tab_cabecara.setSql("SELECT * from sri_comprobante where ide_srcom=-1");
-        tab_cabecara.ejecutarSql();
-        TablaGenerica tab_detalle = new TablaGenerica();
-        tab_detalle.setSql("SELECT * from sri_detalle_comprobante where ide_srdec=-1");
-        tab_detalle.ejecutarSql();
+        String ide_srcom = "-1";
 
         TablaGenerica tab_factura = utilitario.consultar("select a.ide_cccfa,secuencial_cccfa,fecha_emisi_cccfa,serie_ccdaf,base_grabada_cccfa\n"
                 + ",base_tarifa0_cccfa,valor_iva_cccfa,total_cccfa,alterno_ats,identificac_geper\n"
@@ -40,37 +33,61 @@ public class ServicioFacturaElectronica extends ServicioBase {
                 + "where a.ide_cccfa=" + ide_cccfa);
 
         if (tab_factura.isEmpty() == false) {
+            if (tab_factura.getValor("ide_srcom") != null) {
+                ide_srcom = tab_factura.getValor("ide_srcom");
+            }
+            TablaGenerica tab_cabecara = new TablaGenerica();
+            tab_cabecara.setSql("SELECT * from sri_comprobante where ide_srcom=" + ide_srcom);
+            tab_cabecara.ejecutarSql();
+            TablaGenerica tab_detalle = new TablaGenerica();
+            tab_detalle.setSql("SELECT * from sri_detalle_comprobante where ide_srcom=" + ide_srcom);
+            tab_detalle.ejecutarSql();
+
             //Inserta cabecera
-            tab_cabecara.insertar();
-            tab_cabecara.setValor("", "");
-            tab_cabecara.setValor("", "");
-            tab_cabecara.setValor("", "");
-            tab_cabecara.setValor("", "");
-            tab_cabecara.setValor("", "");
-            tab_cabecara.setValor("", "");
-            tab_cabecara.setValor("", "");
-            tab_cabecara.setValor("", "");
-            tab_cabecara.setValor("", "");
-            tab_cabecara.setValor("", "");
-            tab_cabecara.setValor("", "");
-            tab_cabecara.setValor("", "");
-            tab_cabecara.setValor("", "");
-            tab_cabecara.setValor("", "");
-            tab_cabecara.setValor("", "");
+            if (tab_cabecara.isEmpty()) {
+                tab_cabecara.insertar();
+            }
+            tab_cabecara.setValor("ide_sresc", "");
+            tab_cabecara.setValor("coddoc_srcom", "");
+            tab_cabecara.setValor("tipoemision_srcom", "");
+            tab_cabecara.setValor("estab_srcom", "");
+            tab_cabecara.setValor("ptoemi_srcom", "");
+            tab_cabecara.setValor("fechaemision_srcom", "");
+            tab_cabecara.setValor("fecha_sistema_srcom", "");
+            tab_cabecara.setValor("ip_genera_srcom", "");
+            tab_cabecara.setValor("subtotal_srcom", "");
+            tab_cabecara.setValor("subtotal0_srcom", "");
+            tab_cabecara.setValor("base_grabada_srcom", "");
+            tab_cabecara.setValor("iva_srcom", "");
+            tab_cabecara.setValor("descuento_srcom", "");
+            tab_cabecara.setValor("total_srcom", "");
+            tab_cabecara.setValor("identificacion_srcom", "");
+            tab_cabecara.setValor("en_nube_srcom", "false");
+            tab_cabecara.setValor("ide_geper", "");
+            tab_cabecara.setValor("ide_cntdo", "");
+            tab_cabecara.setValor("ide_empr", "");
+            tab_cabecara.setValor("ide_sucu", "");
+           
             tab_cabecara.guardar();
+            ide_srcom = tab_factura.getValor("ide_srcom");
+            if (tab_detalle.isEmpty() == false) {
+                for (int i = 0; i < tab_factura.getTotalFilas(); i++) {
+                    tab_factura.eliminar();
+                }
+            }
             for (int i = 0; i < tab_factura.getTotalFilas(); i++) {
                 tab_detalle.insertar();
-                tab_detalle.setValor("", "");
-                tab_detalle.setValor("", "");
-                tab_detalle.setValor("", "");
-                tab_detalle.setValor("", "");
-                tab_detalle.setValor("", "");
-                tab_detalle.setValor("", "");
-                tab_detalle.setValor("", "");
-                tab_detalle.setValor("", "");
-                tab_detalle.setValor("", "");
-                tab_detalle.setValor("", "");
+                tab_detalle.setValor("ide_srcom", ide_srcom);
+                tab_detalle.setValor("codigo_principal_srdec", "");
+                tab_detalle.setValor("codigo_auxiliar_srdec", "");
+                tab_detalle.setValor("descripcion_srdec", "");
+                tab_detalle.setValor("cantidad_srdec", "");
+                tab_detalle.setValor("precio_srdec", "");
+                tab_detalle.setValor("descuento_detalle_srdec", "");
+                tab_detalle.setValor("total_detalle_srdec", "");
+                tab_detalle.setValor("porcentaje_iva_srdec", "");
             }
+            tab_detalle.guardar();
         }
 
         return ide_srcom;
