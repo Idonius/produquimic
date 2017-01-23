@@ -110,7 +110,19 @@ public final class Comprobante implements Serializable {
             this.formaCobro = resultado.getString("forma_cobre_srcom");
 
             this.fechaautoriza = resultado.getDate("fechaautoriza_srcom");
-            cliente = new Cliente(resultado);
+
+            //Busca el cliente
+            try {
+                ConexionCEO con = new ConexionCEO();
+                ResultSet res = con.consultar("SELECT ide_geper,identificac_geper,ide_getid,nom_geper,direccion_geper,telefono_geper,movil_geper,correo_geper FROM gen_persona  where ide_geper=" + resultado.getString("ide_geper"));
+                if (res.next()) {
+                    cliente = new Cliente(res);
+                }
+                res.close();
+                con.desconectar();
+            } catch (GenericException | SQLException e) {
+                e.printStackTrace();
+            }
 
         } catch (SQLException e) {
             e.printStackTrace();
