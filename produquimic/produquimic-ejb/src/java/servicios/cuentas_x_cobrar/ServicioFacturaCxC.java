@@ -5,7 +5,7 @@
  */
 package servicios.cuentas_x_cobrar;
 
-import comprobantesElectronicos.dao.ComprobanteDAOLocal;
+
 import framework.aplicacion.TablaGenerica;
 import framework.componentes.Tabla;
 import java.util.List;

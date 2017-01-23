@@ -20,6 +20,7 @@ import framework.componentes.Tabla;
 import framework.componentes.Tabulador;
 import framework.componentes.Texto;
 import java.util.List;
+import java.util.Map;
 import javax.ejb.EJB;
 import javax.faces.event.AjaxBehaviorEvent;
 import org.primefaces.event.SelectEvent;
@@ -102,7 +103,15 @@ public class FacturaCxC extends Dialogo {
     private Tabla tab_creacion_producto;
     private Dialogo dia_creacion_producto;
 
+    private final Map<String, String> parametros;
+
     public FacturaCxC() {
+        parametros = utilitario.getVariables("p_con_tipo_documento_factura",
+                "p_cxc_estado_factura_normal", "p_con_for_pag_reembolso_caja",
+                "p_con_estado_comprobante_rete_normal",
+                "p_sri_activa_comp_elect", "p_sri_ambiente_comp_elect",
+                "p_con_deta_pago_efectivo");
+
         this.setWidth("95%");
         this.setHeight("90%");
         this.setTitle("GENERAR FACTURA DE VENTA");
@@ -439,9 +448,9 @@ public class FacturaCxC extends Dialogo {
         tab_cab_factura.getColumna("telefono_cccfa").setNombreVisual("TELEFONO");
         tab_cab_factura.getColumna("telefono_cccfa").setOrden(5);
         tab_cab_factura.getColumna("ide_cntdo").setVisible(false);
-        tab_cab_factura.getColumna("ide_cntdo").setValorDefecto(utilitario.getVariable("p_con_tipo_documento_factura"));
+        tab_cab_factura.getColumna("ide_cntdo").setValorDefecto(parametros.get("p_con_tipo_documento_factura"));
         tab_cab_factura.getColumna("ide_ccefa").setVisible(false);
-        tab_cab_factura.getColumna("ide_ccefa").setValorDefecto(utilitario.getVariable("p_cxc_estado_factura_normal"));
+        tab_cab_factura.getColumna("ide_ccefa").setValorDefecto(parametros.get("p_cxc_estado_factura_normal"));
         tab_cab_factura.getColumna("ide_geubi").setVisible(false);
         tab_cab_factura.getColumna("ide_usua").setValorDefecto(utilitario.getVariable("ide_usua"));
         tab_cab_factura.getColumna("ide_usua").setVisible(false);
@@ -481,7 +490,7 @@ public class FacturaCxC extends Dialogo {
         tab_cab_factura.getColumna("base_tarifa0_cccfa").setEtiqueta();
         tab_cab_factura.getColumna("base_tarifa0_cccfa").setEstilo("font-size: 16px;font-weight: bold;text-decoration: underline");
         tab_cab_factura.getColumna("base_tarifa0_cccfa").setValorDefecto("0");
-        tab_cab_factura.getColumna("ide_cndfp").setCombo("con_deta_forma_pago", "ide_cndfp", "nombre_cndfp", "ide_cndfp!=" + utilitario.getVariable("p_con_for_pag_reembolso_caja"));
+        tab_cab_factura.getColumna("ide_cndfp").setCombo("con_deta_forma_pago", "ide_cndfp", "nombre_cndfp", "ide_cndfp!=" + parametros.get("p_con_for_pag_reembolso_caja"));
         tab_cab_factura.getColumna("ide_cndfp").setOrden(4);
         tab_cab_factura.getColumna("ide_cndfp").setNombreVisual("FORMA DE PAGO");
         tab_cab_factura.getColumna("ide_cndfp").setEstilo("width:140px");
@@ -492,7 +501,7 @@ public class FacturaCxC extends Dialogo {
         tab_cab_factura.getColumna("DIRECCION_CCCFA").setNombreVisual("DIRECCIÓN");
         tab_cab_factura.getColumna("DIRECCION_CCCFA").setRequerida(true);
         tab_cab_factura.getColumna("OBSERVACION_CCCFA").setVisible(false);
-        //tab_cab_factura.getColumna("ide_cndfp").setValorDefecto(utilitario.getVariable("p_con_deta_pago_efectivo"));
+        //tab_cab_factura.getColumna("ide_cndfp").setValorDefecto(`parametros.get("p_con_deta_pago_efectivo"));
         tab_cab_factura.getColumna("solo_guardar_cccfa").setVisible(false);
         tab_cab_factura.getColumna("ide_geubi").setVisible(false);
         tab_cab_factura.getColumna("ide_usua").setVisible(false);
@@ -703,7 +712,7 @@ public class FacturaCxC extends Dialogo {
         tab_cab_retencion.agregarRelacion(tab_det_retencion);
         tab_cab_retencion.getColumna("ide_cnccc").setVisible(false);
         tab_cab_retencion.getColumna("ide_cnere").setVisible(false);
-        tab_cab_retencion.getColumna("ide_cnere").setValorDefecto(utilitario.getVariable("p_con_estado_comprobante_rete_normal"));
+        tab_cab_retencion.getColumna("ide_cnere").setValorDefecto(parametros.get("p_con_estado_comprobante_rete_normal"));
         tab_cab_retencion.getColumna("es_venta_cncre").setValorDefecto("true");
         tab_cab_retencion.getColumna("es_venta_cncre").setVisible(false);
         tab_cab_retencion.getColumna("numero_cncre").setMascara("999-999-99999999");
@@ -966,14 +975,14 @@ public class FacturaCxC extends Dialogo {
                 }
                 String ide_srcom = null; //IDE COMPROBANTE ELECTRONICO
                 //SI ESTA ACTIVA FACTURACION ELECTRONICA
-                if (utilitario.getVariable("p_sri_activa_comp_elect") != null && utilitario.getVariable("p_sri_activa_comp_elect").equalsIgnoreCase("true")) {
+                if (isFacturaElectronica()) {
                     ide_srcom = ser_factura.guardarComprobanteElectronicoFactura(tab_cab_factura, tab_deta_factura);
                     if (ide_srcom == null) {
                         return;
                     }
                 }
                 if (utilitario.getConexion().guardarPantalla().isEmpty()) {
-                    if ((utilitario.getVariable("p_sri_activa_comp_elect").equalsIgnoreCase("true")) && ide_srcom != null) { //*******SI ESTA ACTIVADO ONLINE DE COMPROBANTES ELECTRONICOS
+                    if (isFacturaElectronica() && ide_srcom != null) { //*******SI ESTA ACTIVADO ONLINE DE COMPROBANTES ELECTRONICOS
                         facturacionElectronica(ide_srcom);
                     }
                     this.cerrar();
@@ -1035,13 +1044,13 @@ public class FacturaCxC extends Dialogo {
      * @param ide_srcom
      */
     private void facturacionElectronica(String ide_srcom) {
-        if (utilitario.getVariable("p_sri_activa_comp_elect").equalsIgnoreCase("true")) {
+        if (isFacturaElectronica()) {
             ser_comprobante.generarComprobanteElectronico(ide_srcom);
             TablaGenerica tab_comprobante = ser_comprobante.getComprobante(ide_srcom);
             TablaGenerica tab_xml_sri = ser_comprobante.getXmlComprobante(ide_srcom);
             if (tab_xml_sri.isEmpty() == false) {
                 String mensje = "<p> FACTURA NRO. " + tab_cab_factura.getValor("secuencial_cccfa");
-                mensje += "</br>AMBIENTE : <strong>" + (utilitario.getVariable("p_sri_ambiente_comp_elect").equals("1") ? "PRUEBAS" : "PRODUCCIÓN") + "</strong>";  //********variable ambiente facturacion electronica
+                mensje += "</br>AMBIENTE : <strong>" + (parametros.get("p_sri_ambiente_comp_elect").equals("1") ? "PRUEBAS" : "PRODUCCIÓN") + "</strong>";  //********variable ambiente facturacion electronica
                 mensje += "</br>CLAVE DE ACCESO : <span style='font-size:12px;'>" + tab_comprobante.getValor("claveacceso_srcom") + "</span></p>";
                 mensje += "<p>ESTADO : <strong>" + ser_comprobante.getEstadoComprobante(tab_xml_sri.getValor("ide_sresc")) + "</strong></p>";
 
@@ -1200,6 +1209,18 @@ public class FacturaCxC extends Dialogo {
         tab_creacion_cliente.limpiar();
         tab_creacion_cliente.insertar();
         dia_creacion_cliente.dibujar();
+    }
+
+    public boolean isFacturaElectronica() {
+        String p_sri_activa_comp_elect = parametros.get("p_sri_activa_comp_elect");
+        if (p_sri_activa_comp_elect == null) {
+            return false;
+        }
+        if (p_sri_activa_comp_elect.equalsIgnoreCase("true")) {
+            return true;
+        } else {
+            return false;
+        }
     }
 
     public Tabla getTab_cab_factura() {

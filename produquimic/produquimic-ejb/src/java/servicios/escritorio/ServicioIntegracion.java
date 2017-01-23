@@ -46,7 +46,6 @@ public class ServicioIntegracion extends ServicioBase {
             tab_clie.setCampoPrimaria("cod_clie");
             tab_clie.setSql("select * from clientes");
         }
-
         tab_clie.ejecutarSql();
         long int_maximo_cliente = utilitario.getConexion().getMaximo("gen_persona", "ide_geper", tab_clie.getTotalFilas());
         TablaGenerica tab_cabcxc = new TablaGenerica();
@@ -170,17 +169,22 @@ public class ServicioIntegracion extends ServicioBase {
         return str_ide_geper;
     }
 
-    public void importarFacturas() {
+    public void importarFacturas(String fecha) {
+        fecha = "2016-12-01";//utilitario.getFechaActual();
         importarClientes();
         importarProductos();
 //cabeceras
         TablaGenerica tab_temp_cabecera = new TablaGenerica();
         tab_temp_cabecera.setTabla("cxc_cabece_factura", "ide_cccfa", 0);
-        tab_temp_cabecera.setCondicion("ide_cccfa=-1");
+        tab_temp_cabecera.setCondicion("fact_mig_cccfa is not null and fecha_emisi_cccfa>='" + fecha + "'");
         tab_temp_cabecera.setGenerarPrimaria(false);
         tab_temp_cabecera.getColumna("ide_cccfa").setExterna(false);
         tab_temp_cabecera.ejecutarSql();
-
+        String fact_mig_cccfa = tab_temp_cabecera.getStringColumna("fact_mig_cccfa");
+        if (!fact_mig_cccfa.isEmpty()) {
+            fact_mig_cccfa = "and NUM_FACTURA NOT IN (" + fact_mig_cccfa + ")";
+        }
+        tab_temp_cabecera.limpiar();
         Conexion con_conecta = new Conexion();
         con_conecta.setUnidad_persistencia("sistemaEscritotio");
         con_conecta.conectar(true);
@@ -190,16 +194,17 @@ public class ServicioIntegracion extends ServicioBase {
         //Importo todas las facturas desde -01-01-2015
         tab_aux_cab.setSql("select * from facturas \n"
                 + "inner join clientes on facturas.COD_CLIE=clientes.COD_CLIE\n"
-                + "where FECHA >='2016-12-01' and MIGRADA is null");
+                + "where FECHA >='" + fecha + "' "
+                + fact_mig_cccfa
+                + " order by NUM_FACTURA limit 25");
         tab_aux_cab.ejecutarSql();
 
-        long int_no_cliente = 0;
-        long long_max = utilitario.getConexion().getMaximo("cxc_cabece_factura", "ide_cccfa", 1);
+        long long_max = utilitario.getConexion().getMaximo("cxc_cabece_factura", "ide_cccfa", tab_aux_cab.getTotalFilas());
+        String str_iva = "1"; //por defecto si iva
         for (int i = 0; i < tab_aux_cab.getTotalFilas(); i++) {
             ///Buscamos el ideGeper si existe inserta
-            TablaGenerica tab_clie = utilitario.consultar("Select * from gen_persona where identificac_geper='" + tab_aux_cab.getValor(i, "CEDULA") + "'");
+            TablaGenerica tab_clie = utilitario.consultar("Select ide_geper,ide_geper from gen_persona where identificac_geper='" + tab_aux_cab.getValor(i, "CEDULA") + "'");
             if (tab_clie.getTotalFilas() == 0) {
-                int_no_cliente++;
                 continue;
             }
             tab_temp_cabecera.insertar();
@@ -209,6 +214,9 @@ public class ServicioIntegracion extends ServicioBase {
             String str_anulada = tab_aux_cab.getValor(i, "TOTAL");
             if (str_anulada != null) {
                 tab_temp_cabecera.setValor("ide_ccefa", utilitario.getVariable("p_cxc_estado_factura_normal"));
+                if (!tab_aux_cab.getValor(i, "VENTAS0").equals("0")) {
+                    str_iva = "0"; //no iva
+                }
             } else {
                 tab_temp_cabecera.setValor("ide_ccefa", utilitario.getVariable("p_cxc_estado_factura_anulada"));
             }
@@ -217,37 +225,42 @@ public class ServicioIntegracion extends ServicioBase {
             tab_temp_cabecera.setValor("ide_usua", utilitario.getVariable("ide_usua"));
             //Forma de pago
             tab_temp_cabecera.setValor("ide_cndfp", "");
-            String str_forma = tab_aux_cab.getValor(i, "FORMA");
-            if (str_forma == null || str_forma.isEmpty()) {
-                str_forma = "CONTADO";
-            }
-            //EFECTIVO =0
-            //CREDITO 30 =2
-            //CREDITO 45 =3
-            //CREDITO 60 =6
-            String str_cod_forma_pago = "";
-            if (str_forma.equalsIgnoreCase("CONTADO")) {
-                str_cod_forma_pago = "0";
-            } else if (str_forma.equalsIgnoreCase("CRÉDITO 30 DIAS")) {
-                str_cod_forma_pago = "2";
-            }
-            if (str_forma.equalsIgnoreCase("CRÉDITO 45 DIAS")) {
-                str_cod_forma_pago = "3";
-            }
-            if (str_forma.equalsIgnoreCase("CRÉDITO 60 DIAS")) {
-                str_forma = "6";
-            }
-            tab_temp_cabecera.setValor("ide_cndfp", str_cod_forma_pago);
+            String str_forma_pago = "0";  //por defecto 0 
+//            if (str_forma == null || str_forma.isEmpty()) {
+//                str_forma = "CONTADO";
+//            }
+//            //EFECTIVO =0
+//            //CREDITO 30 =2
+//            //CREDITO 45 =3
+//            //CREDITO 60 =6
+//            String str_cod_forma_pago = "";
+//            if (str_forma.equalsIgnoreCase("CONTADO")) {
+//                str_cod_forma_pago = "0";
+//            } else if (str_forma.equalsIgnoreCase("CRÉDITO 30 DIAS")) {
+//                str_cod_forma_pago = "0";
+//            }
+//            if (str_forma.equalsIgnoreCase("CRÉDITO 45 DIAS")) {
+//                str_cod_forma_pago = "0";
+//            }
+//            if (str_forma.equalsIgnoreCase("CRÉDITO 60 DIAS")) {
+//                str_forma = "0";
+//            }
+            tab_temp_cabecera.setValor("ide_cndfp", str_forma_pago);
             tab_temp_cabecera.setValor("ide_ccdaf", "0");//datos factura
             tab_temp_cabecera.setValor("fecha_emisi_cccfa", tab_aux_cab.getValor(i, "FECHA"));
             tab_temp_cabecera.setValor("fecha_trans_cccfa", utilitario.getFechaActual());
             tab_temp_cabecera.setValor("secuencial_cccfa", utilitario.generarCero(9 - tab_aux_cab.getValor(i, "NUM_FACTURA").length()) + tab_aux_cab.getValor(i, "NUM_FACTURA"));
             tab_temp_cabecera.setValor("fact_mig_cccfa", tab_aux_cab.getValor(i, "NUM_FACTURA"));
             tab_temp_cabecera.setValor("direccion_cccfa", tab_aux_cab.getValor(i, "DIR_CLIE"));
-            tab_temp_cabecera.setValor("observacion_cccfa", "Venta de Quimicos ");
+            tab_temp_cabecera.setValor("telefono_cccfa", tab_aux_cab.getValor(i, "TELEF1"));
+            tab_temp_cabecera.setValor("observacion_cccfa", "Venta de Quimicos - " + tab_aux_cab.getValor(i, "FORMA"));
             tab_temp_cabecera.setValor("base_no_objeto_iva_cccfa", "0");
-            tab_temp_cabecera.setValor("base_tarifa0_cccfa", tab_aux_cab.getValor(i, "VENTAS0"));
-            tab_temp_cabecera.setValor("base_grabada_cccfa", tab_aux_cab.getValor(i, "VENTAS12"));
+            if (str_iva.equals("1")) {
+                tab_temp_cabecera.setValor("base_tarifa0_cccfa", tab_aux_cab.getValor(i, "SUBTOTAL"));
+            } else {
+                tab_temp_cabecera.setValor("base_grabada_cccfa", tab_aux_cab.getValor(i, "SUBTOTAL"));
+            }
+
             tab_temp_cabecera.setValor("valor_iva_cccfa", tab_aux_cab.getValor(i, "IVA"));
             tab_temp_cabecera.setValor("total_cccfa", tab_aux_cab.getValor(i, "TOTAL"));
             tab_temp_cabecera.setValor("pagado_cccfa", "false");
@@ -266,7 +279,7 @@ public class ServicioIntegracion extends ServicioBase {
         for (int i = 0; i < tab_temp_cabecera.getTotalFilas(); i++) {
             tab_aux_deta.setSql("select * from detalle_facturas \n"
                     + "inner JOIN productos on detalle_facturas.COD_PROD=productos.COD_PROD\n"
-                    + "where NUM_FACTURA=" + tab_temp_cabecera.getValor(i, "secuencial_cccfa"));
+                    + "where NUM_FACTURA=" + tab_temp_cabecera.getValor(i, "fact_mig_cccfa"));
             tab_aux_deta.ejecutarSql();
             for (int j = 0; j < tab_aux_deta.getTotalFilas(); j++) {
                 //Busco el ide del articulo 
@@ -278,6 +291,7 @@ public class ServicioIntegracion extends ServicioBase {
                     tab_temp_detalle.setValor("cantidad_ccdfa", tab_aux_deta.getValor(j, "CANTIDAD"));
                     tab_temp_detalle.setValor("precio_ccdfa", tab_aux_deta.getValor(j, "PRECIO"));
                     tab_temp_detalle.setValor("total_ccdfa", tab_aux_deta.getValor(j, "PTOTAL"));
+                    tab_temp_detalle.setValor("iva_inarti_ccdfa", str_iva);
                     tab_temp_detalle.setValor("observacion_ccdfa", tab_aux_deta.getValor(j, "DETALLE"));
                     tab_temp_detalle.setValor("alterno_ccdfa", "00");
                     tab_temp_detalle.setValor("credito_tributario_ccdfa", "false");
@@ -288,7 +302,7 @@ public class ServicioIntegracion extends ServicioBase {
 
         tab_temp_cabecera.guardar();
         tab_temp_detalle.guardar();
-        if (utilitario.getConexion().guardarPantalla().isEmpty()) {
+        if (utilitario.getConexion().ejecutarListaSql().isEmpty()) {
             //guardo correctamente
             String str_facturas = tab_aux_cab.getStringColumna("NUM_FACTURA");
             //pone estado migrado
