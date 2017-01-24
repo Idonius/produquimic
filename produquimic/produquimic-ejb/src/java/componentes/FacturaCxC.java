@@ -61,6 +61,7 @@ public class FacturaCxC extends Dialogo {
     private final Tabulador tab_factura = new Tabulador();
     private Tabla tab_cab_factura = new Tabla();
     private Tabla tab_deta_factura = new Tabla();
+    private Tabla tab_electronica = new Tabla();
     private final AreaTexto ate_observacion = new AreaTexto();
     private final Texto tex_subtotal12 = new Texto();
     private final Texto tex_subtotal0 = new Texto();
@@ -445,6 +446,8 @@ public class FacturaCxC extends Dialogo {
         tab_cab_factura.getColumna("ide_cncre").setVisible(false);
         tab_cab_factura.getColumna("ide_vgven").setVisible(false);
 
+        tab_cab_factura.getColumna("ide_srcom").setVisible(false);  //FE
+
         tab_cab_factura.getColumna("telefono_cccfa").setNombreVisual("TELEFONO");
         tab_cab_factura.getColumna("telefono_cccfa").setOrden(5);
         tab_cab_factura.getColumna("ide_cntdo").setVisible(false);
@@ -472,10 +475,17 @@ public class FacturaCxC extends Dialogo {
         tab_cab_factura.getColumna("total_cccfa").setEtiqueta();
         tab_cab_factura.getColumna("total_cccfa").setEstilo("font-size: 16px;font-weight: bold;text-decoration: underline");
         tab_cab_factura.getColumna("total_cccfa").setValorDefecto("0");
+
+        if (isFacturaElectronica()) {
+            tab_cab_factura.getColumna("secuencial_cccfa").setLectura(true);
+            tab_cab_factura.getColumna("secuencial_cccfa").setRequerida(false);
+        } else {
+            tab_cab_factura.getColumna("secuencial_cccfa").setRequerida(true);
+        }
+
         tab_cab_factura.getColumna("secuencial_cccfa").setEstilo("font-size: 14px;font-weight: bold;text-align: right;");
         tab_cab_factura.getColumna("secuencial_cccfa").setLongitud(10);
         tab_cab_factura.getColumna("secuencial_cccfa").setOrden(1);
-        tab_cab_factura.getColumna("secuencial_cccfa").setRequerida(true);
         tab_cab_factura.getColumna("secuencial_cccfa").setNombreVisual("SECUENCIAL");
         tab_cab_factura.getColumna("secuencial_cccfa").setMascara("999999999");
         tab_cab_factura.getColumna("base_grabada_cccfa").setEtiqueta();
@@ -517,10 +527,42 @@ public class FacturaCxC extends Dialogo {
         tab_cab_factura.setRecuperarLectura(true);
         tab_cab_factura.dibujar();
 
+        if (isFacturaElectronica()) {
+            tab_electronica = new Tabla();
+            tab_electronica.setId("tab_electronica");
+            tab_electronica.setIdCompleto("tab_factura:tab_electronica");
+            tab_electronica.setRuta("pre_index.clase." + getId());
+            tab_electronica.setTabla("sri_comprobante", "ide_srcom", 999);
+            tab_electronica.getGrid().setColumns(8);
+            tab_electronica.setCondicion("ide_srcom=-1");
+            //OCULTA TODAS LAS COLUMNAS
+            for (int i = 0; i < tab_electronica.getTotalColumnas(); i++) {
+                tab_electronica.getColumnas()[i].setVisible(false);
+                tab_electronica.getColumnas()[i].setLectura(true);
+            }
+            tab_electronica.getColumna("ide_sresc").setVisible(true);
+            tab_electronica.getColumna("ide_sresc").setCombo("sri_estado_comprobante", "ide_sresc", "nombre_sresc", "");
+            tab_electronica.getColumna("ide_sresc").setNombreVisual("ESTADO");
+            tab_electronica.getColumna("ide_sresc").setOrden(1);
+            tab_electronica.getColumna("claveacceso_srcom").setVisible(true);
+            tab_electronica.getColumna("claveacceso_srcom").setNombreVisual("CLAVE DE ACCESO");
+            tab_electronica.getColumna("claveacceso_srcom").setOrden(2);
+            tab_electronica.getColumna("fechaautoriza_srcom").setVisible(true);
+            tab_electronica.getColumna("fechaautoriza_srcom").setNombreVisual("FECHA AUTORIZACIÓN");
+            tab_electronica.getColumna("fechaautoriza_srcom").setOrden(3);
+            tab_electronica.getColumna("autorizacion_srcomn").setVisible(true);
+            tab_electronica.getColumna("autorizacion_srcomn").setNombreVisual("NUM. AUTORIZACIÓN");
+            tab_electronica.getColumna("autorizacion_srcomn").setOrden(4);
+            tab_electronica.setMostrarNumeroRegistros(false);
+            tab_electronica.dibujar();
+
+        }
+
         tab_deta_factura.setId("tab_deta_factura");
         tab_deta_factura.setIdCompleto("tab_factura:tab_deta_factura");
         tab_deta_factura.setRuta("pre_index.clase." + getId());
         tab_deta_factura.setTabla("cxc_deta_factura", "ide_ccdfa", 999);
+        tab_deta_factura.setCondicion("ide_cccfa=-1");
         tab_deta_factura.getColumna("ide_ccdfa").setVisible(false);
         tab_deta_factura.getColumna("ide_inarti").setCombo("inv_articulo", "ide_inarti", "nombre_inarti", "nivel_inarti='HIJO'");
         tab_deta_factura.getColumna("ide_inarti").setAutoCompletar();
@@ -568,6 +610,7 @@ public class FacturaCxC extends Dialogo {
         pat_panel.getMenuTabla().getItem_eliminar().setValueExpression("rendered", "true");
         pat_panel.getMenuTabla().getItem_eliminar().setRendered(true);
         grupo.getChildren().add(tab_cab_factura);
+        grupo.getChildren().add(tab_electronica);
         grupo.getChildren().add(pat_panel);
 
         Grid gri_total = new Grid();
@@ -750,17 +793,19 @@ public class FacturaCxC extends Dialogo {
      * Carga el seccuencial maximo de un punto de emision
      */
     public void cargarMaximoSecuencialFactura() {
-
-        if (com_pto_emision.getValue() != null) {
-            String secuencial = ser_factura.getSecuencialFactura(String.valueOf(com_pto_emision.getValue())) + "";
-            String ceros = utilitario.generarCero(9 - secuencial.length());
-            String num_max = ceros.concat(secuencial);
-            tab_cab_factura.setValor("secuencial_cccfa", num_max);
-            utilitario.addUpdateTabla(tab_cab_factura, "secuencial_cccfa", "");
-        } else {
-            tab_cab_factura.setValor("secuencial_cccfa", "");
-            utilitario.addUpdateTabla(tab_cab_factura, "secuencial_cccfa", "");
+        if (isFacturaElectronica() == false) {
+            if (com_pto_emision.getValue() != null) {
+                String secuencial = ser_factura.getSecuencialFactura(String.valueOf(com_pto_emision.getValue())) + "";
+                String ceros = utilitario.generarCero(9 - secuencial.length());
+                String num_max = ceros.concat(secuencial);
+                tab_cab_factura.setValor("secuencial_cccfa", num_max);
+                utilitario.addUpdateTabla(tab_cab_factura, "secuencial_cccfa", "");
+            } else {
+                tab_cab_factura.setValor("secuencial_cccfa", "");
+                utilitario.addUpdateTabla(tab_cab_factura, "secuencial_cccfa", "");
+            }
         }
+
     }
 
     /**
@@ -978,8 +1023,6 @@ public class FacturaCxC extends Dialogo {
                     ////FACTURA ELECTRONICA
                     if (isFacturaElectronica()) {
                         ser_facElectronica.generarFacturaElectronica(tab_cab_factura.getValor("ide_cccfa"));
-                        tab_cab_factura.actualizar();
-                        utilitario.addUpdate("tab_factura:tab_deta_factura");
                         dibujarMensajeFacturaElectronica();
                     }
                     this.cerrar();
@@ -1111,9 +1154,11 @@ public class FacturaCxC extends Dialogo {
             utilitario.agregarMensajeError("No se puede guardar la Factura", "Debe seleccionar un Cliente");
             return false;
         }
-        if (tab_cab_factura.getValor("secuencial_cccfa") == null || tab_cab_factura.getValor("secuencial_cccfa").isEmpty()) {
-            utilitario.agregarMensajeError("No se puede guardar la Factura", "Debe ingresar el Secuencial de la factura");
-            return false;
+        if (isFacturaElectronica() == false) {
+            if (tab_cab_factura.getValor("secuencial_cccfa") == null || tab_cab_factura.getValor("secuencial_cccfa").isEmpty()) {
+                utilitario.agregarMensajeError("No se puede guardar la Factura", "Debe ingresar el Secuencial de la factura");
+                return false;
+            }
         }
         if (tab_cab_factura.getValor("observacion_cccfa") == null || tab_cab_factura.getValor("observacion_cccfa").isEmpty()) {
             utilitario.agregarMensajeError("No se puede guardar la Factura", "Debe ingresar una Observacion");
@@ -1315,6 +1360,14 @@ public class FacturaCxC extends Dialogo {
 
     public void setTab_creacion_producto(Tabla tab_creacion_producto) {
         this.tab_creacion_producto = tab_creacion_producto;
+    }
+
+    public Tabla getTab_electronica() {
+        return tab_electronica;
+    }
+
+    public void setTab_electronica(Tabla tab_electronica) {
+        this.tab_electronica = tab_electronica;
     }
 
 }

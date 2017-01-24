@@ -102,6 +102,7 @@ public class ServicioFacturaElectronica extends ServicioBase {
             tab_cabecara.setValor("ide_cntdo", tab_factura.getValor("ide_cntdo"));
             tab_cabecara.setValor("ide_empr", utilitario.getVariable("ide_empr"));
             tab_cabecara.setValor("ide_sucu", utilitario.getVariable("ide_sucu"));
+            tab_cabecara.setValor("secuencial_srcom", tab_factura.getValor("secuencial_cccfa"));
 
             tab_cabecara.guardar();
             ide_srcom = tab_factura.getValor("ide_srcom");
@@ -130,17 +131,17 @@ public class ServicioFacturaElectronica extends ServicioBase {
             tab_detalle.guardar();
             if (utilitario.getConexion().ejecutarListaSql().isEmpty()) {
                 //Asigna secuencial a la factura
-                String strSecuencialF = getSecuencialFactura();
-                utilitario.getConexion().ejecutarSql("UPDATE sri_comprobante SET secuencial_srcom='" + strSecuencialF + "' where ide_srcom=" + ide_srcom);
-                try {
-                    Comprobante comprobanteFactura = comprobanteService.getComprobantePorId(Integer.parseInt(ide_srcom));
-                    String strClaveAcceso = comprobanteService.getClaveAcceso(comprobanteFactura);
-                    utilitario.getConexion().ejecutarSql("UPDATE sri_comprobante SET claveacceso_srcom='" + strClaveAcceso + "' where ide_srcom=" + ide_srcom);
-                    //!!!!!!!AUMENTAR UPDATE EN cxc_cabece_factura  clave de acceso 
-                    utilitario.getConexion().ejecutarSql("UPDATE cxc_cabece_factura SET  ide_srcom=" + ide_srcom + ", secuencial_cccfa='" + strSecuencialF + "', clave_acceso_ccfa='"+strClaveAcceso+"' where ide_cccfa=" + ide_cccfa);
-
-                } catch (NumberFormatException | GenericException e) {
-                    e.printStackTrace();
+                if (tab_factura.getValor("secuencial_cccfa") == null) {
+                    String strSecuencialF = getSecuencialFactura();
+                    utilitario.getConexion().ejecutarSql("UPDATE sri_comprobante SET secuencial_srcom='" + strSecuencialF + "' where ide_srcom=" + ide_srcom);
+                    try {
+                        Comprobante comprobanteFactura = comprobanteService.getComprobantePorId(Integer.parseInt(ide_srcom));
+                        String strClaveAcceso = comprobanteService.getClaveAcceso(comprobanteFactura);
+                        utilitario.getConexion().ejecutarSql("UPDATE sri_comprobante SET claveacceso_srcom='" + strClaveAcceso + "' where ide_srcom=" + ide_srcom);
+                        utilitario.getConexion().ejecutarSql("UPDATE cxc_cabece_factura SET  ide_srcom=" + ide_srcom + ", secuencial_cccfa='" + strSecuencialF + "' where ide_cccfa=" + ide_cccfa);
+                    } catch (NumberFormatException | GenericException e) {
+                        e.printStackTrace();
+                    }
                 }
 
             }
