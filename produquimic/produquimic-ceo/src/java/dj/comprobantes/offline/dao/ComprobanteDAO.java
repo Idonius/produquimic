@@ -57,4 +57,12 @@ public interface ComprobanteDAO {
      */
     public void actualizar(Comprobante comprobante) throws GenericException;
 
+    /**
+     * Retorna un comprobante por ide_srcom
+     *
+     * @param ide_srcom
+     * @return
+     * @throws dj.comprobantes.offline.exception.GenericException
+     */
+    public Comprobante getComprobantePorId(Integer ide_srcom) throws GenericException;
 }

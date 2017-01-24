@@ -10,6 +10,7 @@
 package dj.comprobantes.offline.conexion;
 
 import dj.comprobantes.offline.exception.GenericException;
+import dj.comprobantes.offline.util.UtilitarioCeo;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
@@ -19,7 +20,6 @@ import javax.naming.Context;
 import javax.naming.InitialContext;
 import javax.naming.NamingException;
 import javax.sql.DataSource;
-import sistema.aplicacion.Utilitario;
 
 /**
  *
@@ -29,7 +29,7 @@ public class ConexionCEO {
 
     public Connection cobCentral;
 
-    private final Utilitario utilitario = new Utilitario();
+    private final UtilitarioCeo utilitario = new UtilitarioCeo();
 
     public ConexionCEO() throws GenericException {
         conectar();

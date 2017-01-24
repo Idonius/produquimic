@@ -13,6 +13,7 @@ import dj.comprobantes.offline.dto.Comprobante;
 import dj.comprobantes.offline.enums.EstadoComprobanteEnum;
 import dj.comprobantes.offline.exception.GenericException;
 import com.sun.xml.ws.client.BindingProviderProperties;
+import dj.comprobantes.offline.util.UtilitarioCeo;
 import ec.gob.sri.comprobantes.ws.Mensaje;
 import ec.gob.sri.comprobantes.ws.RecepcionComprobantesOffline;
 import ec.gob.sri.comprobantes.ws.RecepcionComprobantesOfflineService;
@@ -45,7 +46,6 @@ import javax.xml.transform.stream.StreamResult;
 import javax.xml.ws.BindingProvider;
 import org.w3c.dom.Document;
 import org.xml.sax.SAXException;
-import sistema.aplicacion.Utilitario;
 
 /**
  *
@@ -60,7 +60,7 @@ public class RecepcionServiceImp implements RecepcionService {
     private EmisorService emisorService;
     @EJB
     private FirmarDocumentoService firmarService;
-    private final Utilitario utilitario = new Utilitario();
+    private final UtilitarioCeo utilitario = new UtilitarioCeo();
 
     @Override
     public void enviarRecepcionOfflineSRI(Comprobante comprobateActual, String xml) throws GenericException {

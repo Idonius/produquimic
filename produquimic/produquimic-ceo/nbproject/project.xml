@@ -6,7 +6,6 @@
             <name>produquimic-ceo</name>
             <minimum-ant-version>1.6.5</minimum-ant-version>
             <included-library dirs="200">file.reference.API.jar</included-library>
-            <included-library dirs="100">reference.produquimic-ejb.dist</included-library>
             <included-library dirs="200">file.reference.Cert.jar</included-library>
             <included-library dirs="200">file.reference.Log.jar</included-library>
             <included-library dirs="200">file.reference.OCSP.jar</included-library>
@@ -88,15 +87,6 @@
                 <root id="test.src.dir"/>
             </test-roots>
         </data>
-        <references xmlns="http://www.netbeans.org/ns/ant-project-references/1">
-            <reference>
-                <foreign-project>produquimic-ejb</foreign-project>
-                <artifact-type>jar</artifact-type>
-                <script>build.xml</script>
-                <target>dist</target>
-                <clean-target>clean</clean-target>
-                <id>dist</id>
-            </reference>
-        </references>
+        <references xmlns="http://www.netbeans.org/ns/ant-project-references/1"/>
     </configuration>
 </project>

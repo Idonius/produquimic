@@ -16,6 +16,7 @@ import dj.comprobantes.offline.enums.ParametrosSistemaEnum;
 import dj.comprobantes.offline.enums.TipoComprobanteEnum;
 import dj.comprobantes.offline.enums.TipoImpuestoIvaEnum;
 import dj.comprobantes.offline.exception.GenericException;
+import dj.comprobantes.offline.util.UtilitarioCeo;
 import framework.reportes.DetalleReporte;
 import framework.reportes.GenerarReporte;
 import framework.reportes.ReporteDataSource;
@@ -47,7 +48,6 @@ import org.jdom2.input.SAXBuilder;
 import org.jdom2.output.Format;
 import org.jdom2.output.XMLOutputter;
 import org.xml.sax.InputSource;
-import sistema.aplicacion.Utilitario;
 
 /**
  *
@@ -59,7 +59,7 @@ public class ArchivoServiceImp implements ArchivoService {
     @EJB
     private XmlComprobanteDAO sriComprobanteDao;
 
-    private final Utilitario utilitario = new Utilitario();
+    private final UtilitarioCeo utilitario = new UtilitarioCeo();
 
     @Override
     public byte[] getXml(Comprobante comprobante) throws GenericException {

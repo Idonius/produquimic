@@ -15,6 +15,7 @@ import dj.comprobantes.offline.enums.TipoAmbienteEnum;
 import dj.comprobantes.offline.exception.GenericException;
 
 import com.sun.xml.ws.client.BindingProviderProperties;
+import dj.comprobantes.offline.util.UtilitarioCeo;
 import ec.gob.sri.comprobantes.ws.aut.Autorizacion;
 import ec.gob.sri.comprobantes.ws.aut.AutorizacionComprobantesOffline;
 import ec.gob.sri.comprobantes.ws.aut.AutorizacionComprobantesOfflineService;
@@ -42,7 +43,7 @@ public class AutorizacionServiceImp implements AutorizacionService {
     private ComprobanteService comprobanteService;
     @EJB
     private MailService mailService;
-    private final sistema.aplicacion.Utilitario utilitario = new sistema.aplicacion.Utilitario();
+    private final UtilitarioCeo utilitario = new UtilitarioCeo();
 
     @Override
     public void enviarRecibidosOfflineSRI(Comprobante comprobateActual) throws GenericException {       

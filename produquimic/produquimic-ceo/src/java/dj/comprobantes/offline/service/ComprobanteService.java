@@ -62,8 +62,8 @@ public interface ComprobanteService {
      * @throws GenericException
      */
     public void actualizarAutorizacionComprobante(String xmlFirmado, Comprobante comprobante, String mensajeRespuesta) throws GenericException;
-    
-     /**
+
+    /**
      * Retorna un comprobante por clave de acceso
      *
      * @param claveAcceso
@@ -72,4 +72,12 @@ public interface ComprobanteService {
      */
     public Comprobante getComprobantePorClaveAcceso(String claveAcceso) throws GenericException;
 
+    /**
+     * Retorna un Comprobante por ide_srcom
+     *
+     * @param ide_srcom
+     * @return
+     * @throws GenericException
+     */
+    public Comprobante getComprobantePorId(Integer ide_srcom) throws GenericException;
 }

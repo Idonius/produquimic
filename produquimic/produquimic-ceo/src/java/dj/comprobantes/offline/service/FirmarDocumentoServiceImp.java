@@ -13,6 +13,7 @@ import dj.comprobantes.offline.dao.FirmaDAO;
 import dj.comprobantes.offline.dto.Firma;
 import dj.comprobantes.offline.exception.GenericException;
 import dj.comprobantes.offline.util.PassStoreKS;
+import dj.comprobantes.offline.util.UtilitarioCeo;
 import es.mityc.firmaJava.libreria.xades.DataToSign;
 import es.mityc.firmaJava.libreria.xades.EnumFormatoFirma;
 import es.mityc.firmaJava.libreria.xades.FirmaXML;
@@ -37,7 +38,6 @@ import javax.ejb.Stateless;
 import org.apache.log4j.Level;
 import org.apache.log4j.Logger;
 import org.w3c.dom.Document;
-import sistema.aplicacion.Utilitario;
 
 /**
  *
@@ -48,7 +48,7 @@ public class FirmarDocumentoServiceImp implements FirmarDocumentoService {
 
     @EJB
     private FirmaDAO firmaDAO;
-    private final Utilitario utilitario = new Utilitario();
+    private final UtilitarioCeo utilitario = new UtilitarioCeo();
 
     @Override
     public Document getDocumentoFirmado(Document document) throws GenericException {

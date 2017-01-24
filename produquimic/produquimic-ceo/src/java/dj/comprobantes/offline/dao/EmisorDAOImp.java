@@ -12,10 +12,10 @@ package dj.comprobantes.offline.dao;
 import dj.comprobantes.offline.conexion.ConexionCEO;
 import dj.comprobantes.offline.dto.Emisor;
 import dj.comprobantes.offline.exception.GenericException;
+import dj.comprobantes.offline.util.UtilitarioCeo;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import javax.ejb.Stateless;
-import sistema.aplicacion.Utilitario;
 
 /**
  *
@@ -24,7 +24,7 @@ import sistema.aplicacion.Utilitario;
 @Stateless
 public class EmisorDAOImp implements EmisorDAO {
 
-    private final Utilitario utilitario = new Utilitario();
+    private final UtilitarioCeo utilitario = new UtilitarioCeo();
     private Emisor emisor = null;
 
     @Override

@@ -16,11 +16,11 @@ import dj.comprobantes.offline.dto.XmlComprobante;
 import dj.comprobantes.offline.enums.EstadoComprobanteEnum;
 import dj.comprobantes.offline.enums.TipoComprobanteEnum;
 import dj.comprobantes.offline.exception.GenericException;
+import dj.comprobantes.offline.util.UtilitarioCeo;
 import java.util.Date;
 import java.util.List;
 import javax.ejb.EJB;
 import javax.ejb.Stateless;
-import sistema.aplicacion.Utilitario;
 
 /**
  *
@@ -44,7 +44,7 @@ public class ComprobanteServiceImp implements ComprobanteService {
     @EJB
     private NotaCreditoService notaCreditoService;
 
-    private final Utilitario utilitario = new Utilitario();
+    private final UtilitarioCeo utilitario = new UtilitarioCeo();
     
     @Override
     public void enviarRecepcionSRI() throws GenericException {
@@ -90,7 +90,7 @@ public class ComprobanteServiceImp implements ComprobanteService {
         String ambiente = emisorService.getEmisor().getAmbiente().toString();
         String serie = comprobante.getEstab() + comprobante.getPtoemi();
         String numeroComprobante = comprobante.getSecuencial();
-        String tipoEmision = comprobante.getTipoemision().toString();
+        String tipoEmision = comprobante.getTipoemision();
         String hora = utilitario.getFormatoFecha(new Date(), "HH:mm");
         if (ruc != null && ruc.length() < 13) {
             ruc = String.format("%013d", new Object[]{Integer.parseInt(ruc)});
@@ -186,5 +186,9 @@ public class ComprobanteServiceImp implements ComprobanteService {
     public Comprobante getComprobantePorClaveAcceso(String claveAcceso) throws GenericException {
         return comprobanteDAO.getComprobantePorClaveAcceso(claveAcceso);
     }
-
+@Override
+     public Comprobante getComprobantePorId(Integer ide_srcom) throws GenericException {
+         return comprobanteDAO.getComprobantePorId(ide_srcom);
+     }
+    
 }

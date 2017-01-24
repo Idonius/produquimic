@@ -15,10 +15,11 @@ import dj.comprobantes.offline.enums.TipoComprobanteEnum;
 import dj.comprobantes.offline.enums.TipoImpuestoEnum;
 import dj.comprobantes.offline.enums.TipoImpuestoIvaEnum;
 import dj.comprobantes.offline.exception.GenericException;
+import dj.comprobantes.offline.util.UtilitarioCeo;
 
 import javax.ejb.EJB;
 import javax.ejb.Stateless;
-import sistema.aplicacion.Utilitario;
+
 
 /**
  *
@@ -29,7 +30,7 @@ public class FacturaServiceImp implements FacturaService {
 
     @EJB
     private EmisorService emisorService;
-    private final Utilitario utilitario = new Utilitario();
+    private final UtilitarioCeo utilitario = new UtilitarioCeo();
 
     @Override
     public String getXmlFactura(Comprobante comprobante) throws GenericException {

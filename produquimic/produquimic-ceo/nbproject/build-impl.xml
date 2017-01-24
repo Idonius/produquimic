@@ -780,14 +780,8 @@ exists or setup the property manually. For example like this:
     <!--
                 COMPILATION SECTION
             -->
-    <target depends="init" if="no.dist.ear.dir" name="-deps-module-jar" unless="no.deps">
-        <ant antfile="${project.produquimic-ejb}/build.xml" inheritall="false" target="dist"/>
-    </target>
-    <target depends="init" if="dist.ear.dir" name="-deps-ear-jar" unless="no.deps">
-        <ant antfile="${project.produquimic-ejb}/build.xml" inheritall="false" target="dist-ear">
-            <property location="${build.dir}" name="dist.ear.dir"/>
-        </ant>
-    </target>
+    <target depends="init" if="no.dist.ear.dir" name="-deps-module-jar" unless="no.deps"/>
+    <target depends="init" if="dist.ear.dir" name="-deps-ear-jar" unless="no.deps"/>
     <target depends="init, -deps-module-jar, -deps-ear-jar" name="deps-jar"/>
     <target depends="init,deps-jar" name="-pre-pre-compile">
         <mkdir dir="${build.classes.dir}"/>
@@ -800,7 +794,6 @@ exists or setup the property manually. For example like this:
     <target depends="compile,-library-inclusion-in-archive-weblogic,-library-inclusion-in-archive-by-user" name="library-inclusion-in-archive"/>
     <target if="is.jars.in.ejbjar" name="-library-inclusion-in-archive-by-user">
         <copyfiles files="${file.reference.API.jar}" todir="${build.classes.dir}"/>
-        <copyfiles files="${reference.produquimic-ejb.dist}" todir="${build.classes.dir}"/>
         <copyfiles files="${file.reference.Cert.jar}" todir="${build.classes.dir}"/>
         <copyfiles files="${file.reference.Log.jar}" todir="${build.classes.dir}"/>
         <copyfiles files="${file.reference.OCSP.jar}" todir="${build.classes.dir}"/>
@@ -878,7 +871,6 @@ exists or setup the property manually. For example like this:
     </target>
     <target if="is.server.weblogic" name="-library-inclusion-in-archive-weblogic">
         <basename file="${file.reference.API.jar}" property="manifest.file.reference.API.jar"/>
-        <basename file="${reference.produquimic-ejb.dist}" property="manifest.reference.produquimic-ejb.dist"/>
         <basename file="${file.reference.Cert.jar}" property="manifest.file.reference.Cert.jar"/>
         <basename file="${file.reference.Log.jar}" property="manifest.file.reference.Log.jar"/>
         <basename file="${file.reference.OCSP.jar}" property="manifest.file.reference.OCSP.jar"/>
@@ -954,88 +946,86 @@ exists or setup the property manually. For example like this:
         <basename file="${file.reference.xstream-1.4.1.jar}" property="manifest.file.reference.xstream-1.4.1.jar"/>
         <basename file="${file.reference.jdfaces.jar}" property="manifest.file.reference.jdfaces.jar"/>
         <manifest file="${build.ear.classes.dir}/META-INF/MANIFEST.MF" mode="update">
-            <attribute name="Extension-List" value="jar-1 jar-2 jar-3 jar-4 jar-5 jar-6 jar-7 jar-8 jar-9 jar-10 jar-11 jar-12 jar-13 jar-14 jar-15 jar-16 jar-17 jar-18 jar-19 jar-20 jar-21 jar-22 jar-23 jar-24 jar-25 jar-26 jar-27 jar-28 jar-29 jar-30 jar-31 jar-32 jar-33 jar-34 jar-35 jar-36 jar-37 jar-38 jar-39 jar-40 jar-41 jar-42 jar-43 jar-44 jar-45 jar-46 jar-47 jar-48 jar-49 jar-50 jar-51 jar-52 jar-53 jar-54 jar-55 jar-56 jar-57 jar-58 jar-59 jar-60 jar-61 jar-62 jar-63 jar-64 jar-65 jar-66 jar-67 jar-68 jar-69 jar-70 jar-71 jar-72 jar-73 jar-74 jar-75 jar-76 "/>
+            <attribute name="Extension-List" value="jar-1 jar-2 jar-3 jar-4 jar-5 jar-6 jar-7 jar-8 jar-9 jar-10 jar-11 jar-12 jar-13 jar-14 jar-15 jar-16 jar-17 jar-18 jar-19 jar-20 jar-21 jar-22 jar-23 jar-24 jar-25 jar-26 jar-27 jar-28 jar-29 jar-30 jar-31 jar-32 jar-33 jar-34 jar-35 jar-36 jar-37 jar-38 jar-39 jar-40 jar-41 jar-42 jar-43 jar-44 jar-45 jar-46 jar-47 jar-48 jar-49 jar-50 jar-51 jar-52 jar-53 jar-54 jar-55 jar-56 jar-57 jar-58 jar-59 jar-60 jar-61 jar-62 jar-63 jar-64 jar-65 jar-66 jar-67 jar-68 jar-69 jar-70 jar-71 jar-72 jar-73 jar-74 jar-75 "/>
             <attribute name="jar-1-Extension-Name" value="${manifest.file.reference.API.jar}"/>
-            <attribute name="jar-2-Extension-Name" value="${manifest.reference.produquimic-ejb.dist}"/>
-            <attribute name="jar-3-Extension-Name" value="${manifest.file.reference.Cert.jar}"/>
-            <attribute name="jar-4-Extension-Name" value="${manifest.file.reference.Log.jar}"/>
-            <attribute name="jar-5-Extension-Name" value="${manifest.file.reference.OCSP.jar}"/>
-            <attribute name="jar-6-Extension-Name" value="${manifest.file.reference.Policy.jar}"/>
-            <attribute name="jar-7-Extension-Name" value="${manifest.file.reference.TSA.jar}"/>
-            <attribute name="jar-8-Extension-Name" value="${manifest.file.reference.Trust.jar}"/>
-            <attribute name="jar-9-Extension-Name" value="${manifest.file.reference.XADES.jar}"/>
-            <attribute name="jar-10-Extension-Name" value="${manifest.file.reference.bcmail-jdk15-1.43.jar}"/>
-            <attribute name="jar-11-Extension-Name" value="${manifest.file.reference.bcprov-jdk15-1.43.jar}"/>
-            <attribute name="jar-12-Extension-Name" value="${manifest.file.reference.bctsp-jdk15-1.43.jar}"/>
-            <attribute name="jar-13-Extension-Name" value="${manifest.file.reference.firma-xades.jar}"/>
-            <attribute name="jar-14-Extension-Name" value="${manifest.file.reference.jconn4.jar}"/>
-            <attribute name="jar-15-Extension-Name" value="${manifest.file.reference.jdom-2.0.5.jar}"/>
-            <attribute name="jar-16-Extension-Name" value="${manifest.file.reference.log4j-1.2.16.jar}"/>
-            <attribute name="jar-17-Extension-Name" value="${manifest.file.reference.serializer-2.7.1.jar}"/>
-            <attribute name="jar-18-Extension-Name" value="${manifest.file.reference.ws.offline-1.0.jar}"/>
-            <attribute name="jar-19-Extension-Name" value="${manifest.file.reference.xalan-2.7.1.jar}"/>
-            <attribute name="jar-20-Extension-Name" value="${manifest.file.reference.xml-apis-1.3.04.jar}"/>
-            <attribute name="jar-21-Extension-Name" value="${manifest.file.reference.xmlsec-1.4.2-ADSI-1.0.jar}"/>
-            <attribute name="jar-22-Extension-Name" value="${manifest.file.reference.Courier_New.jar}"/>
-            <attribute name="jar-23-Extension-Name" value="${manifest.file.reference.JTattoo.jar}"/>
-            <attribute name="jar-24-Extension-Name" value="${manifest.file.reference.MITyCLibAPI-1.0.4.jar}"/>
-            <attribute name="jar-25-Extension-Name" value="${manifest.file.reference.MITyCLibCert-1.0.4.jar}"/>
-            <attribute name="jar-26-Extension-Name" value="${manifest.file.reference.MITyCLibTSA-1.0.4.jar}"/>
-            <attribute name="jar-27-Extension-Name" value="${manifest.file.reference.MITyCLibXADES-1.0.4.jar}"/>
-            <attribute name="jar-28-Extension-Name" value="${manifest.file.reference.XadesBes.jar}"/>
-            <attribute name="jar-29-Extension-Name" value="${manifest.file.reference.appframework-1.0.3.jar}"/>
-            <attribute name="jar-30-Extension-Name" value="${manifest.file.reference.barcode4j-2.0.jar}"/>
-            <attribute name="jar-31-Extension-Name" value="${manifest.file.reference.batik-anim.jar}"/>
-            <attribute name="jar-32-Extension-Name" value="${manifest.file.reference.batik-awt-util.jar}"/>
-            <attribute name="jar-33-Extension-Name" value="${manifest.file.reference.batik-bridge.jar}"/>
-            <attribute name="jar-34-Extension-Name" value="${manifest.file.reference.batik-css.jar}"/>
-            <attribute name="jar-35-Extension-Name" value="${manifest.file.reference.batik-dom.jar}"/>
-            <attribute name="jar-36-Extension-Name" value="${manifest.file.reference.batik-ext.jar}"/>
-            <attribute name="jar-37-Extension-Name" value="${manifest.file.reference.batik-gvt.jar}"/>
-            <attribute name="jar-38-Extension-Name" value="${manifest.file.reference.batik-parser.jar}"/>
-            <attribute name="jar-39-Extension-Name" value="${manifest.file.reference.batik-script.jar}"/>
-            <attribute name="jar-40-Extension-Name" value="${manifest.file.reference.batik-svg-dom.jar}"/>
-            <attribute name="jar-41-Extension-Name" value="${manifest.file.reference.batik-svggen.jar}"/>
-            <attribute name="jar-42-Extension-Name" value="${manifest.file.reference.batik-util.jar}"/>
-            <attribute name="jar-43-Extension-Name" value="${manifest.file.reference.batik-xml.jar}"/>
-            <attribute name="jar-44-Extension-Name" value="${manifest.file.reference.bcmail-jdk16-1.43.jar}"/>
-            <attribute name="jar-45-Extension-Name" value="${manifest.file.reference.bcprov-jdk16-1.43.jar}"/>
-            <attribute name="jar-46-Extension-Name" value="${manifest.file.reference.bctsp-jdk16-1.43.jar}"/>
-            <attribute name="jar-47-Extension-Name" value="${manifest.file.reference.cliente-file-ws.jar}"/>
-            <attribute name="jar-48-Extension-Name" value="${manifest.file.reference.commons-beanutils-1.8.2.jar}"/>
-            <attribute name="jar-49-Extension-Name" value="${manifest.file.reference.commons-collections-3.2.1.jar}"/>
-            <attribute name="jar-50-Extension-Name" value="${manifest.file.reference.commons-digester-1.8.jar}"/>
-            <attribute name="jar-51-Extension-Name" value="${manifest.file.reference.commons-io.jar}"/>
-            <attribute name="jar-52-Extension-Name" value="${manifest.file.reference.commons-javaflow-20060411.jar}"/>
-            <attribute name="jar-53-Extension-Name" value="${manifest.file.reference.commons-lang-2.4.jar}"/>
-            <attribute name="jar-54-Extension-Name" value="${manifest.file.reference.commons-logging-1.1.jar}"/>
-            <attribute name="jar-55-Extension-Name" value="${manifest.file.reference.firma-xades.jar-1}"/>
-            <attribute name="jar-56-Extension-Name" value="${manifest.file.reference.groovy-all-1.8.0.jar}"/>
-            <attribute name="jar-57-Extension-Name" value="${manifest.file.reference.hsqldb-1_8_0_10.jar}"/>
-            <attribute name="jar-58-Extension-Name" value="${manifest.file.reference.hsqldb.jar}"/>
-            <attribute name="jar-59-Extension-Name" value="${manifest.file.reference.iText-2.1.7.jar}"/>
-            <attribute name="jar-60-Extension-Name" value="${manifest.file.reference.jasperreports-5.1.0.jar}"/>
-            <attribute name="jar-61-Extension-Name" value="${manifest.file.reference.jasperreports-fonts-5.1.0.jar}"/>
-            <attribute name="jar-62-Extension-Name" value="${manifest.file.reference.jcalendarbutton-1.4.5.jar}"/>
-            <attribute name="jar-63-Extension-Name" value="${manifest.file.reference.log4j-1.2.16.jar-1}"/>
-            <attribute name="jar-64-Extension-Name" value="${manifest.file.reference.mail.jar}"/>
-            <attribute name="jar-65-Extension-Name" value="${manifest.file.reference.napkinlaf-alpha001.jar}"/>
-            <attribute name="jar-66-Extension-Name" value="${manifest.file.reference.swing-worker-1.1.jar}"/>
-            <attribute name="jar-67-Extension-Name" value="${manifest.file.reference.tradise-common.jar}"/>
-            <attribute name="jar-68-Extension-Name" value="${manifest.file.reference.tradise-crypto-api.jar}"/>
-            <attribute name="jar-69-Extension-Name" value="${manifest.file.reference.tradise-utils.jar}"/>
-            <attribute name="jar-70-Extension-Name" value="${manifest.file.reference.tradise_crypto_transport.jar}"/>
-            <attribute name="jar-71-Extension-Name" value="${manifest.file.reference.xml-apis-ext.jar}"/>
-            <attribute name="jar-72-Extension-Name" value="${manifest.file.reference.xml-apis.jar}"/>
-            <attribute name="jar-73-Extension-Name" value="${manifest.file.reference.xmlpull-1.1.3.1.jar}"/>
-            <attribute name="jar-74-Extension-Name" value="${manifest.file.reference.xmlsec-1.4.2-ADSI-1.0.jar-1}"/>
-            <attribute name="jar-75-Extension-Name" value="${manifest.file.reference.xstream-1.4.1.jar}"/>
-            <attribute name="jar-76-Extension-Name" value="${manifest.file.reference.jdfaces.jar}"/>
+            <attribute name="jar-2-Extension-Name" value="${manifest.file.reference.Cert.jar}"/>
+            <attribute name="jar-3-Extension-Name" value="${manifest.file.reference.Log.jar}"/>
+            <attribute name="jar-4-Extension-Name" value="${manifest.file.reference.OCSP.jar}"/>
+            <attribute name="jar-5-Extension-Name" value="${manifest.file.reference.Policy.jar}"/>
+            <attribute name="jar-6-Extension-Name" value="${manifest.file.reference.TSA.jar}"/>
+            <attribute name="jar-7-Extension-Name" value="${manifest.file.reference.Trust.jar}"/>
+            <attribute name="jar-8-Extension-Name" value="${manifest.file.reference.XADES.jar}"/>
+            <attribute name="jar-9-Extension-Name" value="${manifest.file.reference.bcmail-jdk15-1.43.jar}"/>
+            <attribute name="jar-10-Extension-Name" value="${manifest.file.reference.bcprov-jdk15-1.43.jar}"/>
+            <attribute name="jar-11-Extension-Name" value="${manifest.file.reference.bctsp-jdk15-1.43.jar}"/>
+            <attribute name="jar-12-Extension-Name" value="${manifest.file.reference.firma-xades.jar}"/>
+            <attribute name="jar-13-Extension-Name" value="${manifest.file.reference.jconn4.jar}"/>
+            <attribute name="jar-14-Extension-Name" value="${manifest.file.reference.jdom-2.0.5.jar}"/>
+            <attribute name="jar-15-Extension-Name" value="${manifest.file.reference.log4j-1.2.16.jar}"/>
+            <attribute name="jar-16-Extension-Name" value="${manifest.file.reference.serializer-2.7.1.jar}"/>
+            <attribute name="jar-17-Extension-Name" value="${manifest.file.reference.ws.offline-1.0.jar}"/>
+            <attribute name="jar-18-Extension-Name" value="${manifest.file.reference.xalan-2.7.1.jar}"/>
+            <attribute name="jar-19-Extension-Name" value="${manifest.file.reference.xml-apis-1.3.04.jar}"/>
+            <attribute name="jar-20-Extension-Name" value="${manifest.file.reference.xmlsec-1.4.2-ADSI-1.0.jar}"/>
+            <attribute name="jar-21-Extension-Name" value="${manifest.file.reference.Courier_New.jar}"/>
+            <attribute name="jar-22-Extension-Name" value="${manifest.file.reference.JTattoo.jar}"/>
+            <attribute name="jar-23-Extension-Name" value="${manifest.file.reference.MITyCLibAPI-1.0.4.jar}"/>
+            <attribute name="jar-24-Extension-Name" value="${manifest.file.reference.MITyCLibCert-1.0.4.jar}"/>
+            <attribute name="jar-25-Extension-Name" value="${manifest.file.reference.MITyCLibTSA-1.0.4.jar}"/>
+            <attribute name="jar-26-Extension-Name" value="${manifest.file.reference.MITyCLibXADES-1.0.4.jar}"/>
+            <attribute name="jar-27-Extension-Name" value="${manifest.file.reference.XadesBes.jar}"/>
+            <attribute name="jar-28-Extension-Name" value="${manifest.file.reference.appframework-1.0.3.jar}"/>
+            <attribute name="jar-29-Extension-Name" value="${manifest.file.reference.barcode4j-2.0.jar}"/>
+            <attribute name="jar-30-Extension-Name" value="${manifest.file.reference.batik-anim.jar}"/>
+            <attribute name="jar-31-Extension-Name" value="${manifest.file.reference.batik-awt-util.jar}"/>
+            <attribute name="jar-32-Extension-Name" value="${manifest.file.reference.batik-bridge.jar}"/>
+            <attribute name="jar-33-Extension-Name" value="${manifest.file.reference.batik-css.jar}"/>
+            <attribute name="jar-34-Extension-Name" value="${manifest.file.reference.batik-dom.jar}"/>
+            <attribute name="jar-35-Extension-Name" value="${manifest.file.reference.batik-ext.jar}"/>
+            <attribute name="jar-36-Extension-Name" value="${manifest.file.reference.batik-gvt.jar}"/>
+            <attribute name="jar-37-Extension-Name" value="${manifest.file.reference.batik-parser.jar}"/>
+            <attribute name="jar-38-Extension-Name" value="${manifest.file.reference.batik-script.jar}"/>
+            <attribute name="jar-39-Extension-Name" value="${manifest.file.reference.batik-svg-dom.jar}"/>
+            <attribute name="jar-40-Extension-Name" value="${manifest.file.reference.batik-svggen.jar}"/>
+            <attribute name="jar-41-Extension-Name" value="${manifest.file.reference.batik-util.jar}"/>
+            <attribute name="jar-42-Extension-Name" value="${manifest.file.reference.batik-xml.jar}"/>
+            <attribute name="jar-43-Extension-Name" value="${manifest.file.reference.bcmail-jdk16-1.43.jar}"/>
+            <attribute name="jar-44-Extension-Name" value="${manifest.file.reference.bcprov-jdk16-1.43.jar}"/>
+            <attribute name="jar-45-Extension-Name" value="${manifest.file.reference.bctsp-jdk16-1.43.jar}"/>
+            <attribute name="jar-46-Extension-Name" value="${manifest.file.reference.cliente-file-ws.jar}"/>
+            <attribute name="jar-47-Extension-Name" value="${manifest.file.reference.commons-beanutils-1.8.2.jar}"/>
+            <attribute name="jar-48-Extension-Name" value="${manifest.file.reference.commons-collections-3.2.1.jar}"/>
+            <attribute name="jar-49-Extension-Name" value="${manifest.file.reference.commons-digester-1.8.jar}"/>
+            <attribute name="jar-50-Extension-Name" value="${manifest.file.reference.commons-io.jar}"/>
+            <attribute name="jar-51-Extension-Name" value="${manifest.file.reference.commons-javaflow-20060411.jar}"/>
+            <attribute name="jar-52-Extension-Name" value="${manifest.file.reference.commons-lang-2.4.jar}"/>
+            <attribute name="jar-53-Extension-Name" value="${manifest.file.reference.commons-logging-1.1.jar}"/>
+            <attribute name="jar-54-Extension-Name" value="${manifest.file.reference.firma-xades.jar-1}"/>
+            <attribute name="jar-55-Extension-Name" value="${manifest.file.reference.groovy-all-1.8.0.jar}"/>
+            <attribute name="jar-56-Extension-Name" value="${manifest.file.reference.hsqldb-1_8_0_10.jar}"/>
+            <attribute name="jar-57-Extension-Name" value="${manifest.file.reference.hsqldb.jar}"/>
+            <attribute name="jar-58-Extension-Name" value="${manifest.file.reference.iText-2.1.7.jar}"/>
+            <attribute name="jar-59-Extension-Name" value="${manifest.file.reference.jasperreports-5.1.0.jar}"/>
+            <attribute name="jar-60-Extension-Name" value="${manifest.file.reference.jasperreports-fonts-5.1.0.jar}"/>
+            <attribute name="jar-61-Extension-Name" value="${manifest.file.reference.jcalendarbutton-1.4.5.jar}"/>
+            <attribute name="jar-62-Extension-Name" value="${manifest.file.reference.log4j-1.2.16.jar-1}"/>
+            <attribute name="jar-63-Extension-Name" value="${manifest.file.reference.mail.jar}"/>
+            <attribute name="jar-64-Extension-Name" value="${manifest.file.reference.napkinlaf-alpha001.jar}"/>
+            <attribute name="jar-65-Extension-Name" value="${manifest.file.reference.swing-worker-1.1.jar}"/>
+            <attribute name="jar-66-Extension-Name" value="${manifest.file.reference.tradise-common.jar}"/>
+            <attribute name="jar-67-Extension-Name" value="${manifest.file.reference.tradise-crypto-api.jar}"/>
+            <attribute name="jar-68-Extension-Name" value="${manifest.file.reference.tradise-utils.jar}"/>
+            <attribute name="jar-69-Extension-Name" value="${manifest.file.reference.tradise_crypto_transport.jar}"/>
+            <attribute name="jar-70-Extension-Name" value="${manifest.file.reference.xml-apis-ext.jar}"/>
+            <attribute name="jar-71-Extension-Name" value="${manifest.file.reference.xml-apis.jar}"/>
+            <attribute name="jar-72-Extension-Name" value="${manifest.file.reference.xmlpull-1.1.3.1.jar}"/>
+            <attribute name="jar-73-Extension-Name" value="${manifest.file.reference.xmlsec-1.4.2-ADSI-1.0.jar-1}"/>
+            <attribute name="jar-74-Extension-Name" value="${manifest.file.reference.xstream-1.4.1.jar}"/>
+            <attribute name="jar-75-Extension-Name" value="${manifest.file.reference.jdfaces.jar}"/>
         </manifest>
     </target>
     <target depends="compile" name="library-inclusion-in-manifest">
         <copyfiles files="${file.reference.API.jar}" todir="${dist.ear.dir}/lib"/>
-        <copyfiles files="${reference.produquimic-ejb.dist}" todir="${dist.ear.dir}"/>
         <copyfiles files="${file.reference.Cert.jar}" todir="${dist.ear.dir}/lib"/>
         <copyfiles files="${file.reference.Log.jar}" todir="${dist.ear.dir}/lib"/>
         <copyfiles files="${file.reference.OCSP.jar}" todir="${dist.ear.dir}/lib"/>
@@ -1492,9 +1482,7 @@ exists or setup the property manually. For example like this:
     <!--
                 CLEANUP SECTION
             -->
-    <target depends="init" name="deps-clean" unless="no.deps">
-        <ant antfile="${project.produquimic-ejb}/build.xml" inheritall="false" target="clean"/>
-    </target>
+    <target depends="init" name="deps-clean" unless="no.deps"/>
     <target depends="init" name="-do-clean">
         <delete dir="${build.dir}"/>
         <delete dir="${dist.dir}"/>

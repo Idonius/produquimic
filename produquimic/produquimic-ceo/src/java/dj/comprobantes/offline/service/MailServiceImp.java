@@ -13,6 +13,7 @@ import dj.comprobantes.offline.dto.Comprobante;
 import dj.comprobantes.offline.enums.ParametrosSistemaEnum;
 import dj.comprobantes.offline.enums.TipoComprobanteEnum;
 import dj.comprobantes.offline.exception.GenericException;
+import dj.comprobantes.offline.util.UtilitarioCeo;
 
 import javax.ejb.Stateless;
 import java.io.File;
@@ -33,7 +34,6 @@ import javax.mail.internet.InternetAddress;
 import javax.mail.internet.MimeBodyPart;
 import javax.mail.internet.MimeMessage;
 import javax.mail.internet.MimeMultipart;
-import sistema.aplicacion.Utilitario;
 
 /**
  *
@@ -47,7 +47,7 @@ public class MailServiceImp implements MailService {
     @EJB
     private ArchivoService archivoService;
 
-    private final Utilitario utilitario = new Utilitario();
+    private final UtilitarioCeo utilitario = new UtilitarioCeo();
 
     @Override
     public String agregarCorreo(Comprobante comprobanteMail) {

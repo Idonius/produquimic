@@ -184,7 +184,7 @@ public class ServicioConfiguracion {
      *
      * @return
      */
-    public double getPorcentajeIva() {
+    public Double getPorcentajeIva() {
         double valor = 0;
         try {
             String p_con_porcentaje_imp_iva = utilitario.getVariable("p_con_porcentaje_imp_iva");

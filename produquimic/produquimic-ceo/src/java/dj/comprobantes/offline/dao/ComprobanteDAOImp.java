@@ -14,6 +14,7 @@ import dj.comprobantes.offline.dto.Comprobante;
 import dj.comprobantes.offline.enums.EstadoComprobanteEnum;
 import dj.comprobantes.offline.enums.TipoComprobanteEnum;
 import dj.comprobantes.offline.exception.GenericException;
+import dj.comprobantes.offline.util.UtilitarioCeo;
 
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
@@ -22,7 +23,6 @@ import java.util.ArrayList;
 import java.util.List;
 
 import javax.ejb.Stateless;
-import sistema.aplicacion.Utilitario;
 
 /**
  *
@@ -31,7 +31,7 @@ import sistema.aplicacion.Utilitario;
 @Stateless
 public class ComprobanteDAOImp implements ComprobanteDAO {
 
-    private final Utilitario utilitario = new Utilitario();
+    private final UtilitarioCeo utilitario = new UtilitarioCeo();
 
     @Override
     public List<Comprobante> getComprobantesPorEstado(EstadoComprobanteEnum estado) throws GenericException {
@@ -162,6 +162,37 @@ public class ComprobanteDAOImp implements ComprobanteDAO {
             }
             con.desconectar();
         }
+    }
+
+    @Override
+    public Comprobante getComprobantePorId(Integer ide_srcom) throws GenericException {
+        Comprobante comprobante = null;
+        ConexionCEO con = new ConexionCEO();
+        PreparedStatement ps = null;
+        ResultSet res = null;
+        try {
+            String sql = "SELECT * FROM sri_comprobante  WHERE ide_srcom = ?";
+            ps = con.getPreparedStatement(sql);
+            ps.setInt(1, ide_srcom);
+            res = ps.executeQuery();
+            if (res.next()) {
+                comprobante = new Comprobante(res);
+            }
+        } catch (SQLException e) {
+            throw new GenericException(e);
+        } finally {
+            try {
+                if (ps != null) {
+                    ps.close();
+                }
+                if (res != null) {
+                    res.close();
+                }
+            } catch (Exception e) {
+            }
+            con.desconectar();
+        }
+        return comprobante;
     }
 
 }
