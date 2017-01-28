@@ -67,16 +67,31 @@ public class ServicioFacturaCxC extends ServicioBase {
      * @return
      */
     public String getSqlFacturas(String ide_ccdaf, String fechaInicio, String fechaFin) {
-        return "select a.ide_cccfa, secuencial_cccfa, ide_cnccc,a.ide_ccefa,nombre_ccefa ,fecha_emisi_cccfa,nom_geper,identificac_geper,base_grabada_cccfa as ventas12,"
-                + "base_tarifa0_cccfa+base_no_objeto_iva_cccfa as ventas0,valor_iva_cccfa,total_cccfa, "
-                + "observacion_cccfa, fecha_trans_cccfa "
-                + "from cxc_cabece_factura a "
-                + "inner join gen_persona b on a.ide_geper=b.ide_geper "
-                + "inner join cxc_estado_factura c on  a.ide_ccefa=c.ide_ccefa "
-                + "where fecha_emisi_cccfa BETWEEN  '" + fechaInicio + "' and '" + fechaFin + "' "
-                + "and ide_ccdaf=" + ide_ccdaf + " "
-                // + " and a.IDE_SUCU =" + utilitario.getVariable("IDE_SUCU") + " "
-                + "ORDER BY secuencial_cccfa desc,ide_cccfa desc";
+        if (isFacturaElectronica()) { //si tiene facturacion electrónica
+            return "select a.ide_cccfa, secuencial_cccfa,ide_cnccc,a.ide_ccefa,claveacceso_srcom as CLAVE_ACCESO,nombre_sresc as nombre_ccefa, fecha_emisi_cccfa,nom_geper,identificac_geper,base_grabada_cccfa as ventas12,"
+                    + "base_tarifa0_cccfa+base_no_objeto_iva_cccfa as ventas0,valor_iva_cccfa,total_cccfa, "
+                    + "observacion_cccfa, fecha_trans_cccfa "
+                    + "from cxc_cabece_factura a "
+                    + "inner join gen_persona b on a.ide_geper=b.ide_geper "
+                    + "left join sri_comprobante d on a.ide_srcom=d.ide_srcom "
+                    + "left join sri_estado_comprobante f on d.ide_sresc=f.ide_sresc "
+                    + "where fecha_emisi_cccfa BETWEEN  '" + fechaInicio + "' and '" + fechaFin + "' "
+                    // + "and ide_ccdaf=" + ide_ccdaf + " "
+                    // + " and a.IDE_SUCU =" + utilitario.getVariable("IDE_SUCU") + " " 
+                    + "ORDER BY secuencial_cccfa desc,ide_cccfa desc";
+        } else {
+            return "select a.ide_cccfa, secuencial_cccfa, ide_cnccc,a.ide_ccefa,nombre_ccefa ,fecha_emisi_cccfa,nom_geper,identificac_geper,base_grabada_cccfa as ventas12,"
+                    + "base_tarifa0_cccfa+base_no_objeto_iva_cccfa as ventas0,valor_iva_cccfa,total_cccfa, "
+                    + "observacion_cccfa, fecha_trans_cccfa "
+                    + "from cxc_cabece_factura a "
+                    + "inner join gen_persona b on a.ide_geper=b.ide_geper "
+                    + "inner join cxc_estado_factura c on  a.ide_ccefa=c.ide_ccefa "
+                    + "where fecha_emisi_cccfa BETWEEN  '" + fechaInicio + "' and '" + fechaFin + "' "
+                    + "and ide_ccdaf=" + ide_ccdaf + " "
+                    // + " and a.IDE_SUCU =" + utilitario.getVariable("IDE_SUCU") + " "
+                    + "ORDER BY secuencial_cccfa desc,ide_cccfa desc";
+        }
+
     }
 
     /**
@@ -573,6 +588,18 @@ public class ServicioFacturaCxC extends ServicioBase {
                 + "WHERE d.IDE_SUCU =" + utilitario.getVariable("IDE_SUCU") + " "
                 + "GROUP BY d.ide_geper,identificac_geper,nom_geper\n"
                 + "order by nom_geper";
+    }
+
+    public boolean isFacturaElectronica() {
+        String p_sri_activa_comp_elect = utilitario.getVariable("p_sri_activa_comp_elect");
+        if (p_sri_activa_comp_elect == null) {
+            return false;
+        }
+        return p_sri_activa_comp_elect.equalsIgnoreCase("true");
+    }
+
+    public void setHaceFacturaElectronica(String value) {
+        utilitario.getConexion().agregarSqlPantalla("UPDATE sis_parametros SET valor_para='" + value + "' where nom_para='p_sri_activa_comp_elect'");
     }
 
 }
