@@ -14,7 +14,7 @@ import framework.componentes.Tabla;
 import framework.componentes.Tabulador;
 import framework.componentes.VisualizarPDF;
 import javax.ejb.EJB;
-import servicios.sri.ServicioComprobatesElectronicos;
+//import servicios.sri.ServicioComprobatesElectronicos;
 import sistema.aplicacion.Pantalla;
 
 /**
@@ -23,9 +23,8 @@ import sistema.aplicacion.Pantalla;
  */
 public class pre_comprobantes_electronicos extends Pantalla {
 
-    @EJB
-    private final ServicioComprobatesElectronicos ser_comprobante = (ServicioComprobatesElectronicos) utilitario.instanciarEJB(ServicioComprobatesElectronicos.class);
-
+//    @EJB
+//    private final ServicioComprobatesElectronicos ser_comprobante = (ServicioComprobatesElectronicos) utilitario.instanciarEJB(ServicioComprobatesElectronicos.class);
     private Tabla tab_facturas = new Tabla();
 
     private final Combo com_estados = new Combo();
@@ -75,7 +74,7 @@ public class pre_comprobantes_electronicos extends Pantalla {
 
         tab_facturas.setId("tab_facturas");
         tab_facturas.setIdCompleto("tab_tabulador:tab_facturas");
-        tab_facturas.setSql(ser_comprobante.getSqlFacturasElectronicas(cal_fecha_inicio.getFecha(), cal_fecha_fin.getFecha(), String.valueOf(com_estados.getValue())));
+//        tab_facturas.setSql(ser_comprobante.getSqlFacturasElectronicas(cal_fecha_inicio.getFecha(), cal_fecha_fin.getFecha(), String.valueOf(com_estados.getValue())));
 
         tab_facturas.getColumna("ide_srcom").setVisible(false);
         tab_facturas.getColumna("ide_cccfa").setVisible(false);
@@ -96,13 +95,13 @@ public class pre_comprobantes_electronicos extends Pantalla {
     }
 
     public void actualizarConsulta() {
-        tab_facturas.setSql(ser_comprobante.getSqlFacturasElectronicas(cal_fecha_inicio.getFecha(), cal_fecha_fin.getFecha(), String.valueOf(com_estados.getValue())));
+//        tab_facturas.setSql(ser_comprobante.getSqlFacturasElectronicas(cal_fecha_inicio.getFecha(), cal_fecha_fin.getFecha(), String.valueOf(com_estados.getValue())));
         tab_facturas.ejecutarSql();
     }
 
     public void generarPDF() {
         if (tab_facturas.getValorSeleccionado() != null) {
-            ser_comprobante.generarPDF(tab_facturas.getValorSeleccionado());
+//            ser_comprobante.generarPDF(tab_facturas.getValorSeleccionado());
             vipdf_comprobante.setVisualizarPDFUsuario();
             vipdf_comprobante.dibujar();
         } else {
@@ -112,7 +111,7 @@ public class pre_comprobantes_electronicos extends Pantalla {
 
     public void descargarXML() {
         if (tab_facturas.getValorSeleccionado() != null) {
-            ser_comprobante.generarXML(tab_facturas.getValorSeleccionado());
+//            ser_comprobante.generarXML(tab_facturas.getValorSeleccionado());
         } else {
             utilitario.agregarMensajeInfo("Seleccione un Comprobante", "");
         }
