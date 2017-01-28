@@ -107,8 +107,8 @@ public class ServicioFacturaElectronica extends ServicioBase {
             tab_cabecara.setValor("secuencial_srcom", tab_factura.getValor("secuencial_cccfa"));
 
             tab_cabecara.guardar();
-            ide_srcom = tab_factura.getValor("ide_srcom");
-            System.out.println(" *** - -- " + ide_srcom);
+            ide_srcom = tab_cabecara.getValor("ide_srcom");
+            System.out.println(" *** -- " + ide_srcom);
             if (tab_detalle.isEmpty() == false) {
                 for (int i = 0; i < tab_detalle.getTotalFilas(); i++) {
                     tab_detalle.eliminar();
