@@ -33,6 +33,7 @@ import java.util.Map;
 import javax.ejb.EJB;
 import javax.faces.event.ActionEvent;
 import org.primefaces.component.fieldset.Fieldset;
+import servicios.ceo.ServicioFacturaElectronica;
 import servicios.cuentas_x_cobrar.ServicioFacturaCxC;
 import servicios.escritorio.ServicioIntegracion;
 
@@ -43,73 +44,76 @@ import sistema.aplicacion.Pantalla;
  * @author dfjacome
  */
 public class pre_facturasCxC extends Pantalla {
-    
+
     private final MenuPanel mep_menu = new MenuPanel();
-    
+
     @EJB
     private final ServicioFacturaCxC ser_factura = (ServicioFacturaCxC) utilitario.instanciarEJB(ServicioFacturaCxC.class);
-    
+
     private final Combo com_pto_emision = new Combo();
     private final Calendario cal_fecha_inicio = new Calendario();
     private final Calendario cal_fecha_fin = new Calendario();
-    
+
     private FacturaCxC fcc_factura = new FacturaCxC();
-    
+
     private Tabla tab_tabla;
-    
+
     private GraficoCartesiano gca_facturas;
     private GraficoPastel gpa_facturas;
     private Combo com_periodo;
     private Combo com_mes;
-    
+
     private Combo com_estados_fe;
     private VisualizarPDF vipdf_comprobante = new VisualizarPDF();
-    
+
     private Reporte rep_reporte = new Reporte();
     private SeleccionFormatoReporte sel_rep = new SeleccionFormatoReporte();
-    
+
     private AsientoContable asc_asiento = new AsientoContable();
     private Mascara mas_secuencial;
-    
+
     private Confirmar con_confirma = new Confirmar();
-    
+
     @EJB
     private final ServicioIntegracion ser_integra = (ServicioIntegracion) utilitario.instanciarEJB(ServicioIntegracion.class);
-    
+
+    @EJB
+    private final ServicioFacturaElectronica ser_facElect = (ServicioFacturaElectronica) utilitario.instanciarEJB(ServicioFacturaElectronica.class);
+
     private Radio rad_facelectronica = new Radio();
-    
+
     public pre_facturasCxC() {
-        
+
         bar_botones.quitarBotonsNavegacion();
         bar_botones.quitarBotonGuardar();
         bar_botones.quitarBotonEliminar();
         bar_botones.agregarReporte();
-        
+
         com_pto_emision.setId("com_pto_emision");
         com_pto_emision.setCombo(ser_factura.getSqlPuntosEmision());
         com_pto_emision.setMetodo("actualizarFacturas");
         com_pto_emision.eliminarVacio();
         bar_botones.agregarComponente(new Etiqueta("FACTURACIÓN:"));
         bar_botones.agregarComponente(com_pto_emision);
-        
+
         bar_botones.agregarComponente(new Etiqueta("FECHA DESDE :"));
         cal_fecha_inicio.setValue(utilitario.getFecha(utilitario.getAnio(utilitario.getFechaActual()) + "-01-01"));
         bar_botones.agregarComponente(cal_fecha_inicio);
-        
+
         bar_botones.agregarComponente(new Etiqueta("FECHA HASTA :"));
         cal_fecha_fin.setFechaActual();
         bar_botones.agregarComponente(cal_fecha_fin);
-        
+
         Boton bot_consultar = new Boton();
         bot_consultar.setTitle("Buscar");
         bot_consultar.setMetodo("actualizarFacturas");
         bot_consultar.setIcon("ui-icon-search");
         bar_botones.agregarComponente(bot_consultar);
-        
+
         fcc_factura.setId("fcc_factura");
         fcc_factura.getBot_aceptar().setMetodo("guardar");
         agregarComponente(fcc_factura);
-        
+
         mep_menu.setMenuPanel("OPCIONES FACTURA", "20%");
         mep_menu.agregarItem("Listado de Facturas", "dibujarFacturas", "ui-icon-note");
         mep_menu.agregarItem("Generar Asiento Contable", "dibujarFacturasNoContabilizadas", "ui-icon-notice");
@@ -124,20 +128,20 @@ public class pre_facturasCxC extends Pantalla {
         mep_menu.agregarItem("Configuración", "dibujarConfiguraFE", "ui-icon-wrench");
         agregarComponente(mep_menu);
         dibujarFacturas();
-        
+
         vipdf_comprobante.setId("vipdf_comprobante");
         agregarComponente(vipdf_comprobante);
-        
+
         rep_reporte.setId("rep_reporte");
         rep_reporte.getBot_aceptar().setMetodo("aceptarReporte");
         sel_rep.setId("sel_rep");
         agregarComponente(rep_reporte);
         agregarComponente(sel_rep);
-        
+
         asc_asiento.setId("asc_asiento");
         asc_asiento.getBot_aceptar().setMetodo("guardar");
         agregarComponente(asc_asiento);
-        
+
         con_confirma.setId("con_confirma");
         con_confirma.setMessage("Está seguro de Anular la Factura Seleccionada ?");
         con_confirma.setTitle("ANULAR FACTURA");
@@ -145,15 +149,15 @@ public class pre_facturasCxC extends Pantalla {
         con_confirma.getBot_cancelar().setValue("No");
         agregarComponente(con_confirma);
     }
-    
+
     public void dibujarImportar() {
-        
+
         ser_integra.importarFacturas("");
-        
+
         mep_menu.dibujar(9, "IMPORTAR FACTURA DE VENTAS DEL SISTEMA DE FACTURACIÓN", new Etiqueta("Importar facturas"));
-        
+
     }
-    
+
     public void dibujarFacturas() {
         Barra bar_menu = new Barra();
         bar_menu.setId("bar_menu");
@@ -162,16 +166,17 @@ public class pre_facturasCxC extends Pantalla {
         bot_ver.setValue("Ver Factura");
         bot_ver.setMetodo("abrirVerFactura");
         bar_menu.agregarComponente(bot_ver);
-        
+
         Boton bot_anular = new Boton();
         bot_anular.setValue("Anular Factura");
         bot_anular.setMetodo("abrirAnularFactura");
         bar_menu.agregarComponente(bot_anular);
-        
+
         Boton bot_retención = new Boton();
-        bot_retención.setValue("Generar Retención");
+        bot_retención.setValue("Generar FE");
+        bot_retención.setMetodo("generarFacturaElectronica");
         bar_menu.agregarBoton(bot_retención);
-        
+
         tab_tabla = new Tabla();
         tab_tabla.setId("tab_tabla");
         tab_tabla.setSql(ser_factura.getSqlFacturas(com_pto_emision.getValue() + "", cal_fecha_inicio.getFecha(), cal_fecha_fin.getFecha()));
@@ -214,7 +219,15 @@ public class pre_facturasCxC extends Pantalla {
         gru.getChildren().add(pat_panel);
         mep_menu.dibujar(1, "LISTADO DE FACTURAS", gru);
     }
-    
+
+    public void generarFacturaElectronica() {
+        if (tab_tabla.getValor("ide_cccfa") != null) {
+            ser_facElect.generarFacturaElectronica(tab_tabla.getValor("ide_cccfa"));
+        } else {
+            utilitario.agregarMensajeError("Debe seleccionar una Factura", "");
+        }
+    }
+
     public void abrirAnularFactura() {
         if (tab_tabla.getValor("ide_cccfa") != null) {
             con_confirma.getBot_aceptar().setMetodo("anularFactura");
@@ -222,9 +235,9 @@ public class pre_facturasCxC extends Pantalla {
         } else {
             utilitario.agregarMensajeError("Debe seleccionar una Factura", "");
         }
-        
+
     }
-    
+
     public void dibujarFacturasNoContabilizadas() {
         Barra bar_menu = new Barra();
         bar_menu.setId("bar_menu");
@@ -238,7 +251,7 @@ public class pre_facturasCxC extends Pantalla {
         bot_ver.setValue("Ver Factura");
         bot_ver.setMetodo("abrirVerFactura");
         bar_menu.agregarComponente(bot_ver);
-        
+
         tab_tabla = new Tabla();
         tab_tabla.setId("tab_seleccion");
         tab_tabla.setSql(ser_factura.getSqlFacturasNoContabilizadas(com_pto_emision.getValue() + "", cal_fecha_inicio.getFecha(), cal_fecha_fin.getFecha()));
@@ -257,7 +270,7 @@ public class pre_facturasCxC extends Pantalla {
         //tab_tabla.setLectura(true);   
         tab_tabla.setTipoSeleccion(true);
         tab_tabla.setSeleccionTabla("multiple");
-        
+
         tab_tabla.dibujar();
         PanelTabla pat_panel = new PanelTabla();
         pat_panel.setPanelTabla(tab_tabla);
@@ -266,7 +279,7 @@ public class pre_facturasCxC extends Pantalla {
         gru.getChildren().add(pat_panel);
         mep_menu.dibujar(2, "FACTURAS NO CONTABILIZADAS", gru);
     }
-    
+
     public void abrirGeneraAsiento() {
         if (tab_tabla.getFilasSeleccionadas() != null && tab_tabla.getFilasSeleccionadas().length() > 0) {
             asc_asiento.nuevoAsiento();
@@ -289,7 +302,7 @@ public class pre_facturasCxC extends Pantalla {
         tab_tabla.setFilaActual(lin_ide_cnccc.getDir());
         asc_asiento.dibujar();
     }
-    
+
     public void dibujarFacturasAnuladas() {
         tab_tabla = new Tabla();
         tab_tabla.setId("tab_tabla");
@@ -314,14 +327,14 @@ public class pre_facturasCxC extends Pantalla {
         tab_tabla.dibujar();
         PanelTabla pat_panel = new PanelTabla();
         pat_panel.setPanelTabla(tab_tabla);
-        
+
         mas_secuencial = new Mascara();
         mas_secuencial.setId("mas_secuencial");
         mas_secuencial.setMask("999999999");
-        
+
         Fieldset fie_anula = new Fieldset();
         fie_anula.setLegend("Ingresar Factura Anulada");
-        
+
         Grid gri = new Grid();
         gri.setColumns(4);
         gri.getChildren().add(new Etiqueta("<strong>NUM. SECUENCIAL :</strong> <span style='color:red;font-weight: bold;'> *</span>"));
@@ -331,15 +344,15 @@ public class pre_facturasCxC extends Pantalla {
         bot_anula.setValue("Anular");
         bot_anula.setMetodo("ingresarAnulada");
         gri.getChildren().add(bot_anula);
-        
+
         fie_anula.getChildren().add(gri);
-        
+
         Grupo gru = new Grupo();
         gru.getChildren().add(fie_anula);
         gru.getChildren().add(pat_panel);
         mep_menu.dibujar(3, "FACTURAS ANULADAS", gru);
     }
-    
+
     public void dibujarFacturasPorCobrar() {
         tab_tabla = new Tabla();
         tab_tabla.setId("tab_tabla");
@@ -367,26 +380,26 @@ public class pre_facturasCxC extends Pantalla {
         tab_tabla.dibujar();
         PanelTabla pat_panel = new PanelTabla();
         pat_panel.setPanelTabla(tab_tabla);
-        
+
         mep_menu.dibujar(4, "FACTURAS POR COBRAR", pat_panel);
     }
-    
+
     public void dibujarGraficoVentas() {
         Grupo grupo = new Grupo();
         gca_facturas = new GraficoCartesiano();
         gca_facturas.setId("gca_facturas");
-        
+
         gpa_facturas = new GraficoPastel();
         gpa_facturas.setId("gpa_facturas");
         gpa_facturas.setShowDataLabels(true);
         gpa_facturas.setStyle("width:300px;");
-        
+
         com_periodo = new Combo();
         com_periodo.setMetodo("actualizarFacturas");
         com_periodo.setCombo(ser_factura.getSqlAniosFacturacion());
         com_periodo.eliminarVacio();
         com_periodo.setValue(utilitario.getAnio(utilitario.getFechaActual()));
-        
+
         tab_tabla = new Tabla();
         tab_tabla.setId("tab_tabla");
         tab_tabla.setSql(ser_factura.getSqlTotalVentasMensuales(String.valueOf(com_pto_emision.getValue()), String.valueOf(com_periodo.getValue())));
@@ -398,7 +411,7 @@ public class pre_facturasCxC extends Pantalla {
         tab_tabla.getColumna("iva").alinearDerecha();
         tab_tabla.getColumna("total").alinearDerecha();
         tab_tabla.dibujar();
-        
+
         Grid gri_opciones = new Grid();
         gri_opciones.setColumns(2);
         gri_opciones.getChildren().add(new Etiqueta("<strong>PERÍODO :</strong>"));
@@ -406,7 +419,7 @@ public class pre_facturasCxC extends Pantalla {
         PanelTabla pat_panel = new PanelTabla();
         pat_panel.getChildren().add(gri_opciones);
         pat_panel.setPanelTabla(tab_tabla);
-        
+
         Grid gri = new Grid();
         gri.setWidth("100%");
         gri.setColumns(2);
@@ -414,43 +427,43 @@ public class pre_facturasCxC extends Pantalla {
         gri.getChildren().add(pat_panel);
         gri.getChildren().add(gpa_facturas);
         grupo.getChildren().add(gri);
-        
+
         gca_facturas.setTitulo("VENTAS MENSUALES");
         gca_facturas.agregarSerie(tab_tabla, "nombre_gemes", "total", "VENTAS " + String.valueOf(com_periodo.getValue()));
         grupo.getChildren().add(gca_facturas);
         mep_menu.dibujar(5, "GRAFICOS DE VENTAS", grupo);
     }
-    
+
     public void dibujarReporteVentas() {
-        
+
         Barra bar_menu = new Barra();
         bar_menu.setId("bar_menu");
         bar_menu.limpiar();
-        
+
         com_mes = new Combo();
         com_mes.setMetodo("actualizarFacturas");
         com_mes.setCombo(ser_factura.getSqlMeses());
         com_mes.eliminarVacio();
         com_mes.setValue(String.valueOf(utilitario.getMes(utilitario.getFechaActual())));
-        
+
         com_periodo = new Combo();
         com_periodo.setMetodo("actualizarFacturas");
         com_periodo.setCombo(ser_factura.getSqlAniosFacturacion());
         com_periodo.eliminarVacio();
         com_periodo.setValue(utilitario.getAnio(utilitario.getFechaActual()));
-        
+
         bar_menu.agregarComponente(new Etiqueta("<strong>PERÍODO :</strong>"));
         bar_menu.agregarComponente(com_periodo);
         bar_menu.agregarComponente(new Etiqueta("<strong>MES :</strong>"));
         bar_menu.agregarComponente(com_mes);
-        
+
         tab_tabla = new Tabla();
         tab_tabla.setId("tab_tabla");
         tab_tabla.setSql(ser_factura.getSqlVentasMensuales(com_pto_emision.getValue() + "", com_mes.getValue() + "", com_periodo.getValue() + ""));
         tab_tabla.getColumna("ide_cccfa").setVisible(false);
         tab_tabla.getColumna("observacion_cccfa").setVisible(false);
         tab_tabla.setRows(15);
-        
+
         tab_tabla.setLectura(true);
         tab_tabla.getColumna("NOM_GEPER").setLongitud(100);
         tab_tabla.setColumnaSuma("ventas12,ventas0,valor_iva_cccfa,total_cccfa");
@@ -461,26 +474,26 @@ public class pre_facturasCxC extends Pantalla {
         tab_tabla.dibujar();
         PanelTabla pat_panel = new PanelTabla();
         pat_panel.setPanelTabla(tab_tabla);
-        
+
         Grupo grupo = new Grupo();
         grupo.getChildren().add(bar_menu);
         grupo.getChildren().add(pat_panel);
-        
+
         mep_menu.dibujar(7, "REPORTE DE VENTAS POR MES Y PERÍODO", grupo);
-        
+
     }
-    
+
     public void dibujarFacturaElectronica() {
         Grupo grupo = new Grupo();
-        
+
         Barra bar_menu = new Barra();
         bar_menu.setId("bar_menu");
         bar_menu.limpiar();
-        
+
         com_estados_fe = new Combo();
         com_estados_fe.setCombo("SELECT * FROM sri_estado_comprobante order by nombre_sresc");
         com_estados_fe.setMetodo("actualizarFacturas");
-        
+
         bar_menu.agregarComponente(new Etiqueta("ESTADOS COMPROBANTES ELECTRÓNICOS :"));
         bar_menu.agregarComponente(com_estados_fe);
         bar_menu.agregarSeparador();
@@ -488,7 +501,7 @@ public class pre_facturasCxC extends Pantalla {
         bot_pdf.setValue("Ver PDF");
         bot_pdf.setMetodo("generarPDF");
         bar_menu.agregarComponente(bot_pdf);
-        
+
         Boton bot_xml = new Boton();
         bot_xml.setValue("Descargar XML");
         bot_xml.setMetodo("descargarXML");
@@ -501,21 +514,21 @@ public class pre_facturasCxC extends Pantalla {
         tab_tabla.getColumna("ide_srcom").setVisible(false);
         tab_tabla.getColumna("ide_cccfa").setVisible(false);
         tab_tabla.getColumna("SECUENCIAL_SRCOM").setFiltroContenido();
-        
+
         tab_tabla.setLectura(true);
         tab_tabla.setRows(15);
         tab_tabla.dibujar();
         PanelTabla pat_panel = new PanelTabla();
         pat_panel.setPanelTabla(tab_tabla);
-        
+
         grupo.getChildren().add(bar_menu);
         grupo.getChildren().add(pat_panel);
-        
+
         mep_menu.dibujar(8, "FACTURAS ELECTRÓNICAS", grupo);
     }
-    
+
     public void dibujarConfiguraFE() {
-        
+
         tab_tabla = new Tabla();
         tab_tabla.setId("tab_tabla");
         tab_tabla.setTabla("sri_firma_digital", "ide_srfid", 9);
@@ -525,9 +538,9 @@ public class pre_facturasCxC extends Pantalla {
         tab_tabla.getColumna("disponible_srfid").setCheck();
         tab_tabla.getColumna("ruta_srfid").setControl("Texto");
         tab_tabla.dibujar();
-        
+
         PanelTabla pat_panel = new PanelTabla();
-        
+
         Grid g1 = new Grid();
         g1.setColumns(2);
         g1.getChildren().add(new Etiqueta("<strong> HACE FACTURACIÓN ELECTRONICA ? </strong>"));
@@ -541,7 +554,7 @@ public class pre_facturasCxC extends Pantalla {
         pat_panel.getMenuTabla().getItem_eliminar().setRendered(true);
         mep_menu.dibujar(9, "CONFIGURACIÓN FACTURAS ELECTRÓNICAS", pat_panel);
     }
-    
+
     public void abrirVerFactura() {
         if (mep_menu.getOpcion() == 2) {
             if (tab_tabla.getSeleccionados() != null && tab_tabla.getSeleccionados().length > 0) {
@@ -556,17 +569,17 @@ public class pre_facturasCxC extends Pantalla {
         } else {
             utilitario.agregarMensajeInfo("Debe seleccionar una Factura", "");
         }
-        
+
     }
-    
+
     @Override
     public void abrirListaReportes() {
 //Se ejecuta cuando da click en el boton de Reportes de la Barra    
         rep_reporte.dibujar();
     }
-    
+
     Map parametro = new HashMap();
-    
+
     @Override
     public void aceptarReporte() {
 //Se ejecuta cuando se selecciona un reporte de la lista
@@ -595,7 +608,7 @@ public class pre_facturasCxC extends Pantalla {
             }
         }
     }
-    
+
     public void actualizarFacturas() {
         if (mep_menu.getOpcion() == 1) {
             tab_tabla.setSql(ser_factura.getSqlFacturas(com_pto_emision.getValue() + "", cal_fecha_inicio.getFecha(), cal_fecha_fin.getFecha()));
@@ -621,9 +634,9 @@ public class pre_facturasCxC extends Pantalla {
             tab_tabla.setSql(ser_factura.getSqlVentasMensuales(com_pto_emision.getValue() + "", com_mes.getValue() + "", com_periodo.getValue() + ""));
             tab_tabla.ejecutarSql();
         }
-        
+
     }
-    
+
     @Override
     public void insertar() {
         if (mep_menu.getOpcion() == 9) { //CONF FE
@@ -633,7 +646,7 @@ public class pre_facturasCxC extends Pantalla {
         fcc_factura.nuevaFactura();
         fcc_factura.dibujar();
     }
-    
+
     @Override
     public void guardar() {
         if (mep_menu.getOpcion() == 9) { //CONF FE
@@ -660,7 +673,7 @@ public class pre_facturasCxC extends Pantalla {
             }
         }
     }
-    
+
     public void anularFactura() {
         if (tab_tabla.getValor("ide_cccfa") != null) {
             ser_factura.anularFactura(tab_tabla.getValor("ide_cccfa"));
@@ -672,7 +685,7 @@ public class pre_facturasCxC extends Pantalla {
             utilitario.agregarMensajeError("Debe seleccionar una Factura", "");
         }
     }
-    
+
     public void ingresarAnulada() {
         if (mas_secuencial.getValue() != null) {
             ser_factura.anularSecuencial(String.valueOf(mas_secuencial.getValue()), String.valueOf(com_pto_emision.getValue()));
@@ -686,84 +699,84 @@ public class pre_facturasCxC extends Pantalla {
             utilitario.agregarMensajeError("Debe ingresar el Número Secuencial de la Factura", "");
         }
     }
-    
+
     @Override
     public void eliminar() {
         if (mep_menu.getOpcion() == 9) {
             tab_tabla.eliminar();
         }
     }
-    
+
     public FacturaCxC getFcc_factura() {
         return fcc_factura;
     }
-    
+
     public void setFcc_factura(FacturaCxC fcc_factura) {
         this.fcc_factura = fcc_factura;
     }
-    
+
     public GraficoCartesiano getGca_facturas() {
         return gca_facturas;
     }
-    
+
     public void setGca_facturas(GraficoCartesiano gca_facturas) {
         this.gca_facturas = gca_facturas;
     }
-    
+
     public VisualizarPDF getVipdf_comprobante() {
         return vipdf_comprobante;
     }
-    
+
     public void setVipdf_comprobante(VisualizarPDF vipdf_comprobante) {
         this.vipdf_comprobante = vipdf_comprobante;
     }
-    
+
     public Reporte getRep_reporte() {
         return rep_reporte;
     }
-    
+
     public void setRep_reporte(Reporte rep_reporte) {
         this.rep_reporte = rep_reporte;
     }
-    
+
     public SeleccionFormatoReporte getSel_rep() {
         return sel_rep;
     }
-    
+
     public void setSel_rep(SeleccionFormatoReporte sel_rep) {
         this.sel_rep = sel_rep;
     }
-    
+
     public AsientoContable getAsc_asiento() {
         return asc_asiento;
     }
-    
+
     public void setAsc_asiento(AsientoContable asc_asiento) {
         this.asc_asiento = asc_asiento;
     }
-    
+
     public Tabla getTab_tabla() {
         return tab_tabla;
     }
-    
+
     public void setTab_tabla(Tabla tab_tabla) {
         this.tab_tabla = tab_tabla;
     }
-    
+
     public Tabla getTab_seleccion() {
         return tab_tabla;
     }
-    
+
     public void setTab_seleccion(Tabla tab_tabla) {
         this.tab_tabla = tab_tabla;
     }
-    
+
     public Confirmar getCon_confirma() {
         return con_confirma;
     }
-    
+
     public void setCon_confirma(Confirmar con_confirma) {
         this.con_confirma = con_confirma;
     }
-    
+
 }
