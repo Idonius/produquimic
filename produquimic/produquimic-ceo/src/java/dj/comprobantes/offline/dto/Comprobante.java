@@ -102,10 +102,10 @@ public final class Comprobante implements Serializable {
             } else {
                 this.subtotal = resultado.getBigDecimal("subtotal_srcom");
             }
-            if (resultado.getBigDecimal("iva_srcom ") == null) {
+            if (resultado.getBigDecimal("iva_srcom") == null) {
                 this.iva = new BigDecimal("0");
             } else {
-                this.iva = resultado.getBigDecimal("iva_srcom ");
+                this.iva = resultado.getBigDecimal("iva_srcom");
             }
             this.formaCobro = resultado.getString("forma_cobre_srcom");
 
