@@ -184,7 +184,7 @@ public class pre_facturasCxC extends Pantalla {
         tab_tabla.getColumna("ide_cccfa").setVisible(false);
         tab_tabla.getColumna("ide_ccefa").setVisible(false);
         tab_tabla.getColumna("nombre_ccefa").setFiltroContenido();
-        tab_tabla.getColumna("nombre_ccefa").setVisible(false);
+        tab_tabla.getColumna("nombre_ccefa").setVisible(true);
         tab_tabla.getColumna("nombre_ccefa").setNombreVisual("ESTADO");
         tab_tabla.getColumna("secuencial_cccfa").setFiltroContenido();
         tab_tabla.getColumna("secuencial_cccfa").setNombreVisual("SECUENCIAL");
@@ -223,6 +223,7 @@ public class pre_facturasCxC extends Pantalla {
     public void generarFacturaElectronica() {
         if (tab_tabla.getValor("ide_cccfa") != null) {
             ser_facElect.generarFacturaElectronica(tab_tabla.getValor("ide_cccfa"));
+            tab_tabla.actualizar();
         } else {
             utilitario.agregarMensajeError("Debe seleccionar una Factura", "");
         }

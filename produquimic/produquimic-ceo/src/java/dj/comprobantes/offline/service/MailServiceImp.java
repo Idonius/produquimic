@@ -25,9 +25,11 @@ import java.util.Properties;
 import javax.activation.DataHandler;
 import javax.activation.FileDataSource;
 import javax.ejb.EJB;
+import javax.mail.Authenticator;
 import javax.mail.BodyPart;
 import javax.mail.Message;
 import javax.mail.MessagingException;
+import javax.mail.PasswordAuthentication;
 import javax.mail.Session;
 import javax.mail.Transport;
 import javax.mail.internet.InternetAddress;
@@ -54,6 +56,7 @@ public class MailServiceImp implements MailService {
         if (comprobanteMail == null) {
             return null;
         }
+
         if (comprobanteMail.getCliente().getCorreo() == null) {
             return null;
         }
@@ -69,7 +72,7 @@ public class MailServiceImp implements MailService {
         try {
             BodyPart texto = new MimeBodyPart();
             String stb_mensaje = "<html><head><title></title></head><body bgcolor='#EFF0F2' style='font-family: sans-serif'><div align=\"justify\">"
-                    + "<span style='color:#939598;font-size:44px;'>Ban</span><span style='color:#6D6E71;font-size:44px;'>Ecuador</span>"
+                    + "<span style='color:#939598;font-size:44px;'>Produquimic</span>"
                     + "<div align='right' style='background-color:#43BEAC;color:white;white:100%;padding-right:15px;height:30px;font-size:24px;'>  COMPROBANTES ELECTRONICOS</div>"
                     + "<div style='padding-left:15px;font-size:14px;'>"
                     + "<p>Estimad@ " + comprobanteMail.getCliente().getNombreCliente().toUpperCase() + "</p>"
@@ -121,6 +124,7 @@ public class MailServiceImp implements MailService {
             message.setContent(multiParte);
             listaMensajes.add(message);
         } catch (MessagingException | GenericException | IOException e) {
+            e.printStackTrace();
         }
 
         return str;
@@ -129,15 +133,25 @@ public class MailServiceImp implements MailService {
     private void configurarMail() {
         if (session == null) {
             ///SSH
-            Properties propiedades = new Properties();
-            propiedades.setProperty("mail.smtp.starttls.enable", "false");
-            propiedades.setProperty("mail.smtp.auth", "true");
-            propiedades.setProperty("mail.transport.protocol", "smtp");
-            //Propiedades smtp
-            propiedades.put("mail.smtp.host", ParametrosSistemaEnum.MAIL_SMTP_HOST.getCodigo());
-            propiedades.setProperty("mail.smtp.port", ParametrosSistemaEnum.MAIL_SMTP_PORT.getCodigo());
-            propiedades.setProperty("mail.smtp.user", ParametrosSistemaEnum.MAIL_GENERIC.getCodigo());
-            session = Session.getDefaultInstance(propiedades, null);
+            try {
+                // Realiza la conexion y valida credenciales smtp
+                Properties props = new Properties();
+                props.put("mail.smtp.host", ParametrosSistemaEnum.MAIL_SMTP_HOST.getCodigo());
+                props.put("mail.smtp.socketFactory.port", ParametrosSistemaEnum.MAIL_SMTP_PORT.getCodigo());
+                props.put("mail.smtp.auth", "true");
+                props.put("mail.smtp.ssl.enable", "true");
+                props.put("mail.smtp.starttls.enable", "true");
+                props.put("mail.smtp.port", ParametrosSistemaEnum.MAIL_SMTP_PORT.getCodigo());
+                Authenticator auth = new Authenticator() {
+                    protected PasswordAuthentication getPasswordAuthentication() {
+                        return new PasswordAuthentication(ParametrosSistemaEnum.MAIL_GENERIC.getCodigo(), ParametrosSistemaEnum.MAIL_PASSWORD.getCodigo());
+                    }
+                };
+                session = Session.getInstance(props, auth);
+            } catch (Exception e) {
+                System.out.println("Error al Conectarse al Servidor de Correo Electrónico SMTP : " + e.getMessage());
+            }
+
         }
     }
 

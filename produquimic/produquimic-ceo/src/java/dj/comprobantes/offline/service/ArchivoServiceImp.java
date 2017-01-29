@@ -208,7 +208,7 @@ public class ArchivoServiceImp implements ArchivoService {
             parametros.put("AMBIENTE", utilitario.getValorEtiqueta(cadenaXML, "ambiente"));
             parametros.put("NOM_COMERCIAL", utilitario.getValorEtiqueta(cadenaXML, "nombreComercial"));
             // Porcentaje iva
-            double dou_base_no_objeto_iva = 0; // No aplica
+            double dou_base_no_objeto_iva = 0; // No aplica  
             double dou_base_tarifa0 = 0;
             double dou_base_grabada = 0;
             try {
@@ -225,7 +225,7 @@ public class ArchivoServiceImp implements ArchivoService {
                 dou_porcentaje_iva = (comprobante.getIva().doubleValue() * 100) / totalSinImpuestos;
             } catch (Exception e) {
             }
-            parametros.put("TARIFA_IVA", TipoImpuestoIvaEnum.getCodigo(dou_porcentaje_iva));
+            parametros.put("TARIFA_IVA", TipoImpuestoIvaEnum.getPorcentaje(dou_porcentaje_iva));
         } catch (Exception e) {
         }
         return parametros;
