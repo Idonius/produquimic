@@ -68,9 +68,9 @@ public class ServicioFacturaCxC extends ServicioBase {
      */
     public String getSqlFacturas(String ide_ccdaf, String fechaInicio, String fechaFin) {
         if (isFacturaElectronica()) { //si tiene facturacion electrónica
-            return "select a.ide_cccfa, secuencial_cccfa,ide_cnccc,a.ide_ccefa,claveacceso_srcom as CLAVE_ACCESO,nombre_sresc as nombre_ccefa, fecha_emisi_cccfa,nom_geper,identificac_geper,base_grabada_cccfa as ventas12,"
+            return "select a.ide_cccfa, secuencial_cccfa,ide_cnccc,a.ide_ccefa,nombre_sresc as nombre_ccefa, fecha_emisi_cccfa,nom_geper,identificac_geper,base_grabada_cccfa as ventas12,"
                     + "base_tarifa0_cccfa+base_no_objeto_iva_cccfa as ventas0,valor_iva_cccfa,total_cccfa, "
-                    + "observacion_cccfa, fecha_trans_cccfa "
+                    + "claveacceso_srcom as CLAVE_ACCESO, fecha_trans_cccfa "
                     + "from cxc_cabece_factura a "
                     + "inner join gen_persona b on a.ide_geper=b.ide_geper "
                     + "left join sri_comprobante d on a.ide_srcom=d.ide_srcom "

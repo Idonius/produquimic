@@ -13,7 +13,7 @@ import javax.ejb.LocalBean;
  * @author DIEGOFERNANDOJACOMEG
  */
 @Stateless
-@LocalBean
+
 public class ServicioCPanel {
 
     // Add business logic below. (Right-click in editor and choose

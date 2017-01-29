@@ -26,10 +26,10 @@ import servicios.contabilidad.ServicioConfiguracion;
 @Stateless
 
 public class ServicioFacturaElectronica extends ServicioBase {
-
+    
     @EJB
     private ServicioConfiguracion ser_configuracion;
-
+    
     @EJB
     private ComprobanteService comprobanteService;
 
@@ -41,7 +41,7 @@ public class ServicioFacturaElectronica extends ServicioBase {
      */
     public String generarFacturaElectronica(String ide_cccfa) {
         String ide_srcom = "-1";
-
+        
         TablaGenerica tab_factura = utilitario.consultar("select a.ide_cccfa,secuencial_cccfa,fecha_emisi_cccfa,serie_ccdaf,base_grabada_cccfa\n"
                 + ",base_tarifa0_cccfa,valor_iva_cccfa,total_cccfa,alterno_ats,identificac_geper\n"
                 + ",a.ide_geper,ide_cntdo,f.ide_inarti,codigo_inarti,observacion_ccdfa,nombre_inarti,cantidad_ccdfa\n"
@@ -53,7 +53,7 @@ public class ServicioFacturaElectronica extends ServicioBase {
                 + "inner join con_deta_forma_pago e on a.ide_cndfp=e.ide_cndfp\n"
                 + "inner join  inv_articulo f on c.ide_inarti =f.ide_inarti\n"
                 + "where a.ide_cccfa=" + ide_cccfa);
-
+        
         if (tab_factura.isEmpty() == false) {
             if (tab_factura.getValor("ide_srcom") != null) {
                 ide_srcom = tab_factura.getValor("ide_srcom");
@@ -83,7 +83,7 @@ public class ServicioFacturaElectronica extends ServicioBase {
             } catch (Exception e) {
             }
             dou_subtotal = dou_base0 + dou_basegraba;
-
+            
             tab_cabecara.setValor("ide_sresc", String.valueOf(EstadoComprobanteEnum.PENDIENTE.getCodigo()));
             tab_cabecara.setValor("coddoc_srcom", TipoComprobanteEnum.FACTURA.getCodigo());
             tab_cabecara.setValor("tipoemision_srcom", TipoEmisionEnum.NORMAL.getCodigo());
@@ -102,16 +102,18 @@ public class ServicioFacturaElectronica extends ServicioBase {
             tab_cabecara.setValor("en_nube_srcom", "false");
             tab_cabecara.setValor("ide_geper", tab_factura.getValor("ide_geper"));
             tab_cabecara.setValor("ide_cntdo", tab_factura.getValor("ide_cntdo"));
+            tab_cabecara.setValor("forma_cobro_srcom", tab_factura.getValor("alterno_ats"));
             tab_cabecara.setValor("ide_empr", utilitario.getVariable("ide_empr"));
             tab_cabecara.setValor("ide_sucu", utilitario.getVariable("ide_sucu"));
-            tab_cabecara.setValor("secuencial_srcom", tab_factura.getValor("secuencial_cccfa"));
+            //tab_cabecara.setValor("secuencial_srcom", tab_factura.getValor("secuencial_cccfa")); !!!!!SOLO PARA PRUEBAS COMENTADO
 
             tab_cabecara.guardar();
             ide_srcom = tab_cabecara.getValor("ide_srcom");
-            System.out.println(" *** -- " + ide_srcom);
+            
             if (tab_detalle.isEmpty() == false) {
                 for (int i = 0; i < tab_detalle.getTotalFilas(); i++) {
-                    tab_detalle.eliminar();
+                    tab_detalle.modificar(i);
+                    tab_detalle.setValor("ide_srcom", null);
                 }
             }
             for (int i = 0; i < tab_factura.getTotalFilas(); i++) {
@@ -124,14 +126,15 @@ public class ServicioFacturaElectronica extends ServicioBase {
                 tab_detalle.setValor("precio_srdec", tab_factura.getValor(i, "precio_ccdfa"));
                 tab_detalle.setValor("descuento_detalle_srdec", "0.00");
                 tab_detalle.setValor("total_detalle_srdec", tab_factura.getValor(i, "total_ccdfa"));
-                if (tab_factura.getValor(i, "iva_inarti_ccdfa").equals("1")) {
-                    tab_detalle.setValor("porcentaje_iva_srdec", String.valueOf(ser_configuracion.getPorcentajeIva().intValue()));
+                
+                if (tab_factura.getValor(i, "iva_inarti_ccdfa").equalsIgnoreCase("1")) {
+                    tab_detalle.setValor("porcentaje_iva_srdec", String.valueOf((ser_configuracion.getPorcentajeIva() * 100)));
                 } else {
                     tab_detalle.setValor("porcentaje_iva_srdec", "0");
                 }
-
             }
             tab_detalle.guardar();
+            utilitario.getConexion().agregarSqlPantalla("delete from sri_detalle_comprobante where ide_srcom is null");
             if (utilitario.getConexion().ejecutarListaSql().isEmpty()) {
                 //Asigna secuencial a la factura
                 String strSecuencialF = getSecuencialFactura();
@@ -144,10 +147,10 @@ public class ServicioFacturaElectronica extends ServicioBase {
                 } catch (NumberFormatException | GenericException e) {
                     e.printStackTrace();
                 }
-
+                
             }
         }
-
+        
         return ide_srcom;
     }
 
@@ -164,7 +167,6 @@ public class ServicioFacturaElectronica extends ServicioBase {
             List lisResultado = utilitario.getConexion().consultar(sql.toString());
             maximo = Long.parseLong(String.valueOf(lisResultado.get(0)));
         } catch (Exception e) {
-            e.printStackTrace();
         }
         maximo++;
         Formatter fmt = new Formatter();
@@ -172,5 +174,5 @@ public class ServicioFacturaElectronica extends ServicioBase {
         fmt.close();
         return secuencial;
     }
-
+    
 }
