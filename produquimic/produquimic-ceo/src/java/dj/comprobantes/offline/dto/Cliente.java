@@ -29,7 +29,7 @@ public class Cliente implements Serializable {
     public Cliente(ResultSet resultado) {
         try {
             this.identificacion = resultado.getString("identificac_geper").trim();
-            this.tipoIdentificacion = resultado.getString("ide_getid").trim();
+            this.tipoIdentificacion = resultado.getString("alterno2_getid").trim();
             this.nombreCliente = resultado.getString("nom_geper").trim();
             this.direccion = resultado.getString("direccion_geper");
             this.telefono = resultado.getString("telefono_geper");

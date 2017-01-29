@@ -41,7 +41,7 @@ public class XmlComprobanteDAOImp implements XmlComprobanteDAO {
                 sriComprobante.setXmlcomprobante(res.getString("xml_srxmc"));
                 sriComprobante.setMensajerecepcion(res.getString("msg_recepcion_srxmc"));
                 sriComprobante.setMensajeautorizacion(res.getString("msg_autoriza_srxmc"));
-                if (res.getString("sc_estado") != null) {
+                if (res.getString("ide_sresc") != null) {
                     sriComprobante.setCodigoestado(EstadoComprobanteEnum.getCodigo(res.getString("ide_sresc")));
                 }
             }
@@ -69,8 +69,8 @@ public class XmlComprobanteDAOImp implements XmlComprobanteDAO {
                 String sc_msg_recepcion = sriComprobante.getMensajerecepcion() == null ? null : sriComprobante.getMensajerecepcion().replace("'", "\"");
                 String sc_xml_comp = sriComprobante.getXmlcomprobante() == null ? null : sriComprobante.getXmlcomprobante().replace("'", "\"");
                 String sql = "INSERT INTO sri_xml_comprobante "
-                        + "( ide_srxmc,ide_sresc,fecha_hora_srxmc,xml_srxmc ,msg_recepcion_srxmc,msg_autoriza_srxmc) "
-                        + "values (?,?,getDate(),?,?,?)";
+                        + "( ide_srcom,ide_sresc,fecha_hora_srxmc,xml_srxmc ,msg_recepcion_srxmc,msg_autoriza_srxmc) "
+                        + "values (?,?,now(),?,?,?)";
                 preparedStatement = conn.getPreparedStatement(sql);
                 preparedStatement.setLong(1, sriComprobante.getCodigocomprobante().getCodigocomprobante());
                 preparedStatement.setInt(2, sriComprobante.getCodigoestado());
@@ -83,9 +83,9 @@ public class XmlComprobanteDAOImp implements XmlComprobanteDAO {
                 String sc_msg_recepcion = sriComprobante.getMensajerecepcion() == null ? null : sriComprobante.getMensajerecepcion().replace("'", "\"");
                 String sc_xml_comp = sriComprobante.getXmlcomprobante() == null ? null : sriComprobante.getXmlcomprobante().replace("'", "\"");
                 String sql = "UPDATE sri_xml_comprobante "
-                        + "set ide_srxmc=?, "
+                        + "set ide_srcom=?, "
                         + "ide_sresc=?, "
-                        + "fecha_hora_srxmc=getDate(), "
+                        + "fecha_hora_srxmc=now(), "
                         + "xml_srxmc=?, "
                         + "msg_recepcion_srxmc=?, "
                         + "msg_autoriza_srxmc=? "

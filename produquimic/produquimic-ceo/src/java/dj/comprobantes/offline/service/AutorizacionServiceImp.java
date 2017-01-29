@@ -46,7 +46,7 @@ public class AutorizacionServiceImp implements AutorizacionService {
     private final UtilitarioCeo utilitario = new UtilitarioCeo();
 
     @Override
-    public void enviarRecibidosOfflineSRI(Comprobante comprobateActual) throws GenericException {       
+    public void enviarRecibidosOfflineSRI(Comprobante comprobateActual) throws GenericException {
         RespuestaComprobante respuesta = enviarClaveDeAcceso(comprobateActual.getClaveacceso());
         if (respuesta != null) {
             // SRI recivio clave de acceso
@@ -71,7 +71,7 @@ public class AutorizacionServiceImp implements AutorizacionService {
                 }
                 try {
                     // Actualiza estado de respuesta
-                    //System.out.println("... " + autorizacion.getEstado() + "  " + mensajesAutorizacion.toString());
+                    System.out.println("... " + autorizacion.getEstado() + "  " + mensajesAutorizacion.toString());
                     comprobateActual.setCodigoestado(EstadoComprobanteEnum.getCodigo(autorizacion.getEstado()));
                     if (autorizacion.getEstado().equals(EstadoComprobanteEnum.AUTORIZADO.getDescripcion())) {
                         comprobateActual.setFechaautoriza(autorizacion.getFechaAutorizacion().toGregorianCalendar().getTime());
@@ -86,22 +86,22 @@ public class AutorizacionServiceImp implements AutorizacionService {
                                 .append("<comprobante><![CDATA[").append(autorizacion.getComprobante()).append("]]></comprobante>\n")
                                 .append("</autorizacion>");
                         comprobanteService.actualizarAutorizacionComprobante(stb_xml.toString(), comprobateActual, mensajesAutorizacion.toString());
-                        //    mailService.agregarCorreo(comprobateActual);   //******SI FUNCIONA
+                        mailService.agregarCorreo(comprobateActual);
                     } else {
                         comprobanteService.actualizarAutorizacionComprobante(autorizacion.getComprobante(), comprobateActual, mensajesAutorizacion.toString());
                     }
-                } catch (Exception e) {                    
+                } catch (Exception e) {
                     e.printStackTrace();
-                }                
+                }
                 break;
             }
-            // mailService.enviarTodos();   //******SI FUNCIONA 
+            mailService.enviarTodos();
         }
     }
 
     @Override
     public RespuestaComprobante enviarClaveDeAcceso(String claveDeAcceso) throws GenericException {
-        RespuestaComprobante response = null;        
+        RespuestaComprobante response = null;
         try {
             utilitario.instalarCertificados();
             int TIME_OUT = emisorService.getEmisor().getTiempomaxespera() == null ? 30 : emisorService.getEmisor().getTiempomaxespera();
@@ -113,9 +113,9 @@ public class AutorizacionServiceImp implements AutorizacionService {
             requestContext.put(BindingProviderProperties.REQUEST_TIMEOUT, TIME_OUT * 1000);
             requestContext.put(BindingProviderProperties.CONNECT_TIMEOUT, TIME_OUT * 1000);
             response = port.autorizacionComprobante(claveDeAcceso);
-        } catch (GenericException | MalformedURLException e) {            
+        } catch (GenericException | MalformedURLException e) {
             throw new GenericException(e);
-        }        
+        }
         return response;
     }
 

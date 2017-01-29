@@ -40,7 +40,7 @@ public class ComprobanteDAOImp implements ComprobanteDAO {
         PreparedStatement ps = null;
         ResultSet res = null;
         try {
-            String sql = "SELECT * FROM sri_comprobante  WHERE ide_sresc =?";
+            String sql = "SELECT * FROM sri_comprobante  WHERE ide_sresc =? limit 1"; //
             ps = con.getPreparedStatement(sql);
             ps.setInt(1, estado.getCodigo());
             res = ps.executeQuery();
@@ -131,7 +131,7 @@ public class ComprobanteDAOImp implements ComprobanteDAO {
     public void actualizar(Comprobante comprobante) throws GenericException {
         PreparedStatement preparedStatement = null;
         ConexionCEO con = new ConexionCEO();
-        String sql = "UPDATE cob_remesas..sri_comprobante set"
+        String sql = "UPDATE sri_comprobante set"
                 + " ide_sresc=?"
                 + " ,claveacceso_srcom=?"
                 + " ,ide_srfid=?"
@@ -139,18 +139,22 @@ public class ComprobanteDAOImp implements ComprobanteDAO {
                 + " ,tipoemision_srcom=?"
                 + " ,fechaautoriza_srcom=?"
                 + " WHERE ide_srcom=?";
-
         try {
             preparedStatement = con.getPreparedStatement(sql);
             preparedStatement.setInt(1, comprobante.getCodigoestado());
             preparedStatement.setString(2, comprobante.getClaveacceso());
-            preparedStatement.setInt(3, comprobante.getCodigofirma().getCodigofirma());
+            //    preparedStatement.setInt(3, comprobante.getCodigofirma().getCodigofirma());
+            preparedStatement.setInt(3, 1);
             preparedStatement.setString(4, comprobante.getNumAutorizacion());
             preparedStatement.setString(5, comprobante.getTipoemision());
-            preparedStatement.setString(6, utilitario.getFormatoFecha(comprobante.getFechaautoriza()));
+            if (comprobante.getFechaautoriza() != null) {
+                preparedStatement.setDate(6, new java.sql.Date(comprobante.getFechaautoriza().getTime()));
+            } else {
+                preparedStatement.setDate(6, null);
+            }
+
             preparedStatement.setLong(7, comprobante.getCodigocomprobante());
             preparedStatement.executeUpdate();
-
         } catch (SQLException e) {
             throw new GenericException("ERROR. No se puede actualizar el Comprobante", e);
         } finally {

@@ -33,8 +33,7 @@ public class EmisorDAOImp implements EmisorDAO {
             ConexionCEO conn = new ConexionCEO();
             ResultSet resultSet = null;
             try {
-                System.out.println("----  " + utilitario.getVariable("ide_sucu"));
-                resultSet = conn.consultar("select * from sri_emisor a inner join sis_empresa b on a.ide_empr=b.ide_empr where a.ide_empr=" + utilitario.getVariable("ide_empr"));
+                resultSet = conn.consultar("select * from sri_emisor a inner join sis_empresa b on a.ide_empr=b.ide_empr where a.ide_empr=0");
                 if (resultSet.next()) {
                     emisor = new Emisor();
                     emisor.setCodigoemisor(resultSet.getInt("ide_sremi"));
@@ -48,7 +47,6 @@ public class EmisorDAOImp implements EmisorDAO {
                     emisor.setAmbiente(resultSet.getInt("ambiente_sremi"));
                     emisor.setWsdlrecepcion(resultSet.getString("wsdl_recep_offline_sremi"));
                     emisor.setWsdlautirizacion(resultSet.getString("wsdl_autori_offline_sremi"));
-                    emisor.setXmlversion(resultSet.getString("re_xmlversion"));
                 }
             } catch (SQLException e) {
                 throw new GenericException("ERROR. No se puede retornar el Emisor", e);

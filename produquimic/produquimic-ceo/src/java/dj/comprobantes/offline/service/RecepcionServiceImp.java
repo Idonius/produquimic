@@ -73,7 +73,7 @@ public class RecepcionServiceImp implements RecepcionService {
             // Envia a servicio web de Recepcion del SRI
             RespuestaSolicitud respuesta = enviarComprobanteSRI(documentoFirmado);
             // Actualiza Estado y mensaje de respuesta
-            StringBuilder mensajesDevuelta = new StringBuilder();
+            StringBuilder mensajesDevuelta = new StringBuilder(); 
             RespuestaSolicitud.Comprobantes comprobantes = respuesta.getComprobantes();
             if (comprobantes != null) {
                 List<ec.gob.sri.comprobantes.ws.Comprobante> listaComprobantes = comprobantes.getComprobante();
@@ -90,7 +90,7 @@ public class RecepcionServiceImp implements RecepcionService {
                     }
                 }
             }
-            //System.out.println("... " + respuesta.getEstado() + "  " + mensajesDevuelta.toString());
+            System.out.println("... " + respuesta.getEstado() + "  " + mensajesDevuelta.toString());
             comprobateActual.setCodigoestado(EstadoComprobanteEnum.getCodigo(respuesta.getEstado()));
             comprobanteService.actualizarRecepcionComprobante(getStringDeDocument(documentoFirmado), comprobateActual, mensajesDevuelta.toString());//                   
 

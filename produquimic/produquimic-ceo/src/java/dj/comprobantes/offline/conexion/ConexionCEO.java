@@ -43,9 +43,9 @@ public class ConexionCEO {
     private void conectar() throws GenericException {
         try {
             Context ctx = new InitialContext();
-            DataSource ds = (DataSource) ctx.lookup(utilitario.getConexion().getUnidad_persistencia());
+            DataSource ds = (DataSource) ctx.lookup(utilitario.getPropiedad("recursojdbc"));
             this.cobCentral = ds.getConnection();
-            this.cobCentral.setAutoCommit(true);
+            //this.cobCentral.setAutoCommit(true); 
         } catch (NamingException | SQLException e) {
             throw new GenericException("ERROR. al conectar ", e);
         }

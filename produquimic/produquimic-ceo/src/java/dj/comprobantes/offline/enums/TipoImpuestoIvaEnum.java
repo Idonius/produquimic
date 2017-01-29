@@ -15,9 +15,9 @@ package dj.comprobantes.offline.enums;
  */
 public enum TipoImpuestoIvaEnum {
 
-    IVA_VENTA_0("0", "0"),
-    IVA_VENTA_12("2", "12"),
-    IVA_VENTA_14("3", "14"),
+    IVA_VENTA_0("0", "0.00"),
+    IVA_VENTA_12("2", "12.00"),
+    IVA_VENTA_14("3", "14.00"),
     IVA_NO_OBJETO("6", "NO OBJETO"),
     IVA_EXCENTO("7", "EXCENTO");
 
@@ -50,7 +50,7 @@ public enum TipoImpuestoIvaEnum {
      */
     public static String getCodigo(String porcentaje1) {
 
-        String codigo = null;
+        String codigo = IVA_VENTA_14.getCodigo(); //Por defecto
         if (porcentaje1.equals(IVA_VENTA_0.getPorcentaje())) {
             codigo = IVA_VENTA_0.getCodigo();
         } else if (porcentaje1.equals(IVA_VENTA_12.getPorcentaje())) {

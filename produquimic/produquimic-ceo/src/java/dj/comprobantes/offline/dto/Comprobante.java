@@ -74,7 +74,8 @@ public final class Comprobante implements Serializable {
             this.fechaemision = resultado.getDate("fechaemision_srcom");
             //this.direstablecimiento =   Direccion donde se factura
             //this.guiaremision = resultado.getString("va_guia_remision");
-            this.totalsinimpuestos = resultado.getBigDecimal("base_grabada_srcom");
+            this.totalsinimpuestos = resultado.getBigDecimal("subtotal_srcom");
+            
             this.totaldescuento = resultado.getBigDecimal("descuento_srcom");
             this.propina = new BigDecimal(0.00);
             this.importetotal = resultado.getBigDecimal("total_srcom");
@@ -97,24 +98,26 @@ public final class Comprobante implements Serializable {
             } else {
                 this.subtotal0 = resultado.getBigDecimal("subtotal0_srcom");
             }
-            if (resultado.getBigDecimal("subtotal_srcom") == null) {
+            if (resultado.getBigDecimal("base_grabada_srcom") == null) {
                 this.subtotal = this.totalsinimpuestos;
             } else {
-                this.subtotal = resultado.getBigDecimal("subtotal_srcom");
+                this.subtotal = resultado.getBigDecimal("base_grabada_srcom");
             }
             if (resultado.getBigDecimal("iva_srcom") == null) {
                 this.iva = new BigDecimal("0");
             } else {
                 this.iva = resultado.getBigDecimal("iva_srcom");
             }
-            this.formaCobro = resultado.getString("forma_cobre_srcom");
+            this.formaCobro = resultado.getString("forma_cobro_srcom");
 
             this.fechaautoriza = resultado.getDate("fechaautoriza_srcom");
 
-            //Busca el cliente
+            //Busca el cliente 
             try {
                 ConexionCEO con = new ConexionCEO();
-                ResultSet res = con.consultar("SELECT ide_geper,identificac_geper,ide_getid,nom_geper,direccion_geper,telefono_geper,movil_geper,correo_geper FROM gen_persona  where ide_geper=" + resultado.getString("ide_geper"));
+                ResultSet res = con.consultar("SELECT ide_geper,identificac_geper,alterno2_getid,nom_geper,direccion_geper,telefono_geper,movil_geper,correo_geper FROM gen_persona a "
+                        + "inner join gen_tipo_identifi b on a.ide_getid=b.ide_getid "
+                        + " where ide_geper=" + resultado.getString("ide_geper"));
                 if (res.next()) {
                     cliente = new Cliente(res);
                 }

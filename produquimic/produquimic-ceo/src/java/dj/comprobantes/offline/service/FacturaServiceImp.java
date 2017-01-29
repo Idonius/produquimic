@@ -20,7 +20,6 @@ import dj.comprobantes.offline.util.UtilitarioCeo;
 import javax.ejb.EJB;
 import javax.ejb.Stateless;
 
-
 /**
  *
  * @author diego.jacome
@@ -111,16 +110,16 @@ public class FacturaServiceImp implements FacturaService {
                         .append("				<codigoAuxiliar>").append((detalle.getCodigoauxiliar() == null ? detalle.getCodigoprincipal() : detalle.getCodigoauxiliar())).append("</codigoAuxiliar> \n")
                         .append("				<descripcion>").append(detalle.getDescripciondet()).append("</descripcion> \n")
                         .append("				<cantidad>").append(utilitario.getFormatoNumero(detalle.getCantidad())).append("</cantidad> \n")
-                        .append("				<precioUnitario>").append(utilitario.getFormatoNumero(detalle.getPreciototalsinimpuesto())).append("</precioUnitario> \n")
+                        .append("				<precioUnitario>").append(utilitario.getFormatoNumero(detalle.getPreciounitario())).append("</precioUnitario> \n")
                         .append("				<descuento>").append((detalle.getDescuento() == null ? utilitario.getFormatoNumero(0) : utilitario.getFormatoNumero(detalle.getDescuento()))).append("</descuento> \n")
-                        .append("				<precioTotalSinImpuesto>").append(utilitario.getFormatoNumero(detalle.getPreciounitario())).append("</precioTotalSinImpuesto> \n")
+                        .append("				<precioTotalSinImpuesto>").append(utilitario.getFormatoNumero(detalle.getPreciototalsinimpuesto())).append("</precioTotalSinImpuesto> \n")
                         .append("				<impuestos> \n")
                         .append("					<impuesto> \n")
                         .append("						<codigo>").append(TipoImpuestoEnum.IVA.getCodigo()).append("</codigo> \n")
                         .append("						<codigoPorcentaje>").append(TipoImpuestoIvaEnum.getCodigo(String.valueOf(detalle.getPorcentajeiva()))).append("</codigoPorcentaje> \n")
                         .append("						<tarifa>").append(detalle.getPorcentajeiva()).append("</tarifa> \n")
-                        .append("						<baseImponible>").append(utilitario.getFormatoNumero(detalle.getPreciounitario())).append("</baseImponible> \n")
-                        .append("						<valor>").append(utilitario.getFormatoNumero((detalle.getPreciounitario().doubleValue() * (detalle.getPorcentajeiva().doubleValue() / 100)))).append("</valor> \n")
+                        .append("						<baseImponible>").append(utilitario.getFormatoNumero(detalle.getPreciototalsinimpuesto())).append("</baseImponible> \n")
+                        .append("						<valor>").append(utilitario.getFormatoNumero((detalle.getPreciototalsinimpuesto().doubleValue() * (detalle.getPorcentajeiva().doubleValue() / 100)))).append("</valor> \n")
                         .append("					</impuesto>             \n")
                         .append("				</impuestos> \n")
                         .append("			</detalle> \n");

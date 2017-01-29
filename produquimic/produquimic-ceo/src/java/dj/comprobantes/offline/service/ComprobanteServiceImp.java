@@ -45,7 +45,7 @@ public class ComprobanteServiceImp implements ComprobanteService {
     private NotaCreditoService notaCreditoService;
 
     private final UtilitarioCeo utilitario = new UtilitarioCeo();
-    
+
     @Override
     public void enviarRecepcionSRI() throws GenericException {
         try {
@@ -64,7 +64,7 @@ public class ComprobanteServiceImp implements ComprobanteService {
                 }
                 recepcionService.enviarRecepcionOfflineSRI(comprobanteActual, xml);
             }
-        } catch (Exception e) {            
+        } catch (Exception e) {
             throw new GenericException(e);
         }
     }
@@ -77,7 +77,7 @@ public class ComprobanteServiceImp implements ComprobanteService {
             for (Comprobante comprobanteActual : lisCompPendientes) {
                 autorizacionService.enviarRecibidosOfflineSRI(comprobanteActual);
             }
-        } catch (Exception e) {            
+        } catch (Exception e) {
             throw new GenericException(e);
         }
     }
@@ -109,10 +109,10 @@ public class ComprobanteServiceImp implements ComprobanteService {
         clave.append(serie);
         clave.append(numeroComprobante);
         clave.append(codigoNumerico);
-        clave.append(tipoEmision);        
+        clave.append(tipoEmision);
         verificador = getVerifierModule11(clave.toString());
         clave.append(Integer.valueOf(verificador));
-        if (clave.toString().length() != 49) {            
+        if (clave.toString().length() != 49) {
             throw new GenericException("ERROR. La cleve de acceso no tiene longitud 49");
         }
         return clave.toString();
@@ -186,9 +186,10 @@ public class ComprobanteServiceImp implements ComprobanteService {
     public Comprobante getComprobantePorClaveAcceso(String claveAcceso) throws GenericException {
         return comprobanteDAO.getComprobantePorClaveAcceso(claveAcceso);
     }
-@Override
-     public Comprobante getComprobantePorId(Integer ide_srcom) throws GenericException {
-         return comprobanteDAO.getComprobantePorId(ide_srcom);
-     }
-    
+
+    @Override
+    public Comprobante getComprobantePorId(Integer ide_srcom) throws GenericException {
+        return comprobanteDAO.getComprobantePorId(ide_srcom);
+    }
+
 }

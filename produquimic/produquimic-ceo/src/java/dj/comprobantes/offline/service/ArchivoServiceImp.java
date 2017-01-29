@@ -16,10 +16,10 @@ import dj.comprobantes.offline.enums.ParametrosSistemaEnum;
 import dj.comprobantes.offline.enums.TipoComprobanteEnum;
 import dj.comprobantes.offline.enums.TipoImpuestoIvaEnum;
 import dj.comprobantes.offline.exception.GenericException;
+import dj.comprobantes.offline.reporte.DetalleReporte;
+import dj.comprobantes.offline.reporte.GenerarReporte;
+import dj.comprobantes.offline.reporte.ReporteDataSource;
 import dj.comprobantes.offline.util.UtilitarioCeo;
-import framework.reportes.DetalleReporte;
-import framework.reportes.GenerarReporte;
-import framework.reportes.ReporteDataSource;
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.File;
@@ -142,12 +142,10 @@ public class ArchivoServiceImp implements ArchivoService {
         generarReporte.setDataSource(data);
         File reporte = null;
         if (comprobante.getCoddoc().equals(TipoComprobanteEnum.FACTURA.getCodigo())) {
-            //  reporte = generarReporte.crearPDF(parametros, "factura.jasper", parametros.get("CLAVE_ACC") + "");
-            reporte = generarReporte.generar(parametros, "/reportes/rep_sri/comprobantes_electronicos/factura.jasper");
+            reporte = generarReporte.crearPDF(parametros, "factura.jasper", parametros.get("CLAVE_ACC") + "");
 
         } else if (comprobante.getCoddoc().equals(TipoComprobanteEnum.NOTA_DE_CREDITO.getCodigo())) {
-            //reporte = generarReporte.crearPDF(parametros, "notaCredito.jasper", parametros.get("CLAVE_ACC") + "");
-            reporte = generarReporte.generar(parametros, "/reportes/rep_sri/comprobantes_electronicos/notaCredito.jasper");
+            reporte = generarReporte.crearPDF(parametros, "notaCredito.jasper", parametros.get("CLAVE_ACC") + "");
         }
 
         try {
