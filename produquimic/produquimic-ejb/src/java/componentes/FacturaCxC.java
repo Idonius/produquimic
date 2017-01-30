@@ -205,6 +205,11 @@ public class FacturaCxC extends Dialogo {
             tab_cab_factura.setCondicion("ide_cccfa=" + ide_cccfa);
             tab_cab_factura.ejecutarSql();
 
+            if (isFacturaElectronica()) {
+                tab_electronica.setCondicion("ide_cccfa=" + ide_cccfa);
+                tab_electronica.ejecutarSql();
+            }
+
             tab_factura.getTab(1).getChildren().add(dibujarDetallePago());
             if (tab_cab_factura.getValor("ide_cnccc") != null) {
                 tab_factura.getTab(2).getChildren().add(dibujarAsientoVenta());
@@ -534,6 +539,7 @@ public class FacturaCxC extends Dialogo {
             tab_electronica.setRuta("pre_index.clase." + getId());
             tab_electronica.setTabla("sri_comprobante", "ide_srcom", 999);
             tab_electronica.getGrid().setColumns(8);
+            tab_electronica.setTipoFormulario(true);
             tab_electronica.setCondicion("ide_srcom=-1");
             //OCULTA TODAS LAS COLUMNAS
             for (int i = 0; i < tab_electronica.getTotalColumnas(); i++) {
@@ -595,7 +601,12 @@ public class FacturaCxC extends Dialogo {
         tab_deta_factura.getColumna("precio_promedio_ccdfa").setLectura(true);
         tab_deta_factura.getColumna("ALTERNO_CCDFA").setValorDefecto("00");
         tab_deta_factura.setScrollable(true);
-        tab_deta_factura.setScrollHeight(getAltoPanel() - 320);
+        if (isFacturaElectronica() == false) {
+            tab_deta_factura.setScrollHeight(getAltoPanel() - 320);
+        } else {
+            tab_deta_factura.setScrollHeight(getAltoPanel() - 280);
+        }
+
         tab_deta_factura.setRecuperarLectura(true);
         tab_deta_factura.dibujar();
 

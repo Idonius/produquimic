@@ -23,6 +23,22 @@ public class ServicioIntegracion extends ServicioBase {
     @EJB
     private ServicioInventario ser_inventario;
 
+    public Conexion getConexionEscritorio() {
+        Conexion con_conecta = new Conexion();
+        con_conecta.setUnidad_persistencia("sistemaEscritotio");
+        return con_conecta;
+    }
+
+    /**
+     * Retorna sql de kardex de un cliente
+     *
+     * @param identificacion
+     * @return
+     */
+    public String getSqlKardexCliente(String identificacion) {
+        return "";
+    }
+
     public String importarClientes() {
         String str_ide_geper = "";
         TablaGenerica tab_cod = new TablaGenerica();
@@ -35,8 +51,7 @@ public class ServicioIntegracion extends ServicioBase {
         String str_cod = tab_cod.getStringColumna("identificac_geper");
         tab_cod.limpiar();
 
-        Conexion con_conecta = new Conexion();
-        con_conecta.setUnidad_persistencia("sistemaEscritotio");
+        Conexion con_conecta = getConexionEscritorio();
         con_conecta.conectar(true);
         TablaGenerica tab_clie = new TablaGenerica();
         tab_clie.setConexion(con_conecta);
@@ -185,8 +200,7 @@ public class ServicioIntegracion extends ServicioBase {
             fact_mig_cccfa = "and NUM_FACTURA NOT IN (" + fact_mig_cccfa + ")";
         }
         tab_temp_cabecera.limpiar();
-        Conexion con_conecta = new Conexion();
-        con_conecta.setUnidad_persistencia("sistemaEscritotio");
+        Conexion con_conecta = getConexionEscritorio();
         con_conecta.conectar(true);
         TablaGenerica tab_aux_cab = new TablaGenerica();
         tab_aux_cab.setConexion(con_conecta);
@@ -332,8 +346,7 @@ public class ServicioIntegracion extends ServicioBase {
         String str_cod = tab_cod.getStringColumna("codigo_inarti");
         tab_cod.limpiar();
 
-        Conexion con_conecta = new Conexion();
-        con_conecta.setUnidad_persistencia("sistemaEscritotio");
+        Conexion con_conecta = getConexionEscritorio();
         con_conecta.conectar(true);
         TablaGenerica tab_quimi = new TablaGenerica();
         tab_quimi.setConexion(con_conecta);

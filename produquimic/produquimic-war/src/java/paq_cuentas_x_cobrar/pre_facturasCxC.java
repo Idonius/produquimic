@@ -119,6 +119,7 @@ public class pre_facturasCxC extends Pantalla {
         mep_menu.agregarItem("Generar Asiento Contable", "dibujarFacturasNoContabilizadas", "ui-icon-notice");
         mep_menu.agregarItem("Facturas Anuladas", "dibujarFacturasAnuladas", "ui-icon-cancel");
         mep_menu.agregarItem("Facturas Por Cobrar", "dibujarFacturasPorCobrar", "ui-icon-calculator");
+        mep_menu.agregarSubMenu("SISTEMA DE FACTURACIÓN (ESCRITORIO)");
         mep_menu.agregarItem("Importar Facturas", "dibujarImportar", "ui-icon-circle-arrow-n");
         mep_menu.agregarSubMenu("INFORMES");
         mep_menu.agregarItem("Grafico de Ventas", "dibujarGraficoVentas", "ui-icon-clock");
