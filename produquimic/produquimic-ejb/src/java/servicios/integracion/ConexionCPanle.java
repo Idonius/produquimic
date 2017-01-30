@@ -18,6 +18,14 @@ import java.sql.Statement;
 public class ConexionCPanle {
 
     public Connection getConexionCpanel() {
+        System.getProperties().setProperty("http.proxyHost", "172.16.2.167");
+        System.getProperties().setProperty("http.proxyPort", "8080");
+        System.getProperties().setProperty("https.proxyHost", "172.16.2.167");
+        System.getProperties().setProperty("https.proxyPort", "8080");
+        System.getProperties().put("proxySet", "true");
+        System.getProperties().put("proxyHost", "172.16.2.167"); //PROXY TEMPORAL
+        System.getProperties().put("proxyPort", "8080");
+
         String JDBC_DRIVER = "com.mysql.jdbc.Driver";
         String DB_URL = "jdbc:mysql://198.15.70.74:3306/produqui_ceo";
         String USER = "produqui_diego";
@@ -67,6 +75,26 @@ public class ConexionCPanle {
             se.printStackTrace();
         }
 
+//          String sqlQuery = "insert into tu_tabla(campo_foto) values ( ?)";
+//
+//    FileInputStream fis = null;
+//    PreparedStatement ps = null;
+//    try {
+//      conn.setAutoCommit(false);
+//      File archivo = new File("myPhoto.png");
+//      fis = new FileInputStream(archivo);
+//      ps = conn.prepareStatement(sqlQuery);
+//      ps.setBinaryStream(1, fis, (int) file.length());
+//      ps.executeUpdate();
+//      conn.commit();
+//    } finally {
+//      ps.close();
+//      fis.close();
+//    }
+        
+        
     }
+    
+    
 
 }
