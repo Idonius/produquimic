@@ -30,7 +30,7 @@ import servicios.contabilidad.ServicioComprobanteContabilidad;
 import servicios.contabilidad.ServicioContabilidadGeneral;
 import servicios.cuentas_x_cobrar.ServicioCliente;
 import servicios.cuentas_x_cobrar.ServicioFacturaCxC;
-import servicios.escritorio.ServicioIntegracion;
+import servicios.integracion.ServicioIntegracion;
 import servicios.prestamo.ServicioPrestamo;
 import sistema.aplicacion.Pantalla;
 

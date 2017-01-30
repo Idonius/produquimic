@@ -35,7 +35,7 @@ import javax.faces.event.ActionEvent;
 import org.primefaces.component.fieldset.Fieldset;
 import servicios.ceo.ServicioFacturaElectronica;
 import servicios.cuentas_x_cobrar.ServicioFacturaCxC;
-import servicios.escritorio.ServicioIntegracion;
+import servicios.integracion.ServicioIntegracion;
 
 import sistema.aplicacion.Pantalla;
 
