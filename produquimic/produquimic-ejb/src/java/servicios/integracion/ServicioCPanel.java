@@ -6,7 +6,7 @@
 package servicios.integracion;
 
 import javax.ejb.Stateless;
-import javax.ejb.LocalBean;
+import persistencia.Conexion;
 
 /**
  *
@@ -16,6 +16,10 @@ import javax.ejb.LocalBean;
 
 public class ServicioCPanel {
 
-    // Add business logic below. (Right-click in editor and choose
-    // "Insert Code > Add Business Method")
+    public Conexion getConexionCPanel() {
+        Conexion con_conecta = new Conexion();
+        con_conecta.setUnidad_persistencia("cPanel");
+        return con_conecta;
+    }
+
 }
