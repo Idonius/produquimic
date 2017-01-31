@@ -195,9 +195,9 @@ public class pre_clientes extends Pantalla {
             tab_tabla.getColumna("EGRESO").alinearDerecha();
             tab_tabla.getColumna("TOTAL").alinearDerecha();
             tab_tabla.setOrdenar(false);
-            tab_tabla.setScrollable(true);
-            tab_tabla.setScrollHeight(utilitario.getAltoPantalla() - 200);
+            tab_tabla.setRows(25);            
             tab_tabla.dibujar();
+            tab_tabla.fin();
             PanelTabla pat_panel = new PanelTabla();
             pat_panel.setPanelTabla(tab_tabla);
             gru_grupo.getChildren().add(pat_panel);
