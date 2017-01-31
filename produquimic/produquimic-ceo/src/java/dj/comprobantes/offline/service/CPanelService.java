@@ -6,6 +6,7 @@
 package dj.comprobantes.offline.service;
 
 import javax.ejb.Local;
+import persistencia.Conexion;
 
 /**
  *
@@ -13,5 +14,12 @@ import javax.ejb.Local;
  */
 @Local
 public interface CPanelService {
-    
+
+    /**
+     * Retorna la Conexion del CPanel
+     *
+     * @return
+     */
+    public Conexion getConexionCPanel();
+
 }
