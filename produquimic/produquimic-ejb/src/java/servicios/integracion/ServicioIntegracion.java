@@ -36,7 +36,9 @@ public class ServicioIntegracion extends ServicioBase {
      * @return
      */
     public String getSqlKardexCliente(String identificacion) {
-        return "";
+        return "SELECT CODIGOKC,a.COD_CLIE,DATE_FORMAT(fecha,'%d/%m/%Y') as FECHA_MOVI ,FACTURA,DETALLE,INGRESO,EGRESO,TOTAL FROM KARDEXCLIENTES a\n"
+                + "inner join CLIENTES B on a.COD_CLIE=B.COD_CLIE\n"
+                + "where CEDULA ='" + identificacion + "' ORDER BY CODIGOKC";
     }
 
     public String importarClientes() {
@@ -52,7 +54,6 @@ public class ServicioIntegracion extends ServicioBase {
         tab_cod.limpiar();
 
         Conexion con_conecta = getConexionEscritorio();
-        con_conecta.conectar(true);
         TablaGenerica tab_clie = new TablaGenerica();
         tab_clie.setConexion(con_conecta);
         if (str_cod != null && str_cod.isEmpty() == false) {
@@ -180,7 +181,7 @@ public class ServicioIntegracion extends ServicioBase {
                 utilitario.agregarMensaje("Se importaron correctamente ", tab_clie.getTotalFilas() + " CLIENTES del sistema de facturación");
             }
         }
-        con_conecta.desconectar(true);
+
         return str_ide_geper;
     }
 
@@ -201,7 +202,7 @@ public class ServicioIntegracion extends ServicioBase {
         }
         tab_temp_cabecera.limpiar();
         Conexion con_conecta = getConexionEscritorio();
-        con_conecta.conectar(true);
+
         TablaGenerica tab_aux_cab = new TablaGenerica();
         tab_aux_cab.setConexion(con_conecta);
 
@@ -347,7 +348,7 @@ public class ServicioIntegracion extends ServicioBase {
         tab_cod.limpiar();
 
         Conexion con_conecta = getConexionEscritorio();
-        con_conecta.conectar(true);
+
         TablaGenerica tab_quimi = new TablaGenerica();
         tab_quimi.setConexion(con_conecta);
         if (str_cod != null && str_cod.isEmpty() == false) {
@@ -453,7 +454,7 @@ public class ServicioIntegracion extends ServicioBase {
 
             }
         }
-        con_conecta.desconectar(true);
+
         return str_ide_inarti;
 
     }

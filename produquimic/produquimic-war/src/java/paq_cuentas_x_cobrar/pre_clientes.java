@@ -183,11 +183,20 @@ public class pre_clientes extends Pantalla {
         if (isClienteSeleccionado()) {
             tab_tabla = new Tabla();
             tab_tabla.setId("tab_tabla");
+            tab_tabla.setNumeroTabla(13);
             tab_tabla.setConexion(ser_integra.getConexionEscritorio());
             tab_tabla.setLectura(true);
-            tab_tabla.setSql(ser_integra.getSqlKardexCliente(aut_clientes.getValor()));
+            tab_tabla.setSql(ser_integra.getSqlKardexCliente(aut_clientes.getValorArreglo(1)));
+            tab_tabla.setCampoPrimaria("CODIGOKC");
+            tab_tabla.getColumna("CODIGOKC").setVisible(false);
+            tab_tabla.getColumna("COD_CLIE").setVisible(false);
+            tab_tabla.getColumna("FECHA_MOVI").setNombreVisual("FECHA");
+            tab_tabla.getColumna("INGRESO").alinearDerecha();
+            tab_tabla.getColumna("EGRESO").alinearDerecha();
+            tab_tabla.getColumna("TOTAL").alinearDerecha();
+            tab_tabla.setOrdenar(false);
             tab_tabla.setScrollable(true);
-            tab_tabla.setScrollHeight(utilitario.getAltoPantalla()-300);
+            tab_tabla.setScrollHeight(utilitario.getAltoPantalla() - 200);
             tab_tabla.dibujar();
             PanelTabla pat_panel = new PanelTabla();
             pat_panel.setPanelTabla(tab_tabla);
