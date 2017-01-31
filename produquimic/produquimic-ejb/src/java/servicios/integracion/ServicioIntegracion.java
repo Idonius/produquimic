@@ -41,6 +41,21 @@ public class ServicioIntegracion extends ServicioBase {
                 + "where CEDULA ='" + identificacion + "' ORDER BY CODIGOKC";
     }
 
+    /**
+     * Retorna sql de kardex de un producto
+     *
+     * @param codigoProducto
+     * @return
+     */
+    public String getSqlKardexProducto(String codigoProducto) {
+        return "SELECT CODIGOKP,COD_PROD,DATE_FORMAT(fecha,'%d/%m/%Y')as FECHA_MOVI,FACTURA,DETALLE,INGRESO,EGRESO,TOTAL FROM KARDEXPRODUCTOS where COD_PROD ='" + codigoProducto + "' ORDER BY CODIGOKP";
+    }
+
+    public Double getUltimoPrecioCliente(String codigoProducto, String codigoCliente) {
+        String sql = "SELECT PRECIO FROM DETALLE_FACTURAS,FACTURAS WHERE COD_PROD='" + codigoProducto + "' and cod_clie='" + codigoCliente + "' and FACTURAS.NUM_FACTURA=DETALLE_FACTURAS.NUM_FACTURA order by DETALLE_FACTURAS.num_factura desc";
+        return null;
+    }
+
     public String importarClientes() {
         String str_ide_geper = "";
         TablaGenerica tab_cod = new TablaGenerica();

@@ -91,7 +91,10 @@ public class pre_articulos extends Pantalla {
         mep_menu.setMenuPanel("OPCIONES PRODUCTO", "20%");
         mep_menu.agregarItem("Información Producto", "dibujarProducto", "ui-icon-cart");
         mep_menu.agregarItem("Clasificación Productos", "dibujarEstructura", "ui-icon-arrow-4-diag");
-        mep_menu.agregarItem("Importar Productos", "dibujarImportar", "ui-icon-circle-arrow-n");
+        mep_menu.agregarSubMenu("SISTEMA DE FACTURACIÓN (ESCRITORIO)");
+        mep_menu.agregarItem("Tarjeta Kardex", "dibujarTarjetaKardex", "ui-icon-calculator"); //14
+        mep_menu.agregarItem("Importar Productos", "dibujarImportar", "ui-icon-circle-arrow-n");//13
+
         mep_menu.agregarSubMenu("TRANSACCIONES");
         mep_menu.agregarItem("Kardex", "dibujarKardex", "ui-icon-contact");
         mep_menu.agregarItem("Facturas de Ventas", "dibujarVentas", "ui-icon-calculator");
@@ -106,6 +109,33 @@ public class pre_articulos extends Pantalla {
 
         agregarComponente(mep_menu);
 
+    }
+
+    public void dibujarTarjetaKardex() {
+        Grupo gru_grupo = new Grupo();
+        if (isProductoSeleccionado()) {
+            tab_tabla = new Tabla();
+            tab_tabla.setId("tab_tabla");
+            tab_tabla.setNumeroTabla(13);
+            tab_tabla.setConexion(ser_integra.getConexionEscritorio());
+            tab_tabla.setLectura(true);
+            tab_tabla.setSql(ser_integra.getSqlKardexProducto(aut_productos.getValorArreglo(2)));
+            tab_tabla.setCampoPrimaria("CODIGOKP");
+            tab_tabla.getColumna("CODIGOKP").setVisible(false);
+            tab_tabla.getColumna("COD_PROD").setVisible(false);
+            tab_tabla.getColumna("FECHA_MOVI").setNombreVisual("FECHA");
+            tab_tabla.getColumna("INGRESO").alinearDerecha();
+            tab_tabla.getColumna("EGRESO").alinearDerecha();
+            tab_tabla.getColumna("TOTAL").alinearDerecha();
+            tab_tabla.setOrdenar(false);
+            tab_tabla.setRows(25);
+            tab_tabla.dibujar();
+            tab_tabla.fin();
+            PanelTabla pat_panel = new PanelTabla();
+            pat_panel.setPanelTabla(tab_tabla);
+            gru_grupo.getChildren().add(pat_panel);
+        }
+        mep_menu.dibujar(14, "TARJETA KARDEX", gru_grupo);
     }
 
     public void dibujarImportar() {
@@ -170,6 +200,12 @@ public class pre_articulos extends Pantalla {
                     break;
                 case 10:
                     dibujarPrecios();
+                    break;
+                case 13:
+                    dibujarImportar();
+                    break;
+                case 14:
+                    dibujarTarjetaKardex();
                     break;
                 default:
                     dibujarProducto();

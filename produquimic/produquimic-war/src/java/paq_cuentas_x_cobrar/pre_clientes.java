@@ -98,7 +98,7 @@ public class pre_clientes extends Pantalla {
         mep_menu.agregarItem("Información Cliente", "dibujarCliente", "ui-icon-person");
         mep_menu.agregarItem("Clasificación Clientes", "dibujarEstructura", "ui-icon-arrow-4-diag");
         mep_menu.agregarSubMenu("SISTEMA DE FACTURACIÓN (ESCRITORIO)");
-        mep_menu.agregarItem("Kardex", "dibujarTarjetaKardex", "ui-icon-calculator"); //14
+        mep_menu.agregarItem("Tarjeta Kardex", "dibujarTarjetaKardex", "ui-icon-calculator"); //14
         mep_menu.agregarItem("Importar Clientes", "dibujarImportar", "ui-icon-circle-arrow-n");//13
         mep_menu.agregarSubMenu("TRANSACCIONES");
         mep_menu.agregarItem("Transacciones Cliente", "dibujarTransacciones", "ui-icon-contact");
