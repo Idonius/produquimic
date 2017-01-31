@@ -91,10 +91,6 @@ public class ConexionCPanle {
 //      ps.close();
 //      fis.close();
 //    }
-        
-        
     }
-    
-    
 
 }
