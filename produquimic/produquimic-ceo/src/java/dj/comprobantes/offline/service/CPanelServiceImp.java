@@ -124,7 +124,6 @@ public class CPanelServiceImp implements CPanelService {
                         ps.setBinaryStream(3, fisXML, (int) filXML.length());
                         ps.executeUpdate();
                     } catch (GenericException | IOException | SQLException e) {
-                        e.printStackTrace();
                         if (ps != null) {
                             try {
                                 ps.close();
