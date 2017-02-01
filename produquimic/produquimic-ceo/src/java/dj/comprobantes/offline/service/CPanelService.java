@@ -5,8 +5,9 @@
  */
 package dj.comprobantes.offline.service;
 
+import dj.comprobantes.offline.dto.Comprobante;
+import java.sql.Connection;
 import javax.ejb.Local;
-import persistencia.Conexion;
 
 /**
  *
@@ -20,6 +21,13 @@ public interface CPanelService {
      *
      * @return
      */
-    public Conexion getConexionCPanel();
+    public Connection getConexionCPanel();
 
+    /**
+     * Guarda un comprbante en la nube CPanel
+     *
+     * @param comprobante
+     * @return
+     */
+    public boolean guardarComprobanteNube(Comprobante comprobante);
 }

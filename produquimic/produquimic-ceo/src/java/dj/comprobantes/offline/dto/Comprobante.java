@@ -56,6 +56,7 @@ public final class Comprobante implements Serializable {
     private BigDecimal subtotal;
     private BigDecimal iva;
     private List<DetalleComprobante> detalle;
+    private Boolean enNube = false;
 
     private String formaCobro = "01"; //por defecto efectivo
 
@@ -75,7 +76,7 @@ public final class Comprobante implements Serializable {
             //this.direstablecimiento =   Direccion donde se factura
             //this.guiaremision = resultado.getString("va_guia_remision");
             this.totalsinimpuestos = resultado.getBigDecimal("subtotal_srcom");
-            
+
             this.totaldescuento = resultado.getBigDecimal("descuento_srcom");
             this.propina = new BigDecimal(0.00);
             this.importetotal = resultado.getBigDecimal("total_srcom");
@@ -87,6 +88,9 @@ public final class Comprobante implements Serializable {
             this.fechaemisiondocsustento = resultado.getDate("fecha_emision_mod_srcom");
             this.valormodificacion = resultado.getBigDecimal("valor_mod_srcom");
             this.numAutorizacion = resultado.getString("autorizacion_srcomn");
+            if (resultado.getString("en_nube_srcom") != null) {
+                this.enNube = resultado.getBoolean("en_nube_srcom");
+            }
             this.oficina = "1";// SUCURSAL 1 
 
             if (resultado.getString("ide_srfid") != null) {
@@ -402,5 +406,14 @@ public final class Comprobante implements Serializable {
     public void setFormaCobro(String formaCobro) {
         this.formaCobro = formaCobro;
     }
+
+    public Boolean getEnNube() {
+        return enNube;
+    }
+
+    public void setEnNube(Boolean enNube) {
+        this.enNube = enNube;
+    }
+
 
 }

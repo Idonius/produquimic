@@ -138,6 +138,7 @@ public class ComprobanteDAOImp implements ComprobanteDAO {
                 + " ,autorizacion_srcomn=?"
                 + " ,tipoemision_srcom=?"
                 + " ,fechaautoriza_srcom=?"
+                + " ,en_nube_srcom=?"
                 + " WHERE ide_srcom=?";
         try {
             preparedStatement = con.getPreparedStatement(sql);
@@ -152,8 +153,8 @@ public class ComprobanteDAOImp implements ComprobanteDAO {
             } else {
                 preparedStatement.setDate(6, null);
             }
-
-            preparedStatement.setLong(7, comprobante.getCodigocomprobante());
+            preparedStatement.setBoolean(7, comprobante.getEnNube());
+            preparedStatement.setLong(8, comprobante.getCodigocomprobante());
             preparedStatement.executeUpdate();
         } catch (SQLException e) {
             throw new GenericException("ERROR. No se puede actualizar el Comprobante", e);
