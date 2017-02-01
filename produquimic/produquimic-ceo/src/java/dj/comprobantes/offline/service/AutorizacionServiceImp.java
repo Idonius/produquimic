@@ -44,8 +44,6 @@ public class AutorizacionServiceImp implements AutorizacionService {
     @EJB
     private MailService mailService;
 
-    @EJB
-    private CPanelService cpanelService;
     private final UtilitarioCeo utilitario = new UtilitarioCeo();
 
     @Override
@@ -88,9 +86,9 @@ public class AutorizacionServiceImp implements AutorizacionService {
                                 .append("<ambiente>").append(TipoAmbienteEnum.getDescripcion(emisorService.getEmisor().getAmbiente().toString())).append("</ambiente>\n")
                                 .append("<comprobante><![CDATA[").append(autorizacion.getComprobante()).append("]]></comprobante>\n")
                                 .append("</autorizacion>");
-                        mailService.agregarCorreo(comprobateActual);
-                        comprobateActual.setEnNube(cpanelService.guardarComprobanteNube(comprobateActual));
                         comprobanteService.actualizarAutorizacionComprobante(stb_xml.toString(), comprobateActual, mensajesAutorizacion.toString());
+                        mailService.agregarCorreo(comprobateActual);
+
                     } else {
                         comprobanteService.actualizarAutorizacionComprobante(autorizacion.getComprobante(), comprobateActual, mensajesAutorizacion.toString());
                     }
