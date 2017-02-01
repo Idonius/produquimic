@@ -8,6 +8,7 @@ package dj.comprobantes.offline.service;
 import dj.comprobantes.offline.conexion.ConexionCPanel;
 import dj.comprobantes.offline.dto.Comprobante;
 import dj.comprobantes.offline.enums.EstadoComprobanteEnum;
+import dj.comprobantes.offline.enums.EstadoUsuarioEnum;
 import dj.comprobantes.offline.exception.GenericException;
 import java.io.File;
 import java.io.FileInputStream;
@@ -38,7 +39,28 @@ public class CPanelServiceImp implements CPanelService {
                 ConexionCPanel con = new ConexionCPanel();
                 //Crea usuario 
                 if (isExisteCliente(comprobante.getCliente().getIdentificacion()) == false) {
-
+                    PreparedStatement ps = null;
+                    try {
+                        String sql = "insert into USUARIO(CODIGO_ESTADO,NOMBRE_USUARIO,IDENTIFICACION_USUARIO,"
+                                + "CORREO_USUARIO,CLAVE_USUARIO) values (?,?,?,?,?)";
+                        ps = con.getPreparedStatement(sql);
+                        ps.setInt(1, EstadoUsuarioEnum.ACTIVO.getCodigo());
+                        ps.setString(2, comprobante.getCliente().getNombreCliente());
+                        ps.setString(3, comprobante.getCliente().getIdentificacion());
+                        ps.setString(4, comprobante.getCliente().getCorreo());
+                        ps.setString(5, comprobante.getCliente().getIdentificacion());
+                        ps.executeUpdate();
+                    } catch (GenericException | SQLException e) {
+                        if (ps != null) {
+                            try {
+                                ps.close();
+                            } catch (Exception e1) {
+                            }
+                        }
+                        con.desconectar();
+                        guardo = false;
+                        throw new GenericException(e);
+                    }
                 }
                 //Guarda comprobante
                 if (isExisteComprobante(comprobante.getCodigocomprobante()) == false) {
@@ -181,6 +203,31 @@ public class CPanelServiceImp implements CPanelService {
 
     public boolean isExisteCliente(String identificacion) throws GenericException {
         boolean existe = false;
+        ConexionCPanel con = new ConexionCPanel();
+        PreparedStatement ps = null;
+        ResultSet res = null;
+        try {
+            String sql = "SELECT IDENTIFICACION_USUARIO FROM USUARIO  WHERE IDENTIFICACION_USUARIO = ?";
+            ps = con.getPreparedStatement(sql);
+            ps.setString(1, identificacion);
+            res = ps.executeQuery();
+            if (res.next()) {
+                existe = true;
+            }
+        } catch (SQLException e) {
+            throw new GenericException(e);
+        } finally {
+            try {
+                if (ps != null) {
+                    ps.close();
+                }
+                if (res != null) {
+                    res.close();
+                }
+            } catch (Exception e) {
+            }
+            con.desconectar();
+        }
         return existe;
     }
 }
