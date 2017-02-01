@@ -40,7 +40,7 @@ public class ComprobanteDAOImp implements ComprobanteDAO {
         PreparedStatement ps = null;
         ResultSet res = null;
         try {
-            String sql = "SELECT * FROM sri_comprobante  WHERE ide_sresc =? limit 1"; //
+            String sql = "SELECT * FROM sri_comprobante  WHERE ide_sresc =?"; //
             ps = con.getPreparedStatement(sql);
             ps.setInt(1, estado.getCodigo());
             res = ps.executeQuery();
@@ -198,6 +198,37 @@ public class ComprobanteDAOImp implements ComprobanteDAO {
             con.desconectar();
         }
         return comprobante;
+    }
+
+    @Override
+    public List<Comprobante> getComprobantesAutorizadosNoNube() throws GenericException {
+        List<Comprobante> listaComprobantes = new ArrayList<>();
+        ConexionCEO con = new ConexionCEO();
+        PreparedStatement ps = null;
+        ResultSet res = null;
+        try {
+            String sql = "SELECT * FROM sri_comprobante  WHERE ide_sresc =? AND en_nube_srcom =false"; //
+            ps = con.getPreparedStatement(sql);
+            ps.setInt(1, EstadoComprobanteEnum.AUTORIZADO.getCodigo());
+            res = ps.executeQuery();
+            while (res.next()) {
+                listaComprobantes.add(new Comprobante(res));
+            }
+        } catch (SQLException e) {
+            throw new GenericException(e);
+        } finally {
+            try {
+                if (ps != null) {
+                    ps.close();
+                }
+                if (res != null) {
+                    res.close();
+                }
+            } catch (Exception e) {
+            }
+            con.desconectar();
+        }
+        return listaComprobantes;
     }
 
 }

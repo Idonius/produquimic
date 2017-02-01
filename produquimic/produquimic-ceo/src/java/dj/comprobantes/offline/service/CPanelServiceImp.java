@@ -6,6 +6,7 @@
 package dj.comprobantes.offline.service;
 
 import dj.comprobantes.offline.conexion.ConexionCPanel;
+import dj.comprobantes.offline.dao.ComprobanteDAO;
 import dj.comprobantes.offline.dto.Comprobante;
 import dj.comprobantes.offline.enums.EstadoComprobanteEnum;
 import dj.comprobantes.offline.enums.EstadoUsuarioEnum;
@@ -17,6 +18,7 @@ import java.io.IOException;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.util.List;
 import javax.ejb.EJB;
 import javax.ejb.Stateless;
 
@@ -26,10 +28,13 @@ import javax.ejb.Stateless;
  */
 @Stateless
 public class CPanelServiceImp implements CPanelService {
-
+    
     @EJB
     private ArchivoService archivoService;
-
+    
+    @EJB
+    private ComprobanteDAO comprobanteDAO;
+    
     @Override
     public boolean guardarComprobanteNube(Comprobante comprobante) throws GenericException {
         boolean guardo = false;
@@ -131,7 +136,7 @@ public class CPanelServiceImp implements CPanelService {
                         throw new GenericException(e);
                     }
                 }
-
+                
                 guardo = true;
                 con.desconectar();
             } else {
@@ -140,7 +145,7 @@ public class CPanelServiceImp implements CPanelService {
         }
         return guardo;
     }
-
+    
     public boolean isExisteComprobante(Long codigoComprobante) throws GenericException {
         boolean existe = false;
         ConexionCPanel con = new ConexionCPanel();
@@ -170,7 +175,7 @@ public class CPanelServiceImp implements CPanelService {
         }
         return existe;
     }
-
+    
     public boolean isExisteArchivoComprobante(Long codigoComprobante) throws GenericException {
         boolean existe = false;
         ConexionCPanel con = new ConexionCPanel();
@@ -200,7 +205,7 @@ public class CPanelServiceImp implements CPanelService {
         }
         return existe;
     }
-
+    
     public boolean isExisteCliente(String identificacion) throws GenericException {
         boolean existe = false;
         ConexionCPanel con = new ConexionCPanel();
@@ -229,5 +234,14 @@ public class CPanelServiceImp implements CPanelService {
             con.desconectar();
         }
         return existe;
+    }
+    
+    @Override
+    public void subirComprobantesPendientes() throws GenericException {
+        List<Comprobante> lisCompPendientes = comprobanteDAO.getComprobantesAutorizadosNoNube();
+        for (Comprobante comprobanteActual : lisCompPendientes) {
+            comprobanteActual.setEnNube(guardarComprobanteNube(comprobanteActual));
+            comprobanteDAO.actualizar(comprobanteActual);
+        }
     }
 }

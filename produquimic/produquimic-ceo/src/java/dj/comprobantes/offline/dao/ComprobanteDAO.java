@@ -65,4 +65,11 @@ public interface ComprobanteDAO {
      * @throws dj.comprobantes.offline.exception.GenericException
      */
     public Comprobante getComprobantePorId(Integer ide_srcom) throws GenericException;
+
+    /**
+     * Lista de comprobantes autorizados que no se encuentranb en la nube
+     * @return
+     * @throws GenericException 
+     */
+    public List<Comprobante> getComprobantesAutorizadosNoNube() throws GenericException;
 }
