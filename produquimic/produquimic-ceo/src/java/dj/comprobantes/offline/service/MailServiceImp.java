@@ -15,7 +15,6 @@ import dj.comprobantes.offline.enums.TipoComprobanteEnum;
 import dj.comprobantes.offline.exception.GenericException;
 import dj.comprobantes.offline.util.UtilitarioCeo;
 
-import javax.ejb.Stateless;
 import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
@@ -25,6 +24,7 @@ import java.util.Properties;
 import javax.activation.DataHandler;
 import javax.activation.FileDataSource;
 import javax.ejb.EJB;
+import javax.ejb.Singleton;
 import javax.mail.Authenticator;
 import javax.mail.BodyPart;
 import javax.mail.Message;
@@ -41,7 +41,8 @@ import javax.mail.internet.MimeMultipart;
  *
  * @author diego.jacome
  */
-@Stateless
+//@Stateless
+@Singleton
 public class MailServiceImp implements MailService {
 
     private List<MimeMessage> listaMensajes;
@@ -71,14 +72,14 @@ public class MailServiceImp implements MailService {
         }
         try {
             BodyPart texto = new MimeBodyPart();
-            String stb_mensaje = "<html><head><title></title></head><body bgcolor='#EFF0F2' style='font-family: sans-serif'><div align=\"justify\">"
-                    + "<span style='color:#939598;font-size:44px;'>Produquimic</span>"
+            String stb_mensaje = "<html><head><title></title></head><body style='font-family: sans-serif'><div align=\"justify\">"
+                    + "<span style='color:#939598;font-size:44px;'> <img src='http://www.produquimic.com.ec/images/logo_mail.gif'/> </span>"
                     + "<div align='right' style='background-color:#43BEAC;color:white;white:100%;padding-right:15px;height:30px;font-size:24px;'>  COMPROBANTES ELECTRONICOS</div>"
                     + "<div style='padding-left:15px;font-size:14px;'>"
                     + "<p>Estimad@ " + comprobanteMail.getCliente().getNombreCliente().toUpperCase() + "</p>"
                     + "<p>" + "Usted a recibido un Comprobante Electr&oacute;nico :</p>"
                     + "<p> TIPO: " + TipoComprobanteEnum.getDescripcion(comprobanteMail.getCoddoc()) + " </p>"
-                    + "<p>NÚMERO : " + comprobanteMail.getSecuencial() + "</p>"
+                    + "<p>NÚMERO : " + comprobanteMail.getEstab() + "-" + comprobanteMail.getPtoemi() + "-" + comprobanteMail.getSecuencial() + "</p>"
                     + "<p>CLAVE DE ACCESO : " + comprobanteMail.getClaveacceso() + "</p>"
                     + "<br/>"
                     + "<i style='font-size:13px;'><b> No responda a este mensaje ya que ha sido generado automaticamente para su informacion.</b></i>"
