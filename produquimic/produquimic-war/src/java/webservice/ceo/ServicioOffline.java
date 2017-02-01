@@ -14,6 +14,7 @@ import dj.comprobantes.offline.dto.Comprobante;
 import dj.comprobantes.offline.dto.Emisor;
 import dj.comprobantes.offline.exception.GenericException;
 import dj.comprobantes.offline.service.ArchivoService;
+import dj.comprobantes.offline.service.CPanelService;
 import dj.comprobantes.offline.service.ComprobanteService;
 import dj.comprobantes.offline.service.ConsultasService;
 import dj.comprobantes.offline.service.EmisorService;
@@ -40,6 +41,9 @@ public class ServicioOffline {
     private ArchivoService archivoService;
     @EJB
     private ConsultasService consultasService;
+
+    @EJB
+    private CPanelService cPanelService;
 
     /**
      * Retorna el emisor configurado
@@ -84,6 +88,25 @@ public class ServicioOffline {
         Respuesta respuesta = new Respuesta();
         try {
             comprobanteService.enviarAutorizacionSRI();
+        } catch (GenericException e) {
+            respuesta.setError(true);
+            respuesta.setCodigoError(e.getCodigoError());
+            respuesta.setMensaje(e.getMessage());
+        }
+        return respuesta;
+    }
+
+    /**
+     * Sube comprobantes autorizados a la nube
+     *
+     * @return
+     */
+    @WebMethod(operationName = "SubirNube")
+    @WebResult(name = "Respuesta")
+    public Respuesta subirNube() {
+        Respuesta respuesta = new Respuesta();
+        try {
+            cPanelService.subirComprobantesPendientes();
         } catch (GenericException e) {
             respuesta.setError(true);
             respuesta.setCodigoError(e.getCodigoError());
