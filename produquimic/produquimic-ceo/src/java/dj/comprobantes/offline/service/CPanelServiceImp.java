@@ -5,12 +5,13 @@
  */
 package dj.comprobantes.offline.service;
 
+import dj.comprobantes.offline.conexion.ConexionCPanel;
 import dj.comprobantes.offline.dto.Comprobante;
 import dj.comprobantes.offline.enums.EstadoComprobanteEnum;
+import dj.comprobantes.offline.exception.GenericException;
 import java.io.File;
 import java.io.FileInputStream;
-import java.sql.Connection;
-import java.sql.DriverManager;
+import java.io.IOException;
 import java.sql.PreparedStatement;
 import java.sql.SQLException;
 import javax.ejb.EJB;
@@ -27,34 +28,18 @@ public class CPanelServiceImp implements CPanelService {
     private ArchivoService archivoService;
 
     @Override
-    public Connection getConexionCPanel() {
-        String JDBC_DRIVER = "com.mysql.jdbc.Driver";
-        String DB_URL = "jdbc:mysql://198.15.70.74:3306/produqui_ceo";
-        String USER = "produqui_diego";
-        String PASS = "sami2008";
-        Connection conn = null;
-        try {
-            Class.forName(JDBC_DRIVER);
-            conn = DriverManager.getConnection(DB_URL, USER, PASS);
-        } catch (ClassNotFoundException | SQLException se) {
-            se.printStackTrace();
-        }
-        return conn;
-    }
-
-    @Override
-    public boolean guardarComprobanteNube(Comprobante comprobante) {
+    public boolean guardarComprobanteNube(Comprobante comprobante) throws GenericException {
         boolean guardo = false;
         //guarda en la nuebe el comprobante AUTORIZADO
         if (comprobante.getCodigoestado().equals(EstadoComprobanteEnum.AUTORIZADO.getCodigo())) {
             if (comprobante.getEnNube() == false) {
+                ConexionCPanel con = new ConexionCPanel();
                 PreparedStatement ps = null;
-                Connection conexion = getConexionCPanel();
                 try {
                     String sql = "insert into COMPROBANTE(PK_CODIGO_COMP,CODIGO_DOCUMENTO,	ESTADO,CLAVE_ACCESO,"
                             + "SECUENCIAL,CLIENTE,IDENTIFICACION,FECHA_EMISION,NUM_AUTORIZACION,FECHA_AUTORIZACION,"
                             + "ESTABLECIM,PTO_EMISION) values (?,?,?,?,?,?,?,?,?,?,?,?)";
-                    ps = conexion.prepareStatement(sql);
+                    ps = con.getPreparedStatement(sql);
                     ps.setLong(1, comprobante.getCodigocomprobante());
                     ps.setString(2, comprobante.getCoddoc());
                     ps.setString(3, EstadoComprobanteEnum.AUTORIZADO.getDescripcion());
@@ -68,12 +53,9 @@ public class CPanelServiceImp implements CPanelService {
                     ps.setString(11, comprobante.getEstab());
                     ps.setString(12, comprobante.getPtoemi());
                     ps.executeUpdate();
-                } catch (Exception e) {
+                } catch (GenericException | SQLException e) {
                     e.printStackTrace();
-                    try {
-                        conexion.close();
-                    } catch (Exception e1) {
-                    }
+                    con.desconectar();
                     return false;
                 } finally {
                     if (ps != null) {
@@ -92,17 +74,14 @@ public class CPanelServiceImp implements CPanelService {
                     FileInputStream fisPDF = new FileInputStream(filPDF);
                     FileInputStream fisXML = new FileInputStream(filXML);
                     String sql = "insert into RIDE_COMPROBANTE(PK_CODIGO_COMP,ARCHIVO_PDF,ARCHIVO_XML) values (?,?,?)";
-                    ps = conexion.prepareStatement(sql);
+                    ps = con.getPreparedStatement(sql);
                     ps.setLong(1, comprobante.getCodigocomprobante());
                     ps.setBinaryStream(2, fisPDF, (int) filPDF.length());
                     ps.setBinaryStream(3, fisXML, (int) filXML.length());
                     ps.executeUpdate();
-                } catch (Exception e) {
+                } catch (GenericException | IOException | SQLException e) {
                     e.printStackTrace();
-                    try {
-                        conexion.close();
-                    } catch (Exception e1) {
-                    }
+                    con.desconectar();
                     return false;
                 } finally {
                     if (ps != null) {
@@ -113,10 +92,7 @@ public class CPanelServiceImp implements CPanelService {
                     }
                 }
                 guardo = true;
-                try {
-                    conexion.close();
-                } catch (Exception e) {
-                }
+                con.desconectar();
             } else {
                 guardo = true;
             }

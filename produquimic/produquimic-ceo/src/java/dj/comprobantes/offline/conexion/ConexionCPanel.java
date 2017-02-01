@@ -1,37 +1,29 @@
 /*
- *********************************************************************
- Objetivo: Clase ConexionCEO utilizada en todo el proyecto
- ********************************************************************** 
- MODIFICACIONES
- FECHA                     AUTOR             RAZON
- 01-Sep-2016             D. Jácome        Emision Inicial
- ********************************************************************** 
+ * To change this license header, choose License Headers in Project Properties.
+ * To change this template file, choose Tools | Templates
+ * and open the template in the editor.
  */
 package dj.comprobantes.offline.conexion;
 
 import dj.comprobantes.offline.exception.GenericException;
 import dj.comprobantes.offline.util.UtilitarioCeo;
 import java.sql.Connection;
+import java.sql.DriverManager;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
-import javax.naming.Context;
-import javax.naming.InitialContext;
-import javax.naming.NamingException;
-import javax.sql.DataSource;
 
 /**
  *
- * @author diego.jacome
+ * @author DIEGOFERNANDOJACOMEG
  */
-public class ConexionCEO {
-
-    public Connection conCeo;
+public class ConexionCPanel {
 
     private final UtilitarioCeo utilitario = new UtilitarioCeo();
+    public Connection conCPanel;
 
-    public ConexionCEO() throws GenericException {
+    public ConexionCPanel() throws GenericException {
         conectar();
     }
 
@@ -41,14 +33,18 @@ public class ConexionCEO {
      * @throws GenericException
      */
     private void conectar() throws GenericException {
+        String JDBC_DRIVER = "com.mysql.jdbc.Driver";
+        String DB_URL = "jdbc:mysql://198.15.70.74:3306/produqui_ceo";
+        String USER = "produqui_diego";
+        String PASS = "sami2008";
+
         try {
-            Context ctx = new InitialContext();
-            DataSource ds = (DataSource) ctx.lookup(utilitario.getPropiedad("recursojdbc"));
-            this.conCeo = ds.getConnection();
-            //this.conCeo.setAutoCommit(true); 
-        } catch (NamingException | SQLException e) {
-            throw new GenericException("ERROR. al conectar ", e);
+            Class.forName(JDBC_DRIVER);
+            this.conCPanel = DriverManager.getConnection(DB_URL, USER, PASS);
+        } catch (ClassNotFoundException | SQLException se) {
+            se.printStackTrace();
         }
+
     }
 
     /**
@@ -62,7 +58,7 @@ public class ConexionCEO {
         ResultSet resultSet = null;
         try {
             //System.out.println(sql);
-            Statement sentensia = conCeo.createStatement();
+            Statement sentensia = conCPanel.createStatement();
             resultSet = sentensia.executeQuery(sql);
         } catch (SQLException e) {
             throw new GenericException("ERROR. al consultar sql: " + sql, e);
@@ -80,7 +76,7 @@ public class ConexionCEO {
     public String ejecutar(String sql) throws GenericException {
         Statement sentensia = null;
         try {
-            sentensia = conCeo.createStatement();
+            sentensia = conCPanel.createStatement();
             sentensia.executeUpdate(sql);
         } catch (SQLException e) {
             throw new GenericException("ERROR. al ejecutar sql: " + sql, e);
@@ -104,7 +100,7 @@ public class ConexionCEO {
      */
     public PreparedStatement getPreparedStatement(String sql) throws GenericException {
         try {
-            return conCeo.prepareStatement(sql);
+            return conCPanel.prepareStatement(sql);
         } catch (SQLException e) {
             throw new GenericException(e);
         }
@@ -115,19 +111,18 @@ public class ConexionCEO {
      */
     public void desconectar() {
         try {
-            if (conCeo != null) {
-                conCeo.close();
+            if (conCPanel != null) {
+                conCPanel.close();
             }
         } catch (Exception e) {
         }
     }
 
     public Connection getConnection() {
-        return conCeo;
+        return conCPanel;
     }
 
-    public void setConnection(Connection conCeo) {
-        this.conCeo = conCeo;
+    public void setConnection(Connection cobCentral) {
+        this.conCPanel = cobCentral;
     }
-
 }

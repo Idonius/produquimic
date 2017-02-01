@@ -6,6 +6,7 @@
 package dj.comprobantes.offline.service;
 
 import dj.comprobantes.offline.dto.Comprobante;
+import dj.comprobantes.offline.exception.GenericException;
 import java.sql.Connection;
 import javax.ejb.Local;
 
@@ -16,12 +17,7 @@ import javax.ejb.Local;
 @Local
 public interface CPanelService {
 
-    /**
-     * Retorna la Conexion del CPanel
-     *
-     * @return
-     */
-    public Connection getConexionCPanel();
+ 
 
     /**
      * Guarda un comprbante en la nube CPanel
@@ -29,5 +25,5 @@ public interface CPanelService {
      * @param comprobante
      * @return
      */
-    public boolean guardarComprobanteNube(Comprobante comprobante);
+    public boolean guardarComprobanteNube(Comprobante comprobante) throws GenericException;
 }
