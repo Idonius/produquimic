@@ -1,0 +1,109 @@
+<!doctype html>
+<html lang="en" ng-app="jdframework">
+    <head>
+        <meta charset="UTF-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1">
+        <title>Comprobantes Electrónicos</title>
+        <!-- STYLES -->
+        <!-- build:css lib/css/main.min.css -->
+        <link rel="stylesheet" type="text/css" href="components/bootstrap/dist/css/bootstrap.min.css">
+        <link rel="stylesheet" type="text/css" href="components/font-awesome/css/font-awesome.min.css">
+        <link rel='stylesheet' type='text/css' href="components/angular-loading-bar/build/loading-bar.min.css" />
+        <link rel='stylesheet' type='text/css' href="components/AdminLTE/css/AdminLTE.min.css" />
+        <link rel='stylesheet' type='text/css' href="components/AdminLTE/css/skins/skin-green.min.css" />
+        <link rel='stylesheet' type='text/css' href="components/angular-ui-grid/ui-grid.min.css" />
+        <!-- endbuild -->
+        <!-- SCRIPTS -->
+        <!-- build:js lib/js/main.min.js -->
+        <script type="text/javascript" src="components/angular/angular.min.js"></script>
+        <script type="text/javascript" src="components/angular-bootstrap/ui-bootstrap-tpls.min.js"></script>
+        <script type="text/javascript" src="components/angular-ui-router/release/angular-ui-router.min.js"></script>
+        <script type="text/javascript" src="components/angular-loading-bar/build/loading-bar.min.js"></script>
+        <script type="text/javascript" src="components/angular-animate/angular-animate.min.js"></script>
+        <script type="text/javascript" src="components/angular-ui-grid/ui-grid.min.js"></script>
+        <script type="text/javascript" src="components/api-check/dist/api-check.min.js"></script>
+        <script type="text/javascript" src="components/angular-formly/dist/formly.min.js"></script>
+        <script type="text/javascript" src="components/angular-formly-templates-bootstrap/dist/angular-formly-templates-bootstrap.min.js"></script>
+        <script type="text/javascript" src="components/jquery/dist/jquery.min.js"></script>
+        <script type="text/javascript" src="components/AdminLTE/js/app.min.js"></script>
+        <!-- endbuild -->
+        <!-- Custom Scripts -->
+        <script type="text/javascript" src="js/dashboard.min.js"></script>
+    </head>
+    <body class="skin-green" >
+        <!-- Site wrapper -->
+        <div class="wrapper">
+            <header class="main-header">
+                <a href="../../index.html" class="logo"><b>PRODUQUIMIC</b></a>
+                <!-- Header Navbar: style can be found in header.less -->
+                <nav class="navbar navbar-static-top" role="navigation">
+                    <!-- Sidebar toggle button-->
+                    <a href="#" class="sidebar-toggle" data-toggle="offcanvas" role="button">
+                    <span class="sr-only">Toggle navigation</span>
+                    <span class="icon-bar"></span>
+                    <span class="icon-bar"></span>
+                    <span class="icon-bar"></span>
+                    </a>
+                    <div class="navbar-custom-menu">
+                        <ul class="nav navbar-nav">
+                            
+                    
+                            <!-- User Account: style can be found in dropdown.less -->
+                            <li class="dropdown user user-menu">
+                                <a href="#" class="dropdown-toggle" data-toggle="dropdown">
+                                <img src="img/usuario.png" class="user-image" alt="User Image" />
+                                <span class="hidden-xs">Diego Jacome</span>
+                                </a>
+                                <ul class="dropdown-menu">
+                                    <!-- User image -->
+                                    <li class="user-header">
+                                        <img src="img/usuario.png" class="img-circle" alt="User Image" />
+                                        <p>
+                                        Diego Jacome - Web Developer
+                                        <small>Member since Nov. 2012</small>
+                                        </p>
+                                    </li>
+                                    <!-- Menu Footer-->
+                                    <li class="user-footer">
+                                        <div class="pull-left">
+                                            <a href="#" class="btn btn-default btn-flat">Perfil</a>
+                                        </div>
+                                        <div class="pull-right">
+                                            <a href="#" class="btn btn-default btn-flat">Salir</a>
+                                        </div>
+                                    </li>
+                                </ul>
+                            </li>
+                        </ul>
+                    </div>
+                </nav>
+            </header>
+            <!-- =============================================== -->
+            <!-- Left side column. contains the sidebar -->
+            <aside class="main-sidebar" ng-controller="MasterCtrl">
+                <!-- sidebar: style can be found in sidebar.less -->
+                <section class="sidebar">
+                    <!-- sidebar menu: : style can be found in sidebar.less -->
+                    <ul class="sidebar-menu">                                            
+                        <li ng-repeat="op in templates ">
+                            <a ng-click="linkClicked(op)" href="{{op.url}}"><i class="{{op.icono}}"></i> {{op.nombre}}</a>
+                        </li>
+                    </ul>
+                </section>
+                <!-- /.sidebar -->
+            </aside>
+            <!-- =============================================== -->
+            <!-- Content Wrapper. Contains page content -->
+            <div class="content-wrapper">
+                <!-- Main content -->
+                <section class="content">
+                    <!-- MVistas -->
+                    <div ui-view></div>
+                </section>
+                <!-- /.content -->
+            </div>
+            <!-- /.content-wrapper -->
+        </div>
+        <!-- ./wrapper -->
+    </body>
+</html>

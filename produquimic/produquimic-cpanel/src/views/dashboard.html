@@ -1,0 +1,20 @@
+<!-- Content Header (Page header) -->
+<section class="content-header">
+    <h1>
+    Comprobantes Electrónicos
+    <small>Framework Angular</small>
+    </h1>
+</section>
+<div ng-controller="Mycontroller">
+    <h1>{{message}}</h1>
+  <div class="gridStyle" ui-grid-pagination ui-grid-cellnav ui-grid-selection ui-grid="gridOptions"></div>       
+
+</div>    
+
+<div ng-controller="MyFormCtrl as vm">
+<form ng-submit="vm.onSubmit()">
+  <formly-form model="vm.user" fields="vm.userFields">
+    <button type="submit">Submit</button>
+  </formly-form>
+</form>
+</div>  
