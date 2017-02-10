@@ -47,7 +47,7 @@ function FacturaController($scope, $http) {
         width: "5%",
         enableSorting: false,
         cellTemplate:  '<div class="grid-action-cell" align="center">'+
-                       '<a ng-click="grid.appScope.getXML(row)" ><img src="img/im_xml.png"/></a></div>'
+                       '<a ng-click="grid.appScope.getXML(row)"  target="_blank"><img src="img/im_xml.png"/></a></div>'
     }];
     
     
@@ -55,8 +55,7 @@ function FacturaController($scope, $http) {
     alert (row.entity.PK_CODIGO_COMP);
     
     $http.get('framework/models/ComprobanteModel.php/getXML').success(function(data) {
-         angular.extend(_this, data);
-         defer.resolve();
+
     });
     
     }; 
