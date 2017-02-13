@@ -33,14 +33,19 @@ function FacturaController($scope, $http) {
     }, {
         field: 'NUM_AUTORIZACION',
         displayName: 'NUM. AUTORIZACION',
-        width: "50%"          
+        width: "40%"          
+    }, {
+        field: 'TOTAL',
+        displayName: 'TOTAL',
+        cellFilter: 'currency',
+        width: "10%"          
     }, {
         field: 'PDF',
         displayName: 'PDF',
         width: "5%", 
         enableSorting: false,
         cellTemplate:  '<div  class="grid-action-cell" align="center">'+
-                       '<a ng-click="grid.appScope.foo()" ><img src="img/im_pdf.png"/></a></div>'
+                       '<a ng-click="grid.appScope.getPDF(row)"  target="_blank"><img src="img/im_pdf.png"/></a></div>'
     }, {
         field: 'XML',
         displayName: 'XML',
@@ -51,19 +56,32 @@ function FacturaController($scope, $http) {
     }];
     
     
-    $scope.getXML = function(row) {  
-    alert (row.entity.PK_CODIGO_COMP);
-    
-    $http.get('framework/models/ComprobanteModel.php/getXML').success(function(data) {
-
-    });
-    
+    $scope.getXML = function(row) { 
+    $http.get('framework/models/ComprobanteModel.php/getXML',{responseType:'arraybuffer'}).success(function(data) {        
+        var file = new Blob([data], {type: 'text/xml'});        
+        var fileURL = URL.createObjectURL(file);        
+        var fileName = row.entity.NUM_AUTORIZACION+".xml";
+        var a = document.createElement("a");
+        document.body.appendChild(a);
+        a.href = fileURL;
+        a.download = fileName;
+        a.click();
+    });    
     }; 
     
-    $scope.foo = function() {
-
-    alert('');
-    };
+    
+    $scope.getPDF = function(row) { 
+    $http.get('framework/models/ComprobanteModel.php/getPDF',{responseType:'arraybuffer'}).success(function(data) {        
+        var file = new Blob([data], {type: 'application/pdf'});        
+        var fileURL = URL.createObjectURL(file);
+        var fileName = row.entity.NUM_AUTORIZACION+".pdf";
+        var a = document.createElement("a");
+        document.body.appendChild(a);
+        a.href = fileURL;
+        a.download = fileName;
+        a.click();        
+    });    
+    }; 
     
     
 }

@@ -12017,16 +12017,16 @@ module.filter('px', function() {
         },
         pagination: {
           aria: {
-            pageToFirst: 'Page to first',
-            pageBack: 'Page back',
-            pageSelected: 'Selected page',
-            pageForward: 'Page forward',
-            pageToLast: 'Page to last'
+            pageToFirst: 'Primera Página',
+            pageBack: 'Página anterior',
+            pageSelected: 'Seleccionar página',
+            pageForward: 'Página siguiente',
+            pageToLast: 'Última página'
           },
-          sizes: 'items per page',
-          totalItems: 'items',
+          sizes: 'Registros por página',
+          totalItems: 'registros',
           through: 'through',
-          of: 'of'
+          of: 'de'
         },
         grouping: {
           group: 'Group',
