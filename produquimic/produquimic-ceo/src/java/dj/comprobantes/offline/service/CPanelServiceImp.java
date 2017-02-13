@@ -73,7 +73,7 @@ public class CPanelServiceImp implements CPanelService {
                     try {
                         String sql = "insert into COMPROBANTE(PK_CODIGO_COMP,CODIGO_DOCUMENTO,	ESTADO,CLAVE_ACCESO,"
                                 + "SECUENCIAL,CLIENTE,IDENTIFICACION,FECHA_EMISION,NUM_AUTORIZACION,FECHA_AUTORIZACION,"
-                                + "ESTABLECIM,PTO_EMISION) values (?,?,?,?,?,?,?,?,?,?,?,?)";
+                                + "ESTABLECIM,PTO_EMISION,TOTAL) values (?,?,?,?,?,?,?,?,?,?,?,?,?)";
                         ps = con.getPreparedStatement(sql);
                         ps.setLong(1, comprobante.getCodigocomprobante());
                         ps.setString(2, comprobante.getCoddoc());
@@ -87,6 +87,7 @@ public class CPanelServiceImp implements CPanelService {
                         ps.setDate(10, new java.sql.Date(comprobante.getFechaautoriza().getTime()));
                         ps.setString(11, comprobante.getEstab());
                         ps.setString(12, comprobante.getPtoemi());
+                        ps.setDouble(13, comprobante.getImportetotal().doubleValue());
                         ps.executeUpdate();
                     } catch (GenericException | SQLException e) {
                         if (ps != null) {
