@@ -140,6 +140,7 @@ public class pre_libro_bancos extends Pantalla {
 
         asc_asiento.setId("asc_asiento");
         asc_asiento.getBot_aceptar().setMetodo("guardar");
+        asc_asiento.getBot_cancelar().setMetodo("cerrarAsiento");
         agregarComponente(asc_asiento);
 
         dia_modifica.setId("dia_modifica");
@@ -185,6 +186,12 @@ public class pre_libro_bancos extends Pantalla {
         pat_panel.setPanelTabla(tab_tabla1);
         pat_panel.setMensajeInfo(utilitario.getFechaLarga(utilitario.getFechaActual()));
         mep_menu.dibujar(1, "POSICIÓN CONSOLIDADA", pat_panel);
+    }
+
+    public void cerrarAsiento() {
+        //limpia sql guardados
+        utilitario.getConexion().getSqlPantalla().clear();
+        asc_asiento.cerrar();
     }
 
     public void aceptarModificar() {
@@ -1112,7 +1119,7 @@ public class pre_libro_bancos extends Pantalla {
     }
 
     public void aceptarOtros() {
-        if (validarOtros()) {            
+        if (validarOtros()) {
             if (aut_persona.isRendered() == false) {
                 if (str_ide_geper == null) {
                     //Crea el beneficiario
