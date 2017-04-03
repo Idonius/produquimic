@@ -59,14 +59,14 @@ gulp.task('custom-images', function() {
 
 gulp.task('custom-js', function() {
     return gulp.src(paths.scripts)
-        .pipe(minifyJs())
+        
         .pipe(concat('dashboard.min.js'))
         .pipe(gulp.dest('dist/js'));
 });
 
 gulp.task('custom-less', function() {
     return gulp.src(paths.styles)
-        .pipe(less())
+        
         .pipe(gulp.dest('dist/css'));
 });
 
@@ -123,8 +123,8 @@ gulp.task('livereload', function() {
 gulp.task('connect', function() {
     connectphp.server({
     hostname: '127.0.0.1',
-    bin: '/usr/bin/php',
-    ini: '/etc/php5/apache2php.ini',
+    bin: 'C:/wamp/bin/php/php5.5.12/php.exe',
+    ini: 'C:/wamp/bin/php/php5.5.12/php.ini',
     port: 8000,
     base: 'dist',
     livereload: true
