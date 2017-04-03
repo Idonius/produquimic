@@ -1,0 +1,41 @@
+ <div layout="row"  layout-sm="column"  layout-align="end end" layout-wrap>              
+  <md-button class="md-primary" ng-href="#/registro" aria-label="Registrarse">
+    <md-icon md-font-icon="ion-android-person-add" class="s36"></md-icon>
+    Registrarse
+  </md-button>
+</div>
+<section layout="row" layout-sm="column" layout-align="center center" layout-wrap>
+  <div flex="65" layout="row" layout-sm="column" layout-align="center center" layout-wrap>      
+    <img src="img/logo.png"/>
+  </div>    
+</section>
+<div layout="row" layout-sm="column" layout-align="center center" layout-wrap>    
+  <form name="frmLogin" class="form-horizontal" role="form">
+    <md-content class="md-no-momentum">
+     <md-input-container class="md-block">
+      <md-icon md-font-icon="ion-person" ng-style="{color: 'green'}"  aria-hidden="true"></md-icon>
+      <input ng-model="usuario" type="text" name="txtUsuario" placeholder="Usuario" title="CEDULA / RUC" ng-required="true" required>
+      <div ng-messages="frmLogin.txtUsuario.$error">
+        <div ng-message="required">Usuario es un campo obligatorio.</div>
+      </div>
+    </md-input-container>
+    <md-input-container class="md-block">
+      <md-icon md-font-icon="fa fa-key" ng-style="{color: 'green'}" aria-hidden="true"></md-icon>
+      <input ng-model="password" type="password" name="txtPassword" placeholder="Contraseña" ng-required="true" required>
+      <div ng-messages="frmLogin.txtPassword.$error">
+       <div ng-message="required">Contraseña es un campo obligatorio.</div>
+     </div>
+   </md-input-container>
+   <section layout="row" layout-md="column" layout-align="center center" layout-wrap>
+    <md-button type="submit" class="md-raised md-primary" ng-click="doLogin(login)" data-ng-disabled="frmLogin.$invalid">Ingresar</md-button>
+  </section>
+  <section layout="row" layout-md="column" layout-align="center center" layout-wrap>
+   <md-button class="md-primary" ng-href="#/signup">
+    <md-icon md-font-icon="ion-unlocked" class="s36"></md-icon>
+    Recordar Contraseña?        
+  </md-button>                                
+</section>
+</md-content>
+</form>
+</div>
+
