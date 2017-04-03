@@ -5,77 +5,77 @@ include_once("Util.php");
 \Slim\Slim::registerAutoloader();
 $app = new \Slim\Slim();
 
-$app->get('/getFacturas', 'getFacturas');
+$app->get('/getFacturas/:FECHA_DESDE/:FECHA_HASTA', 'getFacturas');
 
-$app->get('/getNotasCredito', 'getNotasCredito');
+$app->get('/getNotasCredito/:FECHA_DESDE/:FECHA_HASTA', 'getNotasCredito');
 
-$app->get('/getNotasDebito', 'getNotasDebito');
+$app->get('/getNotasDebito/:FECHA_DESDE/:FECHA_HASTA', 'getNotasDebito');
 
-$app->get('/getGuias', 'getGuias');
+$app->get('/getGuias/:FECHA_DESDE/:FECHA_HASTA', 'getGuias');
 
-$app->get('/getRetenciones', 'getRetenciones');
+$app->get('/getRetenciones/:FECHA_DESDE/:FECHA_HASTA', 'getRetenciones');
 
-$app->get('/getXML', 'getXML');
+$app->get('/getXML/:PK_CODIGO_COMP', 'getXML');
 
-$app->get('/getPDF/', 'getPDF');
+$app->get('/getPDF/:PK_CODIGO_COMP', 'getPDF');
 
 $app->run();
 
 
-function getFacturas(){
+function getFacturas($FECHA_DESDE,$FECHA_HASTA){
 	$response = \Slim\Slim::getInstance()->response();
 	if(Util::isAutorizado($response)){
-		$sql = "SELECT PK_CODIGO_COMP,DATE_FORMAT(FECHA_EMISION,'%d/%m/%Y') as FECHA_EMISION,concat(ESTABLECIM , '-' , PTO_EMISION , '-' , SECUENCIAL) as SECUENCIAL,NUM_AUTORIZACION,TOTAL FROM COMPROBANTE WHERE CODIGO_DOCUMENTO='01' ORDER BY FECHA_EMISION desc";	
+		$sql = "SELECT PK_CODIGO_COMP,DATE_FORMAT(FECHA_EMISION,'%d/%m/%Y') as FECHA_EMISION,concat(ESTABLECIM , '-' , PTO_EMISION , '-' , SECUENCIAL) as SECUENCIAL,NUM_AUTORIZACION,TOTAL FROM COMPROBANTE WHERE CODIGO_DOCUMENTO='01' AND IDENTIFICACION='".$_SESSION['IDENTIFICACION']."' AND FECHA_EMISION BETWEEN '".$FECHA_DESDE."' AND '".$FECHA_HASTA."' ORDER BY FECHA_EMISION desc";	
 		$db = new Conexion();
 		$resultado = $db->consultar($sql);
 		Util::validarResultado($response,$resultado);
 	}
 }
 
-function getNotasCredito(){
+function getNotasCredito($FECHA_DESDE,$FECHA_HASTA){
 	$response = \Slim\Slim::getInstance()->response();
 	if(Util::isAutorizado($response)){
-		$sql = "SELECT PK_CODIGO_COMP,DATE_FORMAT(FECHA_EMISION,'%d/%m/%Y') as FECHA_EMISION,concat(ESTABLECIM , '-' , PTO_EMISION , '-' , SECUENCIAL) as SECUENCIAL,NUM_AUTORIZACION,TOTAL FROM COMPROBANTE WHERE CODIGO_DOCUMENTO='01' ORDER BY FECHA_EMISION desc";	
+		$sql = "SELECT PK_CODIGO_COMP,DATE_FORMAT(FECHA_EMISION,'%d/%m/%Y') as FECHA_EMISION,concat(ESTABLECIM , '-' , PTO_EMISION , '-' , SECUENCIAL) as SECUENCIAL,NUM_AUTORIZACION,TOTAL FROM COMPROBANTE WHERE CODIGO_DOCUMENTO='04' AND IDENTIFICACION='".$_SESSION['IDENTIFICACION']."' AND FECHA_EMISION BETWEEN '".$FECHA_DESDE."' AND '".$FECHA_HASTA."' ORDER BY FECHA_EMISION desc";	
 		$db = new Conexion();
 		$resultado = $db->consultar($sql);
 		Util::validarResultado($response,$resultado);
 	}
 }
 
-function getNotasDebito(){
+function getNotasDebito($FECHA_DESDE,$FECHA_HASTA){
 	$response = \Slim\Slim::getInstance()->response();
 	if(Util::isAutorizado($response)){
-		$sql = "SELECT PK_CODIGO_COMP,DATE_FORMAT(FECHA_EMISION,'%d/%m/%Y') as FECHA_EMISION,concat(ESTABLECIM , '-' , PTO_EMISION , '-' , SECUENCIAL) as SECUENCIAL,NUM_AUTORIZACION,TOTAL FROM COMPROBANTE WHERE CODIGO_DOCUMENTO='01' ORDER BY FECHA_EMISION desc";	
+		$sql = "SELECT PK_CODIGO_COMP,DATE_FORMAT(FECHA_EMISION,'%d/%m/%Y') as FECHA_EMISION,concat(ESTABLECIM , '-' , PTO_EMISION , '-' , SECUENCIAL) as SECUENCIAL,NUM_AUTORIZACION,TOTAL FROM COMPROBANTE WHERE CODIGO_DOCUMENTO='05' AND IDENTIFICACION='".$_SESSION['IDENTIFICACION']."' AND FECHA_EMISION BETWEEN '".$FECHA_DESDE."' AND '".$FECHA_HASTA."' ORDER BY FECHA_EMISION desc";	
 		$db = new Conexion();
 		$resultado = $db->consultar($sql);
 		Util::validarResultado($response,$resultado);
 	}
 }
 
-function getGuias(){
+function getGuias($FECHA_DESDE,$FECHA_HASTA){
 	$response = \Slim\Slim::getInstance()->response();
 	if(Util::isAutorizado($response)){
-		$sql = "SELECT PK_CODIGO_COMP,DATE_FORMAT(FECHA_EMISION,'%d/%m/%Y') as FECHA_EMISION,concat(ESTABLECIM , '-' , PTO_EMISION , '-' , SECUENCIAL) as SECUENCIAL,NUM_AUTORIZACION,TOTAL FROM COMPROBANTE WHERE CODIGO_DOCUMENTO='01' ORDER BY FECHA_EMISION desc";	
+		$sql = "SELECT PK_CODIGO_COMP,DATE_FORMAT(FECHA_EMISION,'%d/%m/%Y') as FECHA_EMISION,concat(ESTABLECIM , '-' , PTO_EMISION , '-' , SECUENCIAL) as SECUENCIAL,NUM_AUTORIZACION,TOTAL FROM COMPROBANTE WHERE CODIGO_DOCUMENTO='06' AND IDENTIFICACION='".$_SESSION['IDENTIFICACION']."' AND FECHA_EMISION BETWEEN '".$FECHA_DESDE."' AND '".$FECHA_HASTA."' ORDER BY FECHA_EMISION desc";	
 		$db = new Conexion();
 		$resultado = $db->consultar($sql);
 		Util::validarResultado($response,$resultado);
 	}
 }
 
-function getRetenciones(){
+function getRetenciones($FECHA_DESDE,$FECHA_HASTA){
 	$response = \Slim\Slim::getInstance()->response();
 	if(Util::isAutorizado($response)){
-		$sql = "SELECT PK_CODIGO_COMP,DATE_FORMAT(FECHA_EMISION,'%d/%m/%Y') as FECHA_EMISION,concat(ESTABLECIM , '-' , PTO_EMISION , '-' , SECUENCIAL) as SECUENCIAL,NUM_AUTORIZACION,TOTAL FROM COMPROBANTE WHERE CODIGO_DOCUMENTO='01' ORDER BY FECHA_EMISION desc";	
+		$sql = "SELECT PK_CODIGO_COMP,DATE_FORMAT(FECHA_EMISION,'%d/%m/%Y') as FECHA_EMISION,concat(ESTABLECIM , '-' , PTO_EMISION , '-' , SECUENCIAL) as SECUENCIAL,NUM_AUTORIZACION,TOTAL FROM COMPROBANTE WHERE CODIGO_DOCUMENTO='07' AND IDENTIFICACION='".$_SESSION['IDENTIFICACION']."' AND FECHA_EMISION BETWEEN '".$FECHA_DESDE."' AND '".$FECHA_HASTA."' ORDER BY FECHA_EMISION desc";	
 		$db = new Conexion();
 		$resultado = $db->consultar($sql);
 		Util::validarResultado($response,$resultado);
 	}
 }
 
-function getXML() {
-		$response = \Slim\Slim::getInstance()->response();
+function getXML($PK_CODIGO_COMP) {
+	$response = \Slim\Slim::getInstance()->response();
 	if(Util::isAutorizado($response)){	    
-     	$sql = "select ARCHIVO_XML FROM RIDE_COMPROBANTE WHERE PK_CODIGO_COMP=10";
+     	$sql = "select ARCHIVO_XML FROM COMPROBANTE a INNER JOIN RIDE_COMPROBANTE b on a.PK_CODIGO_COMP = b.PK_CODIGO_COMP  WHERE IDENTIFICACION='".$_SESSION['IDENTIFICACION']."' AND  b.PK_CODIGO_COMP=".$PK_CODIGO_COMP;
 		$db = new Conexion();
 		$resultado = $db->consultar($sql,false);
 		$file = $resultado->getDatos()[0]->ARCHIVO_XML;		
@@ -84,11 +84,11 @@ function getXML() {
 	}
 }
 
-function getPDF() {
+function getPDF($PK_CODIGO_COMP) {
 	$response = \Slim\Slim::getInstance()->response();
-	if(Util::isAutorizado($response)){		
-		$conexion=mysqli_connect("localhost", "root", "DIEGO", "ceo");			
-     	$sql = "select ARCHIVO_PDF FROM RIDE_COMPROBANTE WHERE PK_CODIGO_COMP=10";
+	if(Util::isAutorizado($response)){					
+     	$sql = "select ARCHIVO_PDF FROM COMPROBANTE a INNER JOIN RIDE_COMPROBANTE b on a.PK_CODIGO_COMP = b.PK_CODIGO_COMP  WHERE IDENTIFICACION='".$_SESSION['IDENTIFICACION']."' AND  b.PK_CODIGO_COMP=".$PK_CODIGO_COMP;
+		var_dump($sql);
 		$db = new Conexion();
 		$resultado = $db->consultar($sql,false);
 		$file = $resultado->getDatos()[0]->ARCHIVO_PDF;			

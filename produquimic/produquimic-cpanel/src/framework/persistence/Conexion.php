@@ -4,15 +4,20 @@
   {
 
     private $db;
+    private $isConnected = false;
     
-    public function __construct() {        
-        $this->db =  new PDO('mysql:host=localhost;dbname=ceo', 'root', 'DIEGO');
-        /*$this->db->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);   */     
-        /*,  PDO::ERRMODE_WARNING*/
+    public function __construct() {     
+        try {   
+                $this->db =  new PDO('mysql:host=localhost;dbname=ceo', 'root', 'DIEGO');
+                $this->isConnected = true;
+        }catch(PDOException $e) {
+                $this->isConnected = false;
+            }
     }
 
     public function __destruct() {
      $this->db = null;
+     $this->isConnected = false;
     }
 
     
@@ -22,12 +27,12 @@
      * @param  boolean $_json      [obtener resultado en formato JSON]     
      * @return resultadoSQL        [resultado de la consulta]
      */
-    public function consultar($_sql, $_json = true) {
+    public function consultar($_sql, $_json = false) {
         $resultadoSQL = new resultadoSQL();
         try {
             $st = $this->db->query($_sql);
             if ($_json) {
-                $resultadoSQL->setDatos(json_encode($st->fetchAll(PDO::FETCH_CLASS)));
+                $resultadoSQL->setDatos(json_encode($st->fetchAll(PDO::FETCH_CLASS), JSON_UNESCAPED_UNICODE));
             } 
             else {
                 $resultadoSQL->setDatos($st->fetchAll(PDO::FETCH_CLASS));
@@ -144,6 +149,29 @@
             $resultadoSQL->setMensaje("Error al eliminar en la tabla " . $_tabla . ": ==> " . $e->getMessage());
         }
         return $resultadoSQL;
+    }
+
+    /**
+     * [setErrors description]
+     */
+    public function setErrors(){
+        $this->connection->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
+    }
+
+    /**
+     * [getConnection description]
+     * @return [type] [description]
+     */
+    public function getConnection(){
+        return $this->db;
+    }
+    
+    /**
+     * [isConnected description]
+     * @return boolean [description]
+     */
+    public function isConnected(){
+        return $this->isConnected;
     }
 
 }

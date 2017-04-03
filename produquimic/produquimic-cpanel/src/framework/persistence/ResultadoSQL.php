@@ -1,7 +1,7 @@
 <?php
 class ResultadoSQL
 {
-    
+
     /*Boolean*/
     private $error = false;
     
@@ -11,6 +11,7 @@ class ResultadoSQL
     /*Array*/
     private $datos;
 
+  
     public function isError() {
         return $this->error;
     }
@@ -23,7 +24,7 @@ class ResultadoSQL
         return $this->mensaje;
     }
     
-    public function setMensaje($mensaje) {
+    public function setMensaje($mensaje) {        
         $this->mensaje = $mensaje;
     }
     
@@ -34,6 +35,6 @@ class ResultadoSQL
     public function setDatos($datos) {
         $this->datos = $datos;
     }    
-   
+
 }
 ?>
