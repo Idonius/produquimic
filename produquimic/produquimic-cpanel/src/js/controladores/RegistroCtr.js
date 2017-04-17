@@ -1,9 +1,9 @@
-app.controller('RegistroCtrl', function ($scope, $rootScope, $routeParams, $location, $http, toaster) {
+app.controller('RegistroCtrl', function($scope, $rootScope, $routeParams, $location, $http, Utilitario) {
 
-	$scope.identificacion="";
-	$scope.confirmaEmail="";
-	
-	$scope.usuario = { 
+	$scope.identificacion = "";
+	$scope.confirmaEmail = "";
+
+	$scope.usuario = {
 		CODIGO_USUARIO: null,
 		REGISTRADO_USUARIO: 0,
 		NOMBRE_USUARIO: null,
@@ -14,35 +14,36 @@ app.controller('RegistroCtrl', function ($scope, $rootScope, $routeParams, $loca
 		DIRECCION_USUARIO: null
 	};
 
-	$scope.buscarCliente = function () {	
-		if($scope.identificacion)	{
-			if ($scope.identificacion.length==10 || $scope.identificacion.length==13)	{
-				$http.post('framework/models/UsuarioModel.php/getDatosUsuario/'+ $scope.identificacion ).success(function(data) {	
-				    if (data.datos) {
-					     $scope.usuario=data.datos[0];					     			 
-						 /*Si el usuario ya se a registrado envia mensaje*/
-						 if( $scope.usuario.REGISTRADO_USUARIO == 1){
-						 	toaster.pop("warning","","El usuario "+$scope.usuario.NOMBRE_USUARIO +" ya se encuentra registrado", 10000, 'trustedHtml');
-						 	$scope.limpiar();
-						 }
-				    }
-				    else{
-				    	toaster.pop("warning","","No se han generado comprobantes electrónicos para el usuario ingresado", 10000, 'trustedHtml');
-				    	$scope.identificacion="";
-				    }
+	$scope.buscarCliente = function() {
+		if ($scope.identificacion) {
+			if ($scope.identificacion.length == 10 || $scope.identificacion.length == 13) {
+				Utilitario.consumirWebService('framework/servicios/ServicioUsuario.php/getDatosUsuario',
+					({
+						'identificacion': $scope.identificacion
+					})).then(function(data) {
+					if (data.datos) {
+						$scope.usuario = data.datos;
+						/*Si el usuario ya se a registrado envia mensaje*/
+						if ($scope.usuario.REGISTRADO_USUARIO == 1) {
+							Utilitario.agregarDialogoMensajeAlerta("Mensaje", "El usuario " + $scope.usuario.NOMBRE_USUARIO + " ya se encuentra registrado");
+							$location.path('/login');
+						}
+					} else {
+						Utilitario.agregarDialogoMensajeAlerta("Mensaje", "No se han generado comprobantes electrónicos para el usuario ingresado");
+						$scope.identificacion = "";
+					}
 				});
-			}
-			else{
-				toaster.pop("error","","Identificación no válida", 10000, 'trustedHtml');
+			} else {
+				Utilitario.agregarDialogoMensajeError("Error", "Identificación no válida");
 				$scope.limpiar();
 			}
-		} 	
+		}
 	};
 
-	$scope.limpiar = function () {
-		$scope.identificacion="";
-		$scope.confirmaEmail="";		
-		$scope.usuario = { 
+	$scope.limpiar = function() {
+		$scope.identificacion = "";
+		$scope.confirmaEmail = "";
+		$scope.usuario = {
 			CODIGO_USUARIO: null,
 			REGISTRADO_USUARIO: 0,
 			NOMBRE_USUARIO: null,
@@ -52,26 +53,25 @@ app.controller('RegistroCtrl', function ($scope, $rootScope, $routeParams, $loca
 			CONTACTO_USUARIO: null,
 			DIRECCION_USUARIO: null
 		};
-	};	
+	};
 
 
-	$scope.registrarUsuario = function() { 
-		if($scope.usuario.CORREO_USUARIO==$scope.confirmaEmail){
-			if($scope.usuario.CODIGO_USUARIO){
-			  $scope.usuario.REGISTRADO_USUARIO=1;
-			  $http.post('framework/models/UsuarioModel.php/actualizarUsuario', $scope.usuario).success(function(data){                   		    
-			  	toaster.pop("succes","", "Se guardo Correctamente", 10000, 'trustedHtml');     
-			  	$scope.limpiar();             
-			  }).error(function(data){   		  	
-			    toaster.pop("error","", data.mensaje, 10000, 'trustedHtml');                  
-			  });
-			}			
+	$scope.registrarUsuario = function() {
+		if ($scope.usuario.CORREO_USUARIO == $scope.confirmaEmail) {
+			if ($scope.usuario.CODIGO_USUARIO) {
+				$scope.usuario.REGISTRADO_USUARIO = 1; //true
+				$scope.usuario.CODIGO_ESTADO = 5; //REGISTRADO
+				Utilitario.consumirWebService('framework/servicios/ServicioUsuario.php/actualizarUsuario',
+					$scope.usuario).then(function(data) {						
+					Utilitario.agregarMensajeExito("Se guardo Correctamente");
+					$location.path('/login');
+				});
+
+
+			}
+		} else {
+			Utilitario.agregarDialogoMensajeError("Error", "Verificar la confirmación del correo electrónico");
+			$scope.confirmaEmail = "";
 		}
-		else{
-			toaster.pop("error","", "Verificar la confirmación del correo electrónico", 10000, 'trustedHtml');                  
-			$scope.confirmaEmail="";
-		}
-
-
-	};	
+	};
 });

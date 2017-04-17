@@ -1,43 +1,38 @@
-app.factory('ServicioAutenticacion',['Base64', '$http', '$cookieStore', '$rootScope', '$timeout',
-  function (Base64, $http, $cookieStore, $rootScope, $timeout) {
+app.factory('ServicioAutenticacion',['Encripta', '$http', '$cookieStore', '$rootScope', '$timeout','Utilitario',
+  function (Encripta, $http, $cookieStore, $rootScope, $timeout, Utilitario) {
     var service = {};
+    service.login = function (usuario,  callback) {
+      usuario.clave=Encripta.encode(usuario.clave);
 
-    service.login = function (usuario, password, callback) {
-      $http.post('framework/models/SeguridadModel.php/validarLogin/' + usuario+"/"+ password)
-      .success(function (response) {              
-        callback(response);
-      })
-      .error(function(response){ 
-         callback(response);
+      Utilitario.consumirWebService('framework/servicios/ServicioSeguridad.php/validarLogin',
+        usuario).then(function(data) {
+            callback(data);
       });
-    };
+      };
 
-    service.generarToken = function (usuario, password, success) {
-      var authdata = Base64.encode(usuario + ':' + password);
+    service.generarToken = function (usuario, success) {
+      var authdata = Encripta.encode(success.datos.CODIGO_USUARIO + ':' + usuario);
       $rootScope.globals = {
         currentUser: {
-          usuario: usuario,
+          usuario: success.datos.CODIGO_USUARIO,
           authdata: authdata
         }
       };
+      $http.defaults.headers.common['Authorization'] = 'AccesToken ' + authdata; 
+      $cookieStore.put('globals', $rootScope.globals);
+    };
 
-$http.defaults.headers.common['Authorization'] = 'Basic ' + authdata; // jshint ignore:line
-$cookieStore.put('globals', $rootScope.globals);
-$cookieStore.put('codigo', success.datos.CODIGO_USUARIO);
-};
-
-service.logout = function () {
-  $rootScope.globals = {};
-  $cookieStore.remove('globals');
-  $cookieStore.remove('codigo');
-  $http.defaults.headers.common.Authorization = 'Basic ';
-};
+    service.logout = function () {
+      $rootScope.globals = {};
+      $cookieStore.remove('globals');
+      $http.defaults.headers.common.Authorization = 'AccesToken ';
+    };
 
 return service;
 }])
 
-.factory('Base64', function () {
-  /* jshint ignore:start */
+.factory('Encripta', function () {
+
   var keyStr = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+/=';
   return {
     encode: function (input) {
@@ -76,7 +71,7 @@ return service;
       var chr1, chr2, chr3 = "";
       var enc1, enc2, enc3, enc4 = "";
       var i = 0;      
-// remove all characters that are not A-Z, a-z, 0-9, +, /, or =
+
 var base64test = /[^A-Za-z0-9\+\/\=]/g;
 if (base64test.exec(input)) {
   window.alert("There were invalid base64 characters in the input text.\n" +
@@ -113,5 +108,4 @@ return output;
 }
 };
 
-/* jshint ignore:end */
 });
