@@ -1,0 +1,96 @@
+.errorToast .md-toast-content {
+  background: #C95D58;
+  color: #fafafa;
+}
+
+.infoToast .md-toast-content {
+  background: #58AAC2;
+  color: #fafafa;
+}
+
+.warnToast .md-toast-content {
+  background: #F8A837;
+  color: #fafafa;
+}
+
+.successToast .md-toast-content {
+  background: #73B473;
+  color: #fafafa;
+}
+
+.iconoToast {
+  color:#fff; 
+  font-size:28px;
+  padding-right: 5px;
+}
+
+
+.iconoLista {
+  color:green; 
+  font-size:14px;
+  padding-right: 6px;
+}
+
+.textoPeque{
+  font-size: small;
+}
+
+.errorFondo {
+  background: #C95D58;
+  color: #fafafa;
+}
+
+.alertFondo {
+  background: #F8A837;
+  color: #fafafa;
+}
+
+.infoFondo {
+ background: #58AAC2;
+ color: #fafafa;
+}
+
+.s28{
+  font-size:28px; 
+}
+.s24{
+  font-size:24px; 
+}
+.s18{
+  font-size:18px; 
+}
+
+.negrilla{
+  font-weight: bold;
+}
+
+*{
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+*:after,
+*:before{
+  box-sizing: border-box;
+}
+
+.wrapper{
+  display: flex;
+  flex-direction: column;            
+  height: 100vh;
+  overflow: hidden;
+  vertical-align: center;
+}
+.header{
+  flex: 0 0 auto;  
+  background: #aaa;
+}
+.content{
+  flex: 1 1 auto;     
+  overflow-y: auto;     
+}
+.footer{
+  flex: 0 0 auto;  
+  background: #aaa;
+}
+
