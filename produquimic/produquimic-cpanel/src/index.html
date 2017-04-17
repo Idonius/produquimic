@@ -6,12 +6,13 @@
     <title>Comprobantes Electrónicos</title>
     <!-- STYLES -->
     <!-- build:css lib/css/main.min.css -->        
-    <link rel="stylesheet" type="text/css" href="components/angular-material/angular-material.css"> 
-    <link rel="stylesheet" type="text/css" href="components/font-awesome/css/font-awesome.css">               
+    <link rel="stylesheet" type="text/css" href="components/angular-material/angular-material.css">            
     <link rel="stylesheet" type="text/css" href="components/Ionicons/css/ionicons.css">     
-    <link rel="stylesheet" type="text/css" href="components/toaster/toaster.css">
     <link rel="stylesheet" type="text/css" href="components/angular-ui-grid/ui-grid.css">   
+    
     <!-- endbuild -->
+    <!-- Custom Style -->
+    <link rel="stylesheet" type="text/css" href="css/framework.css">   
     <!-- SCRIPTS -->
     <!-- build:js lib/js/main.min.js -->
     <script type="text/javascript" src="components/angular/angular.js"></script>
@@ -21,26 +22,46 @@
     <script type="text/javascript" src="components/angular-material/angular-material.js"></script>
     <script type="text/javascript" src="components/angular-route/angular-route.js"></script>        
     <script type="text/javascript" src="components/angular-cookies/angular-cookies.js"></script>
-    <script type="text/javascript" src="components/toaster/toaster.js"></script>
     <script type="text/javascript" src="components/angular-ui-grid/ui-grid.js"></script>
+    
     <!-- endbuild -->
     <!-- Custom Scripts -->
-    <script type="text/javascript" src="js/dashboard.min.js"></script>      
-
+    <script type="text/javascript" src="js/dashboard.min.js"></script>
 </head>
 <body ng-app="jdframework" ng-cloak>
-    <md-toolbar class="md-theme-indigo" >       
-        <div class="md-toolbar-tools"> 
-            <h1 class="md-toolbar-tools">
-                COMPROBANTES ELECTRÓNICOS
-            </h1>            
+<div ng-controller="MenuCtrl" layout="column">
+    <div class="wrapper">
+        <md-toolbar class="header" >       
+            <div class="md-toolbar-tools"> 
+                <md-button class="md-icon-button" aria-label="Opciones" ng-click="toggleRight()">                    
+                    <md-icon md-font-icon="ion-navicon s28"></md-icon>
+                </md-button>
+                <h3>
+                     Comprobantes Electrónicos
+                </h3>     
+            </div>
+        </md-toolbar>
 
-        </div>
-    </md-toolbar>
-    <md-content flex layout-padding >
-        <div data-ng-view="" id="ng-view" class="slide-animation">           
-        </div>
-    </md-content>
+        <md-content  layout-padding  md-scroll-y layout="column" flex >
+            <div data-ng-view="" id="ng-view" class="content slide-animation" flex="noshrink"> 
+            </div>
+        </md-content>
+    </div>
+
+  <section layout="row" flex>
+    <md-sidenav class="md-sidenav-left md-whiteframe-4dp" md-component-id="right">
+
+
+
+      <md-list-item ng-click="abrirPagina(pagina.state, $event)"  ng-repeat="pagina in paginas" >
+        <md-icon  md-colors="{color: '{{pagina.color}}'}"   md-font-icon="{{pagina.icono}}"></md-icon>
+        <p> {{ pagina.nombre }} </p>
+        <md-divider></md-divider>
+      </md-list-item>     
+    </md-sidenav>
+  </section>
+
+</div>
+
 </body>    
-<toaster-container toaster-options="{'time-out': 3000}"></toaster-container>
 </html>
