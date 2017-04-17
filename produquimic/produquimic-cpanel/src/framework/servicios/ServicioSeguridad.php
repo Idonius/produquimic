@@ -21,27 +21,32 @@ function validarLogin() {
         $request = \Slim\Slim::getInstance()->request();
         $usuario = json_decode($request->getBody());
         try {
-            $sql = "SELECT CODIGO_USUARIO,IDENTIFICACION_USUARIO,CLAVE_USUARIO,CODIGO_ESTADO FROM USUARIO WHERE IDENTIFICACION_USUARIO = :usuario";
+            $sql = "SELECT CODIGO_USUARIO,IDENTIFICACION_USUARIO,CLAVE_USUARIO,CODIGO_ESTADO,REGISTRADO_USUARIO FROM USUARIO WHERE IDENTIFICACION_USUARIO = :usuario";
             $valoresSql = array(":usuario" => $usuario->identificacion);
             $db = new Conexion();
             $result = $db->consultarUnico($sql, $valoresSql);
             if ($result->getDatos()) {
-                // Valida password
-                $password = base64_decode($usuario->clave);
-                if ($password != $result->getDatos()->CLAVE_USUARIO) {
-                    $resultadoSQL->setError(true);
-                    $resultadoSQL->setMensaje("Contraseña incorrecta");
-                } else {
-                    if (!isset($_SESSION)) {
-                        session_start();
+                if ($result->getDatos()->REGISTRADO_USUARIO == 1) {
+                    // Valida password
+                    $password = base64_decode($usuario->clave);
+                    if ($password != $result->getDatos()->CLAVE_USUARIO) {
+                        $resultadoSQL->setError(true);
+                        $resultadoSQL->setMensaje("Contraseña incorrecta");
+                    } else {
+                        if (!isset($_SESSION)) {
+                            session_start();
+                        }
+                        $_SESSION['CODIGO_USUARIO'] = $result->getDatos()->CODIGO_USUARIO;
+                        $_SESSION['IDENTIFICACION'] = $result->getDatos()->IDENTIFICACION_USUARIO;
+                        $resultadoSQL->setMensaje("Acceso Correcto");
+                        //Respuesta del servicio
+                        $datos = array("CODIGO_ESTADO" => $result->getDatos()->CODIGO_ESTADO,
+                            "CODIGO_USUARIO" => $result->getDatos()->CODIGO_USUARIO);
+                        $resultadoSQL->setDatos($datos);
                     }
-                    $_SESSION['CODIGO_USUARIO'] = $result->getDatos()->CODIGO_USUARIO;
-                    $_SESSION['IDENTIFICACION'] = $result->getDatos()->IDENTIFICACION_USUARIO;
-                    $resultadoSQL->setMensaje("Acceso Correcto");
-                    //Respuesta del servicio
-                    $datos = array("CODIGO_ESTADO" => $result->getDatos()->CODIGO_ESTADO,
-                        "CODIGO_USUARIO" => $result->getDatos()->CODIGO_USUARIO);
-                    $resultadoSQL->setDatos($datos);
+                } else {
+                    $resultadoSQL->setError(true);
+                    $resultadoSQL->setMensaje("El Usuario no se encuentra registrado en el sistema, por favor ingrese a la opción REGISTRARSE");
                 }
             } else {
                 $resultadoSQL->setError(true);
