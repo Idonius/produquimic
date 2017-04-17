@@ -14,28 +14,28 @@
     <md-content class="md-no-momentum">
      <md-input-container class="md-block">
       <md-icon md-font-icon="ion-person" ng-style="{color: 'green'}"  aria-hidden="true"></md-icon>
-      <input ng-model="usuario" type="text" name="txtUsuario" placeholder="Usuario" title="CEDULA / RUC" ng-required="true" required>
+      <input ng-model="usuario.identificacion" type="text" name="txtUsuario" placeholder="Identificación" ng-required="true" required>
+      <md-tooltip md-direction="right">CEDULA / RUC</md-tooltip>
       <div ng-messages="frmLogin.txtUsuario.$error">
         <div ng-message="required">Usuario es un campo obligatorio.</div>
       </div>
     </md-input-container>
     <md-input-container class="md-block">
-      <md-icon md-font-icon="fa fa-key" ng-style="{color: 'green'}" aria-hidden="true"></md-icon>
-      <input ng-model="password" type="password" name="txtPassword" placeholder="Contraseña" ng-required="true" required>
+      <md-icon md-font-icon="ion-locked" ng-style="{color: 'green'}" aria-hidden="true"></md-icon>
+      <input ng-model="usuario.clave" type="password" name="txtPassword" placeholder="Contraseña" ng-required="true" required>
       <div ng-messages="frmLogin.txtPassword.$error">
        <div ng-message="required">Contraseña es un campo obligatorio.</div>
      </div>
    </md-input-container>
    <section layout="row" layout-md="column" layout-align="center center" layout-wrap>
-    <md-button type="submit" class="md-raised md-primary" ng-click="doLogin(login)" data-ng-disabled="frmLogin.$invalid">Ingresar</md-button>
+    <md-button type="submit" class="md-raised md-primary" ng-click="validarAcceso($event)" data-ng-disabled="frmLogin.$invalid">Ingresar</md-button>
   </section>
   <section layout="row" layout-md="column" layout-align="center center" layout-wrap>
    <md-button class="md-primary" ng-href="#/signup">
-    <md-icon md-font-icon="ion-unlocked" class="s36"></md-icon>
+    <md-icon md-font-icon="ion-unlocked" ></md-icon>
     Recordar Contraseña?        
   </md-button>                                
 </section>
 </md-content>
 </form>
 </div>
-
