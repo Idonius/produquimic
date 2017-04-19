@@ -45,7 +45,6 @@ function actualizarUsuario() {
             $correo = new EnviarCorreo();
             $correo->enviarRegistro($param);
         }
-
         Util::validarResultado($response, $resultado);
     }
 }
