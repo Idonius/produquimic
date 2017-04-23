@@ -16,6 +16,10 @@ $app->post('/getGuias/:FECHA_DESDE/:FECHA_HASTA', 'getGuias');
 
 $app->post('/getRetenciones/:FECHA_DESDE/:FECHA_HASTA', 'getRetenciones');
 
+$app->post('/getTotalComprobantes', 'getTotalComprobantes');
+
+$app->post('/getUltimosComprobantes', 'getUltimosComprobantes');
+
 $app->get('/getXML/:PK_CODIGO_COMP', 'getXML');
 
 $app->get('/getPDF/:PK_CODIGO_COMP', 'getPDF');
@@ -62,6 +66,16 @@ function getGuias($FECHA_DESDE, $FECHA_HASTA) {
     }
 }
 
+function getTotalComprobantes() {
+    $response = \Slim\Slim::getInstance()->response();
+    if (Util::isAutorizado($response)) {
+        $sql = "SELECT LABEL_DOCUMENTO,(SELECT COUNT(1)  FROM COMPROBANTE WHERE CODIGO_DOCUMENTO=a.CODIGO_DOCUMENTO AND IDENTIFICACION='" . $_SESSION['IDENTIFICACION'] . "' )AS NUM_FACTURAS,COLOR_DOCUMENTO FROM TIPO_DOCUMENTO a WHERE ACTIVO_DOCUMENTO=1";
+        $db = new Conexion();
+        $resultado = $db->consultar($sql);
+        Util::validarResultado($response, $resultado);
+    }
+}
+
 function getRetenciones($FECHA_DESDE, $FECHA_HASTA) {
     $response = \Slim\Slim::getInstance()->response();
     if (Util::isAutorizado($response)) {
@@ -72,6 +86,15 @@ function getRetenciones($FECHA_DESDE, $FECHA_HASTA) {
     }
 }
 
+function getUltimosComprobantes() {
+    $response = \Slim\Slim::getInstance()->response();
+    if (Util::isAutorizado($response)) {
+        $sql = "SELECT PK_CODIGO_COMP,NOMBRE_DOCUMENTO,DATE_FORMAT(FECHA_EMISION,'%d/%m/%Y') as FECHA_EMISION,concat(ESTABLECIM , '-' , PTO_EMISION , '-' , SECUENCIAL) as SECUENCIAL,NUM_AUTORIZACION,TOTAL FROM COMPROBANTE a INNER JOIN TIPO_DOCUMENTO b on a.CODIGO_DOCUMENTO=b.CODIGO_DOCUMENTO WHERE IDENTIFICACION='" . $_SESSION['IDENTIFICACION'] . "' ORDER BY FECHA_EMISION desc LIMIT 10";
+        $db = new Conexion();
+        $resultado = $db->consultar($sql);
+        Util::validarResultado($response, $resultado);
+    }
+}
 function getXML($PK_CODIGO_COMP) {
     $response = \Slim\Slim::getInstance()->response();
     if (Util::isAutorizado($response)) {
