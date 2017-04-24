@@ -1,34 +1,51 @@
-  <md-card>    
-    <md-card-content>
-    <div layout="row" layout-align="center center" >
-        <form name="frmConsulta">        
-         <md-input-container style="width: 155px;height:20px;">
-          <label>Tipo de Comprobante</label>
-          <md-select  ng-model="tipoComprobante">
-            <md-option ng-repeat="actualTipoComprobante in listaTipoComprobante" value="{{actualTipoComprobante}}">{{actualTipoComprobante}}</md-option>
-          </md-select>
+<md-grid-list
+md-cols-xs="1" md-cols-sm="2" md-cols-md="4" md-cols-gt-md="4"
+md-row-height-gt-md="1:0.6" md-row-height="2:0.9" md-gutter="12px"  >
+<md-grid-tile ng-repeat="totalComprobante in totalComprobantes">
+<md-card class="card card-stats">
+<md-card-title class="card-header" data-background-color="{{totalComprobante.COLOR_DOCUMENTO}}">
+<md-icon md-font-icon="ion-ios-paper-outline s28"  ng-style="{color: 'white'}" aria-hidden="true"></md-icon>
+</md-card-title>
+<md-card-content  class="card-content">
+<p class="category">{{totalComprobante.LABEL_DOCUMENTO}}</p>
+<h3 class="title">{{totalComprobante.NUM_FACTURAS}}</h3>
+</md-card-content>
+<div class="card-footer">
+    <div class="stats">
+        <md-icon md-font-icon="ion-ios-search-strong s18" aria-hidden="true"></md-icon> Descargar RIDE
+    </div>
+</div>
+</md-card>
+</md-grid-tile>
+</md-grid-list>
+<md-card>
+<md-card-content>
+<div layout="row" layout-align="center center" >
+    <form name="frmConsulta">
+        <md-input-container style="width: 155px;height:20px;">
+        <label>Tipo de Comprobante</label>
+        <md-select  ng-model="tipoComprobante">
+        <md-option ng-repeat="actualTipoComprobante in listaTipoComprobante" value="{{actualTipoComprobante}}">{{actualTipoComprobante}}</md-option>
+        </md-select>
         </md-input-container>
         <md-input-container style="width: 185px; height:20px;">
-         <label>Fecha Desde</label>
-         <md-datepicker title="DD-MM-YYYY" ng-model="fechaDesde" placeholder="Fecha Desde" md-max-date="fechaMaxima" ng-required="true" required>
-         </md-datepicker>
-       </md-input-container>
-       <md-input-container style="width: 185px;height:20px;">
-         <label>Fecha Hasta</label>
-         <md-datepicker title="DD-MM-YYYY" ng-model="fechaHasta" placeholder="Fecha Hasta" md-max-date="fechaMaxima" ng-required="true" required>
-         </md-datepicker>
-       </md-input-container>   
-       <md-input-container style="padding-left:15px;height:40px;">       
-         <md-button class="md-raised md-primary" ng-click="buscar()" aria-label="Buscar" data-ng-disabled="frmConsulta.$invalid">
-          <i class="ion-android-search"></i>
-          Buscar
+        <label>Fecha Desde</label>
+        <md-datepicker title="DD-MM-YYYY" ng-model="fechaDesde" placeholder="Fecha Desde" md-max-date="fechaMaxima" ng-required="true" required>
+        </md-datepicker>
+        </md-input-container>
+        <md-input-container style="width: 185px;height:20px;">
+        <label>Fecha Hasta</label>
+        <md-datepicker title="DD-MM-YYYY" ng-model="fechaHasta" placeholder="Fecha Hasta" md-max-date="fechaMaxima" ng-required="true" required>
+        </md-datepicker>
+        </md-input-container>
+        <md-input-container style="padding-left:15px;height:40px;">
+        <md-button class="md-raised md-primary" ng-click="buscar()" aria-label="Buscar" data-ng-disabled="frmConsulta.$invalid">
+        <i class="ion-android-search"></i>
+        Buscar
         </md-button>
-      </md-input-container>
-    </form> 
-  </div>
-  <div layout="row" style="width: 100%;height: 300px;" ui-grid-pagination ui-grid-cellnav ui-grid-selection ui-grid="gridOptions"></div>       
+        </md-input-container>
+    </form>
+</div>
+<div layout="row" style="width: 100%;height: 300px;" ui-grid-pagination ui-grid-cellnav ui-grid-selection ui-grid="gridOptions"></div>
 </md-card-content>
 </md-card>
-
-
-

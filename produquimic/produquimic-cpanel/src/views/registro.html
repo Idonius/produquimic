@@ -1,82 +1,86 @@
- <div layout="row"  layout-sm="column"  layout-align="end end" layout-wrap>              
+<div layout="row"  layout-sm="column"  layout-align="end end" layout-wrap>
   <md-button class="md-primary" ng-href="#/login" aria-label="Inicio">
-    <md-icon md-font-icon="ion-ios-home" class="s36"></md-icon>
-    Inicio
+  <md-icon md-font-icon="ion-ios-home" class="s36"></md-icon>
+  Inicio
   </md-button>
 </div>
 <md-content layout-gt-sm="row" layout-padding layout-align="center center">
-  <form name="frmRegistro" >
-    <md-card>    
-      <md-card-title>
-        <md-card-title-text>
-          <span class="md-headline">Formulario de Registro</span>
-          <span class="md-subhead">Por favor complete la siguiente Información para el uso de la facturación electrónica.</span>
-        </md-card-title-text>
-      </md-card-title>
-
-      <md-card-content layout-padding>      
-        <div>
-
-         <div layout-gt-xs="row">
-           <md-input-container class="md-block" style="width: 155px;">
-            <label>Identificación :</label>
-            <input ng-model="identificacion" ng-blur="buscarCliente()" maxlength="13" required type="text" placeholder="RUC / CEDULA" ng-required="true">
-          </md-input-container>
-
-          <md-input-container class="md-block" flex-gt-xs >
-            <label>Nombre de la Empresa:</label>
-            <input ng-model="usuario.NOMBRE_USUARIO" disabled>
-          </md-input-container>
-        </div>
-
-        <div layout-gt-xs="row">
-          <md-input-container class="md-block" flex-gt-xs>
-            <label>Correo electrónico:</label>
-            <input ng-model="usuario.CORREO_USUARIO" type="email"  required placeholder="Correo electrónico" ng-required="true" ng-pattern="/^.+@.+\..+$/">
-          </md-input-container>
-        </div>
-
-        <div layout-gt-xs="row">
-          <md-input-container class="md-block" flex-gt-xs>
-            <label>Confirmar Correo electrónico:</label>
-            <input ng-model="confirmaEmail" type="mail"  required placeholder="Confirmar Correo electrónico" ng-required="true" ng-pattern="/^.+@.+\..+$/">
-          </md-input-container>
-        </div>
-
-
-        <div layout-gt-xs="row">
-         <md-input-container class="md-block" style="width: 155px;">
-           <label>Teléfono :</label>
-           <input ng-model="usuario.TELEFONO_USUARIO" maxlength="9"  placeholder="Eje. 022692634" type="text" placeholder="Teléfono" ng-pattern="/^[0-9]{1,9}$/">
-         </md-input-container>
-
-         <md-input-container class="md-block" flex-gt-xs >
-          <label>Dirección:</label>
-          <input ng-model="usuario.DIRECCION_USUARIO" required placeholder="Dirección" ng-required="true" >
-        </md-input-container>
-      </div>
-
-      <div layout-gt-xs="row">
-        <md-input-container class="md-block" flex-gt-xs>
-          <label>Nombre de Contacto :</label>
-          <input ng-model="usuario.CONTACTO_USUARIO" type="text"  required placeholder="Nombre de Contacto" ng-required="true">
-        </md-input-container>
-      </div>
-
-
+<form name="frmRegistro" >
+  <md-card>
+  <md-card-title>
+  <md-card-title-text>
+  <span class="md-headline">Formulario de Registro</span>
+  <span class="md-subhead">Por favor complete la siguiente Información para el uso de la facturación electrónica.</span>
+  </md-card-title-text>
+  </md-card-title>
+  <md-card-content layout-padding>
+  <div>
+    <div layout-gt-xs="row">
+      <md-input-container class="md-block" style="width: 155px;">
+      <label>Identificación :</label>
+      <input ng-model="identificacion" ng-blur="buscarCliente()" maxlength="13" required type="text" placeholder="RUC / CEDULA" ng-required="true" fw-numeros>
+      </md-input-container>
+      <md-input-container class="md-block" flex-gt-xs >
+      <label>Nombre de la Empresa:</label>
+      <input ng-model="usuario.NOMBRE_USUARIO" disabled>
+      </md-input-container>
     </div>
-
+    <div layout-gt-xs="row">
+      <md-input-container class="md-block" flex-gt-xs>
+      <label>Correo electrónico:</label>
+      <input ng-model="usuario.CORREO_USUARIO" type="email" placeholder="Correo electrónico" ng-required="true" ng-pattern="/^.+@.+\..+$/">
+      </md-input-container>
+    </div>
+    <div layout-gt-xs="row">
+      <md-input-container class="md-block" flex-gt-xs>
+      <label>Confirmar Correo electrónico:</label>
+      <input ng-model="confirmaEmail" type="mail" placeholder="Confirmar Correo electrónico" ng-required="true" ng-pattern="/^.+@.+\..+$/">
+      </md-input-container>
+    </div>
+    <div layout-gt-xs="row">
+      <md-input-container class="md-block" style="width: 155px;">
+      <label>Teléfono :</label>
+      <input ng-model="usuario.TELEFONO_USUARIO" maxlength="9"  placeholder="Eje. 022692634" type="text" placeholder="Teléfono" ng-pattern="/^[0-9]{1,9}$/" fw-numeros>
+      </md-input-container>
+      <md-input-container class="md-block" flex-gt-xs >
+      <label>Dirección:</label>
+      <input ng-model="usuario.DIRECCION_USUARIO"  placeholder="Dirección" ng-required="true" fw-mayusculas>
+      </md-input-container>
+    </div>
+    <div layout-gt-xs="row">
+      <md-input-container class="md-block" flex-gt-xs>
+      <label>Nombre del Contacto :</label>
+      <input ng-model="usuario.CONTACTO_USUARIO" type="text"   placeholder="Nombre del Contacto" ng-required="true" fw-mayusculas>
+      </md-input-container>
+    </div>
+  </div>
   </md-card-content>
-
   <md-card-actions layout="row" layout-align="center center">
-    <md-button class="md-raised md-primary" ng-click="registrarUsuario()" aria-label="Aceptar" 
-               data-ng-disabled="frmRegistro.$invalid">
-      <i class="ion-checkmark-circled"></i>
-      Aceptar
-    </md-button>
-
+  <md-button class="md-raised md-primary" ng-click="registrarUsuario()" aria-label="Aceptar"
+  ng-disabled="procesa ||frmRegistro.$invalid">
+  <i class="ion-checkmark-circled"></i>
+  Aceptar
+  </md-button>
   </md-card-actions>
-</md-card>
-
+  </md-card>
 </form>
 </md-content>
+
+
+
+
+    <md-menu>
+      <md-button aria-label="Menu Usuario" ng-click="openMenu($mdOpenMenu, $event)">
+        <img src="img/usuario.png" height="38" /> 
+      </md-button>
+      <md-menu-content width="4">
+       <md-subheader>DIEGO FERNANDO JACOME GUAYASAMIN</md-subheader>
+        <md-menu-item>
+          <md-button >
+            <i class="ion-android-person-add"></i>
+            Account
+          </md-button>
+        </md-menu-item>
+         
+      </md-menu-content>
+    </md-menu>
