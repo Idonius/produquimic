@@ -67,30 +67,168 @@
 *{
   box-sizing: border-box;
   margin: 0;
-  padding: 0;
+  padding: 0;  
 }
 *:after,
 *:before{
   box-sizing: border-box;
 }
 
-.wrapper{
-  display: flex;
-  flex-direction: column;            
-  height: 100vh;
-  overflow: hidden;
-  vertical-align: center;
+#loading-bar .bar {
+  background: #FB8C00;
+  position: fixed;
+  z-index: 1031;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 3px;
+  border-color: #29d;
 }
-.header{
-  flex: 0 0 auto;  
-  background: #aaa;
+
+.mayuscula{  
+  text-transform: uppercase;  
+} 
+
+
+
+#cargandoDiv {
+ position: fixed;
+ top: 0;
+ right: 0;
+ bottom: 0;
+ left: 0;
+ z-index: 1000;
+ background-color: white;
+ opacity: .6;
 }
-.content{
-  flex: 1 1 auto;     
-  overflow-y: auto;     
+
+.framework-cargando {
+ position: absolute;
+ left: 50%;
+ top: 50%;
+ margin-left: -32px; /* -1 * image width / 2 */
+ margin-top: -32px; /* -1 * image height / 2 */
+ display: block;
+ z-index: 1100;
 }
-.footer{
-  flex: 0 0 auto;  
-  background: #aaa;
+
+
+.hidden{
+  display:none !important
 }
+
+
+.nav{  
+  width: 275px;
+  box-shadow: 0 10px 30px -12px rgba(0, 0, 0, 0.42), 0 4px 25px 0px rgba(0, 0, 0, 0.12), 0 8px 10px -5px rgba(0, 0, 0, 0.2);
+  text-align: left;
+  background: linear-gradient(to bottom, rgba(255,255,255,0.9) 0%,rgba(255,255,255,0.9) 100%), url("../img/im_sidebar.jpg") ;
+  background-repeat: no-repeat;
+  border-radius: 3px;
+  color: #3C4858;
+  opacity: .93;
+  height: 100%
+}
+
+.selectedIndexNav {
+  background:  #4A9140;  
+  box-shadow: 0 12px 20px -10px rgba(244, 67, 54, 0.28), 0 4px 20px 0px rgba(0, 0, 0, 0.12), 0 7px 8px -5px rgba(244, 67, 54, 0.2);
+  color: #FFFFFF;
+}
+
+
+.card {
+  display: inline-block;
+  position: relative;
+  width: 100%;
+  margin: 25px 0;
+  box-shadow: 0 1px 4px 0 rgba(0, 0, 0, 0.14);
+  border-radius: 3px;
+  color: rgba(0,0,0, 0.87);
+  background: #fff;
+}
+
+
+.card .category:not([class*="text-"]) {
+  color: #999999;
+}
+.card .card-content {
+  padding: 15px 20px;
+}
+.card .card-content .category {
+  margin-bottom: 0;
+}
+.card .card-header {
+  box-shadow: 0 10px 30px -12px rgba(0, 0, 0, 0.42), 0 4px 25px 0px rgba(0, 0, 0, 0.12), 0 8px 10px -5px rgba(0, 0, 0, 0.2);
+  margin: -20px 15px 0;
+  border-radius: 3px;
+  padding: 15px;
+  background-color: #999999;
+}
+.card .card-footer {
+  margin: 0 20px 10px;
+  padding-top: 10px;
+  border-top: 1px solid #eeeeee;
+}
+.card .card-footer .stats {
+  line-height: 22px;
+  color: #999999;
+  font-size: 12px;
+}
+.card [data-background-color="purple"] {
+  background: linear-gradient(60deg, #ab47bc, #8e24aa);
+  box-shadow: 0 12px 20px -10px rgba(156, 39, 176, 0.28), 0 4px 20px 0px rgba(0, 0, 0, 0.12), 0 7px 8px -5px rgba(156, 39, 176, 0.2);
+}
+.card [data-background-color="blue"] {
+  background: linear-gradient(60deg, #26c6da, #00acc1);
+  box-shadow: 0 12px 20px -10px rgba(0, 188, 212, 0.28), 0 4px 20px 0px rgba(0, 0, 0, 0.12), 0 7px 8px -5px rgba(0, 188, 212, 0.2);
+}
+.card [data-background-color="green"] {
+  background: linear-gradient(60deg, #66bb6a, #43a047);
+  box-shadow: 0 12px 20px -10px rgba(76, 175, 80, 0.28), 0 4px 20px 0px rgba(0, 0, 0, 0.12), 0 7px 8px -5px rgba(76, 175, 80, 0.2);
+}
+.card [data-background-color="orange"] {
+  background: linear-gradient(60deg, #ffa726, #fb8c00);
+  box-shadow: 0 12px 20px -10px rgba(255, 152, 0, 0.28), 0 4px 20px 0px rgba(0, 0, 0, 0.12), 0 7px 8px -5px rgba(255, 152, 0, 0.2);
+}
+.card [data-background-color="red"] {
+  background: linear-gradient(60deg, #ef5350, #e53935);
+  box-shadow: 0 12px 20px -10px rgba(244, 67, 54, 0.28), 0 4px 20px 0px rgba(0, 0, 0, 0.12), 0 7px 8px -5px rgba(244, 67, 54, 0.2);
+}
+.card-stats .title {
+  margin: 0;
+}
+.card-stats .card-header {
+  float: left;
+  text-align: center;
+}
+.card-stats .card-content {
+  text-align: right;
+  padding-top: 10px;
+}
+
+
+md-menu-content {
+    display: -webkit-flex;
+    display: -ms-flexbox;
+    display: flex;
+    -webkit-flex-direction: column;
+    -ms-flex-direction: column;
+    flex-direction: column;
+    padding: 8px 0;
+    max-height: 360px;
+    overflow-y: auto;
+}
+
+.md-open-menu-container md-menu-divider {
+    margin-top: 3px;
+    margin-bottom: 3px;
+    height: 1px;
+    width: calc(100% - 20px);
+    position: relative;
+    left: 10px;
+}
+
+
+
 
