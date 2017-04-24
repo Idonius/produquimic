@@ -7,6 +7,8 @@ app.factory('ServicioAutenticacion',['Encripta', '$http', '$cookieStore', '$root
       Utilitario.consumirWebService('framework/servicios/ServicioSeguridad.php/validarLogin',
         usuario).then(function(data) {
             callback(data);
+      }).catch(function(err){
+            callback(err);
       });
       };
 

@@ -2,6 +2,14 @@ app.controller('PrincipalCtrl', ['$scope', '$http', 'Utilitario', PrincipalCtrl]
 
 function PrincipalCtrl($scope, $http, Utilitario) {
 
+
+    Utilitario.consumirWebService('framework/servicios/ServicioComprobante.php/getTotalComprobantes',
+        null).then(function(data) {
+        if (data.datos) {
+            $scope.totalComprobantes = data.datos;
+        }
+    });
+
     $scope.tipoComprobante = "Factura";
     $scope.fechaMaxima = new Date();
     $scope.fechaHasta = $scope.fechaMaxima;

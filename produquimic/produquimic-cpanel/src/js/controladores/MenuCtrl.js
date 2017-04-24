@@ -1,5 +1,5 @@
 app.controller('MenuCtrl', function($scope, $timeout, $mdSidenav, $location) {
-
+    $scope.selectedIndex = 0;
     $scope.paginas = [{
         nombre: 'Inicio',
         state: '/login',
@@ -9,22 +9,17 @@ app.controller('MenuCtrl', function($scope, $timeout, $mdSidenav, $location) {
         nombre: 'Registrarse',
         state: '/registro',
         icono: 'ion-android-person-add s24',
-        color: 'deep-orange'
+        color: 'indigo'
     }, {
         nombre: 'Recordar Contraseña',
         state: '/recordarClave',
         icono: 'ion-android-unlock s24',
-        color: 'indigo'
+        color: 'deep-orange'
     }, {
         nombre: 'Preguntas Frecuentes',
         state: '/preguntas',
         icono: 'ion-help-circled s24',
         color: 'blue'
-    }, {
-        nombre: 'Cantactenos',
-        state: '/contactenos',
-        icono: 'ion-ios-location s24',
-        color: 'red'
     }, {
         nombre: 'Acerca del Sistema ',
         state: '/sistema',
@@ -33,7 +28,8 @@ app.controller('MenuCtrl', function($scope, $timeout, $mdSidenav, $location) {
     }];
 
 
-    $scope.abrirPagina = function(pagina, event) {
+    $scope.abrirPagina = function(pagina, index) {
+        $scope.selectedIndex = index;
         $location.path(pagina);
         $mdSidenav('right').close();
     };

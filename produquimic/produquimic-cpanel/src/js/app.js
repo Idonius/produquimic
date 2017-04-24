@@ -1,7 +1,8 @@
 var app = angular.module('jdframework', ['ngMaterial', 'ngMessages', 'ngRoute', 'ngAnimate', 'ngCookies', 'ui.grid',
     'ui.grid.cellNav',
     'ui.grid.selection',
-    'ui.grid.pagination'
+    'ui.grid.pagination',
+    'angular-loading-bar'
 ]);
 
 app.config(['$routeProvider',
@@ -29,10 +30,10 @@ app.config(['$routeProvider',
                     controller: 'PrincipalCtrl'
 
                 })
-                .when('/cambiarClave', {
-                    title: 'cambiarClave',
-                    templateUrl: 'views/cambiarClave.html',
-                    controller: 'CambiarClaveCtrl'
+                .when('/recordarClave', {
+                    title: 'recordarClave',
+                    templateUrl: 'views/recordar.html',
+                    controller: 'RecordarClaveCtrl'
 
                 })
                 .when('/preguntas', {
@@ -58,6 +59,8 @@ app.config(['$routeProvider',
                     $location.path('/registro');
                 } else if ($location.path() == '/preguntas') {
                     $location.path('/preguntas');
+                } else if ($location.path() == '/recordarClave') {
+                    $location.path('/recordarClave');
                 } else if ($location.path() !== '/login' && !$rootScope.globals.currentUser) {
                     $location.path('/login');
                 }
@@ -79,3 +82,8 @@ app.config(function($mdThemingProvider) {
     $mdThemingProvider.theme('default')
         .primaryPalette('neonRed');
 });
+
+
+app.config(['cfpLoadingBarProvider', function(cfpLoadingBarProvider) {
+    cfpLoadingBarProvider.includeSpinner = false;
+  }]);
