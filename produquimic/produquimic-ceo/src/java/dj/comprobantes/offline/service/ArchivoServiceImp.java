@@ -113,7 +113,7 @@ public class ArchivoServiceImp implements ArchivoService {
             }
         } else {
             cadenaXML = sriComprobante.getXmlcomprobante();
-        }        
+        }
         Map<String, Object> parametros = getParametrosComunes(cadenaXML, comprobante);
         List<DetalleReporte> lisDetalle = new ArrayList<>();
         // Info Adicional infoAdicional
@@ -234,7 +234,6 @@ public class ArchivoServiceImp implements ArchivoService {
             parametros.put("DESCUENTO", utilitario.getValorEtiqueta(cadenaXML, "totalDescuento"));
             String cadenaTotalImpuesto = utilitario.getValorEtiqueta(cadenaXML, "totalImpuesto");
             parametros.put("IVA", utilitario.getValorEtiqueta(cadenaTotalImpuesto, "valor"));
-            parametros.put("IVA_0", "0,00");
             parametros.put("IVA_12", utilitario.getValorEtiqueta(cadenaTotalImpuesto, "baseImponible"));
             parametros.put("SUBTOTAL", utilitario.getValorEtiqueta(cadenaXML, "totalSinImpuestos"));
             parametros.put("NUM_FACT", utilitario.getValorEtiqueta(cadenaXML, "estab") + "-" + utilitario.getValorEtiqueta(cadenaXML, "ptoEmi") + "-"
@@ -268,6 +267,8 @@ public class ArchivoServiceImp implements ArchivoService {
             } catch (Exception e) {
             }
             parametros.put("TARIFA_IVA", TipoImpuestoIvaEnum.getPorcentaje(dou_porcentaje_iva));
+            parametros.put("IVA_0", utilitario.getFormatoNumero(dou_base_tarifa0 + dou_base_no_objeto_iva));
+
         } catch (Exception e) {
         }
         return parametros;
