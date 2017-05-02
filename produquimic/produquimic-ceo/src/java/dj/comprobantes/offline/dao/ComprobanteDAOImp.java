@@ -170,7 +170,7 @@ public class ComprobanteDAOImp implements ComprobanteDAO {
     }
 
     @Override
-    public Comprobante getComprobantePorId(Integer ide_srcom) throws GenericException {
+    public Comprobante getComprobantePorId(Integer ide_srcom) throws GenericException {        
         Comprobante comprobante = null;
         ConexionCEO con = new ConexionCEO();
         PreparedStatement ps = null;
@@ -184,6 +184,7 @@ public class ComprobanteDAOImp implements ComprobanteDAO {
                 comprobante = new Comprobante(res);
             }
         } catch (SQLException e) {
+            e.printStackTrace();
             throw new GenericException(e);
         } finally {
             try {

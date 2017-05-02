@@ -14,6 +14,7 @@ import dj.comprobantes.offline.dto.Comprobante;
 import dj.comprobantes.offline.dto.XmlComprobante;
 import dj.comprobantes.offline.enums.ParametrosSistemaEnum;
 import dj.comprobantes.offline.enums.TipoComprobanteEnum;
+import dj.comprobantes.offline.enums.TipoImpuestoEnum;
 import dj.comprobantes.offline.enums.TipoImpuestoIvaEnum;
 import dj.comprobantes.offline.exception.GenericException;
 import dj.comprobantes.offline.reporte.DetalleReporte;
@@ -58,7 +59,12 @@ public class ArchivoServiceImp implements ArchivoService {
 
     @EJB
     private XmlComprobanteDAO sriComprobanteDao;
-
+    @EJB
+    private FacturaService facturaService;
+    @EJB
+    private NotaCreditoService notaCreditoService;
+    @EJB
+    private RetencionService retencionService;
     private final UtilitarioCeo utilitario = new UtilitarioCeo();
 
     @Override
@@ -95,15 +101,20 @@ public class ArchivoServiceImp implements ArchivoService {
     @Override
     public byte[] getPdf(Comprobante comprobante) throws GenericException {
         XmlComprobante sriComprobante = sriComprobanteDao.getSriComprobanteActual(comprobante);
+        String cadenaXML = "";
         if (sriComprobante == null) {
-            return null;
-        }
-        String cadenaXML = sriComprobante.getXmlcomprobante();
+            //AUN NO SE ENVIA AL SRI
+            if (comprobante.getCoddoc().equals(TipoComprobanteEnum.FACTURA.getCodigo())) {
+                cadenaXML = facturaService.getXmlFactura(comprobante);
+            } else if (comprobante.getCoddoc().equals(TipoComprobanteEnum.NOTA_DE_CREDITO.getCodigo())) {
+                cadenaXML = notaCreditoService.getXmlNotaCredito(comprobante);
+            } else if (comprobante.getCoddoc().equals(TipoComprobanteEnum.COMPROBANTE_DE_RETENCION.getCodigo())) {
+                cadenaXML = retencionService.getXmlRetencion(comprobante);
+            }
+        } else {
+            cadenaXML = sriComprobante.getXmlcomprobante();
+        }        
         Map<String, Object> parametros = getParametrosComunes(cadenaXML, comprobante);
-        // Detalles
-        String cadenaDetalles = utilitario.getValorEtiqueta(cadenaXML, "detalles");
-        // //Forma un arreglo de todos los detalles
-        String strDetalles[] = cadenaDetalles.split("</detalle>");
         List<DetalleReporte> lisDetalle = new ArrayList<>();
         // Info Adicional infoAdicional
         String cadenainfoAdicional = utilitario.getValorEtiqueta(cadenaXML, "infoAdicional");
@@ -123,18 +134,42 @@ public class ArchivoServiceImp implements ArchivoService {
             parametros.put("col_name", col_name);
         } catch (Exception e) {
         }
-        // Recorre todos los detalles
-        String columnas[] = {"codigoPrincipal", "codigoAuxiliar", "cantidad", "descripcion", "precioUnitario", "precioTotalSinImpuesto"};
-        for (String strDetalleActual : strDetalles) {
-            Object valores[] = {
-                (utilitario.getValorEtiqueta(strDetalleActual, "codigoPrincipal").isEmpty() ? utilitario.getValorEtiqueta(strDetalleActual,
-                "codigoInterno") : utilitario.getValorEtiqueta(strDetalleActual, "codigoPrincipal")),
-                (utilitario.getValorEtiqueta(strDetalleActual, "codigoAuxiliar").isEmpty() ? utilitario.getValorEtiqueta(strDetalleActual,
-                "codigoAdicional") : utilitario.getValorEtiqueta(strDetalleActual, "codigoAuxiliar")),
-                utilitario.getValorEtiqueta(strDetalleActual, "cantidad"), utilitario.getValorEtiqueta(strDetalleActual, "descripcion"),
-                utilitario.getValorEtiqueta(strDetalleActual, "precioUnitario"),
-                utilitario.getValorEtiqueta(strDetalleActual, "precioTotalSinImpuesto")};
-            lisDetalle.add(new DetalleReporte(columnas, valores));
+        // Recorre todos los detalles de factura o nota de credito
+        if (comprobante.getCoddoc().equals(TipoComprobanteEnum.FACTURA.getCodigo()) || comprobante.getCoddoc().equals(TipoComprobanteEnum.NOTA_DE_CREDITO.getCodigo())) {
+            // Detalles
+            String cadenaDetalles = utilitario.getValorEtiqueta(cadenaXML, "detalles");
+            // //Forma un arreglo de todos los detalles
+            String strDetalles[] = cadenaDetalles.split("</detalle>");
+
+            String columnas[] = {"codigoPrincipal", "codigoAuxiliar", "cantidad", "descripcion", "precioUnitario", "precioTotalSinImpuesto"};
+            for (String strDetalleActual : strDetalles) {
+                Object valores[] = {
+                    (utilitario.getValorEtiqueta(strDetalleActual, "codigoPrincipal").isEmpty() ? utilitario.getValorEtiqueta(strDetalleActual,
+                    "codigoInterno") : utilitario.getValorEtiqueta(strDetalleActual, "codigoPrincipal")),
+                    (utilitario.getValorEtiqueta(strDetalleActual, "codigoAuxiliar").isEmpty() ? utilitario.getValorEtiqueta(strDetalleActual,
+                    "codigoAdicional") : utilitario.getValorEtiqueta(strDetalleActual, "codigoAuxiliar")),
+                    utilitario.getFormatoNumero(utilitario.getValorEtiqueta(strDetalleActual, "cantidad")), utilitario.getValorEtiqueta(strDetalleActual, "descripcion"),
+                    utilitario.getValorEtiqueta(strDetalleActual, "precioUnitario"),
+                    utilitario.getValorEtiqueta(strDetalleActual, "precioTotalSinImpuesto")};
+                lisDetalle.add(new DetalleReporte(columnas, valores));
+            }
+        } else if (comprobante.getCoddoc().equals(TipoComprobanteEnum.COMPROBANTE_DE_RETENCION.getCodigo())) {
+            // Detalles impuestos
+            String cadenaDetalles = utilitario.getValorEtiqueta(cadenaXML, "impuestos");
+            // //Forma un arreglo de todos los impuestos
+            String strDetalles[] = cadenaDetalles.split("</impuesto>");
+            String columnas[] = {"baseImponible", "porcentajeRetener", "valorRetenido", "nombreImpuesto", "nombreComprobante", "numeroComprobante", "fechaEmisionCcompModificado"};
+            for (String strDetalleActual : strDetalles) {
+                Object valores[] = {
+                    utilitario.getValorEtiqueta(strDetalleActual, "baseImponible"),
+                    utilitario.getValorEtiqueta(strDetalleActual, "porcentajeRetener"),
+                    utilitario.getValorEtiqueta(strDetalleActual, "valorRetenido"),
+                    TipoImpuestoEnum.getDescripcion(utilitario.getValorEtiqueta(strDetalleActual, "codigo")),
+                    TipoComprobanteEnum.getDescripcion(utilitario.getValorEtiqueta(strDetalleActual, "codDocSustento")),
+                    utilitario.getValorEtiqueta(strDetalleActual, "numDocSustento"),
+                    utilitario.getValorEtiqueta(strDetalleActual, "fechaEmisionDocSustento")};
+                lisDetalle.add(new DetalleReporte(columnas, valores));
+            }
         }
         // Genera el reporte en PDF
         ReporteDataSource data = new ReporteDataSource(lisDetalle);
@@ -207,8 +242,15 @@ public class ArchivoServiceImp implements ArchivoService {
             parametros.put("TOTAL_DESCUENTO", utilitario.getValorEtiqueta(cadenaXML, "totalDescuento"));
             parametros.put("AMBIENTE", utilitario.getValorEtiqueta(cadenaXML, "ambiente"));
             parametros.put("NOM_COMERCIAL", utilitario.getValorEtiqueta(cadenaXML, "nombreComercial"));
+
+            if (comprobante.getCoddoc().equals(TipoComprobanteEnum.COMPROBANTE_DE_RETENCION.getCodigo())) {
+                parametros.put("EJERCICIO_FISCAL", utilitario.getValorEtiqueta(cadenaXML, "periodoFiscal"));
+                parametros.put("RS_COMPRADOR", utilitario.getValorEtiqueta(cadenaXML, "razonSocialSujetoRetenido"));
+                parametros.put("RUC_COMPRADOR", utilitario.getValorEtiqueta(cadenaXML, "identificacionSujetoRetenido"));
+            }
+
             // Porcentaje iva
-            double dou_base_no_objeto_iva = 0; // No aplica  
+            double dou_base_no_objeto_iva = 0; // No aplica
             double dou_base_tarifa0 = 0;
             double dou_base_grabada = 0;
             try {

@@ -1,10 +1,10 @@
 /*
  *********************************************************************
- Objetivo: Interface con métodos para generar XML de la Nota de Crédito
+ Objetivo: Interface RetencionService
  ********************************************************************** 
  MODIFICACIONES
  FECHA                     AUTOR             RAZON
- 01-Sep-2016             D. Jácome        Emision Inicial
+ 06-Abril-2017             D. Jácome        RFC-201704-843
  ********************************************************************** 
  */
 package dj.comprobantes.offline.service;
@@ -12,19 +12,20 @@ package dj.comprobantes.offline.service;
 import dj.comprobantes.offline.dto.Comprobante;
 import dj.comprobantes.offline.exception.GenericException;
 
-
 /**
  *
  * @author djacome
  */
-public interface NotaCreditoService {
+public interface RetencionService {
 
     /**
-     * Genera el squema xml de una Nota de Crédito Electronica Offline
-     *
+     * Genera el squema xml de un Comprobante de Retención Electronica Offline
      * @param comprobante
      * @return
-     * @throws dj.comprobantes.offline.exception.GenericException
+     * @throws GenericException 
      */
-    public String getXmlNotaCredito(Comprobante comprobante) throws GenericException;
+    public String getXmlRetencion(Comprobante comprobante) throws GenericException;
+        
+    
+    
 }

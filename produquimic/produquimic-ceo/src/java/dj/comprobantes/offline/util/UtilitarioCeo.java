@@ -141,4 +141,38 @@ public class UtilitarioCeo extends Framework {
         }
         return str_valor;
     }
+
+    /**
+     * Retorna una cantidad numerica sin decimales
+     *
+     * @param numero
+     * @return
+     */
+    public  String getFormatoNumeroEntero(Object numero) {
+        try {
+            Double ldob_valor = Double.parseDouble(numero.toString());
+            return String.valueOf(ldob_valor.intValue());
+        } catch (Exception ex) {
+            return null;
+        }
+    }
+
+    public  String reemplazarCaracteresEspeciales(String xml) {
+         //REMPLAZAR TILDES Y Ñ
+        //remplaza ñ y tildes
+        xml = xml.replaceAll("Ñ", "N");
+        xml = xml.replaceAll("ñ", "n");
+        xml = xml.replaceAll("Á", "A");
+        xml = xml.replaceAll("á", "a");
+        xml = xml.replaceAll("É", "E");
+        xml = xml.replaceAll("é", "e");
+        xml = xml.replaceAll("Í", "I");
+        xml = xml.replaceAll("í", "i");
+        xml = xml.replaceAll("ó", "o");
+        xml = xml.replaceAll("Ó", "O");
+        xml = xml.replaceAll("Ú", "U");
+        xml = xml.replaceAll("ú", "u");
+        xml = xml.replaceAll("&", "");
+        return xml;
+    }
 }

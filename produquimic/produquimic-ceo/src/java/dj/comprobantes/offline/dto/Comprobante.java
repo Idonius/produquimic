@@ -57,7 +57,7 @@ public final class Comprobante implements Serializable {
     private BigDecimal iva;
     private List<DetalleComprobante> detalle;
     private Boolean enNube = false;
-
+    private List<DetalleImpuesto> impuesto;
     private String formaCobro = "01"; //por defecto efectivo
 
     public Comprobante() {
@@ -81,7 +81,7 @@ public final class Comprobante implements Serializable {
             this.propina = new BigDecimal(0.00);
             this.importetotal = resultado.getBigDecimal("total_srcom");
             this.moneda = "DOLAR";
-            //this.periodofiscal = resultado.getString("va_anio");
+            this.periodofiscal = resultado.getString("periodo_fiscal_srcom");
             // this.rise = resultado.getString("");
             this.coddocmodificado = resultado.getString("codigo_docu_mod_srcom");
             this.numdocmodificado = resultado.getString("num_doc_mod_srcom"); ///0010010000001
@@ -124,6 +124,22 @@ public final class Comprobante implements Serializable {
                         + " where ide_geper=" + resultado.getString("ide_geper"));
                 if (res.next()) {
                     cliente = new Cliente(res);
+                }
+                res.close();
+                con.desconectar();
+            } catch (GenericException | SQLException e) {
+                e.printStackTrace();
+            }
+
+            //Busca los detalles de impuestos del Comprobante
+            try {
+                impuesto = new ArrayList();
+                ConexionCEO con = new ConexionCEO();
+                ResultSet res = con.consultar("SELECT * FROM sri_imp_comprobante where ide_srcom=" + this.codigocomprobante);
+                while (res.next()) {
+                    DetalleImpuesto di = new DetalleImpuesto(res);
+                    di.setComprobante(this);
+                    impuesto.add(di);
                 }
                 res.close();
                 con.desconectar();
@@ -415,5 +431,11 @@ public final class Comprobante implements Serializable {
         this.enNube = enNube;
     }
 
+    public List<DetalleImpuesto> getImpuesto() {
+        return impuesto;
+    }
 
+    public void setImpuesto(List<DetalleImpuesto> impuesto) {
+        this.impuesto = impuesto;
+    }
 }

@@ -133,16 +133,19 @@ public class FacturaServiceImp implements FacturaService {
                     .append("				<valor>0.00</valor> \n")
                     .append("			</retencion> \n")
                     .append("		</retenciones> \n");
-            if (comprobante.getCliente().getCorreo() != null && comprobante.getCliente().getTelefono() != null) {
-                str_xml.append("		<infoAdicional> \n");
-                if (comprobante.getCliente().getCorreo() != null) {
-                    str_xml.append("      		<campoAdicional nombre=\"Email\">").append(comprobante.getCliente().getCorreo()).append("</campoAdicional> \n");
-                }
-                if (comprobante.getCliente().getTelefono() != null) {
-                    str_xml.append("      		<campoAdicional nombre=\"Teléfono\">").append(comprobante.getCliente().getTelefono()).append("</campoAdicional> \n");
-                }
-                str_xml.append("		</infoAdicional> \n");
+            str_xml.append("		<infoAdicional> \n");
+            if (comprobante.getCliente().getCorreo() != null && utilitario.isCorreoValido(comprobante.getCliente().getCorreo())) {
+                str_xml.append("      		<campoAdicional nombre=\"Email\">").append(comprobante.getCliente().getCorreo()).append("</campoAdicional> \n");
+            } else {
+                str_xml.append("      		<campoAdicional nombre=\"Email\">").append("nodispone@banecuador.fin.ec").append("</campoAdicional> \n");
             }
+            if (comprobante.getCliente().getTelefono() != null) {
+                str_xml.append("      		<campoAdicional nombre=\"Teléfono\">").append(comprobante.getCliente().getTelefono()).append("</campoAdicional> \n");
+            }
+            if (comprobante.getCliente().getDireccion() != null) {
+                str_xml.append("      		<campoAdicional nombre=\"Dirección\">").append(comprobante.getCliente().getDireccion()).append("</campoAdicional> \n");
+            }
+            str_xml.append("		</infoAdicional> \n");
             str_xml.append("     </factura>");
         }
         return str_xml.toString();

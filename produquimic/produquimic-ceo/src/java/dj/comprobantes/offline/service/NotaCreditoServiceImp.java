@@ -19,6 +19,7 @@ import dj.comprobantes.offline.util.UtilitarioCeo;
 
 import javax.ejb.EJB;
 import javax.ejb.Stateless;
+
 /**
  *
  * @author djacome
@@ -71,7 +72,7 @@ public class NotaCreditoServiceImp implements NotaCreditoService {
                     .append("		</infoTributaria> \n")
                     .append("		<infoNotaCredito> \n")
                     .append("			<fechaEmision>").append(utilitario.getFormatoFecha(comprobante.getFechaemision(), "dd/MM/yyyy")).append("</fechaEmision> \n")
-                    .append("			<dirEstablecimiento>").append(emisorService.getEmisor().getDirmatriz()).append("</dirEstablecimiento> \n")
+                    .append("			<dirEstablecimiento>").append(comprobante.getDirestablecimiento()).append("</dirEstablecimiento> \n")
                     .append("			<tipoIdentificacionComprador>").append(comprobante.getCliente().getTipoIdentificacion()).append("</tipoIdentificacionComprador> \n")
                     .append("			<razonSocialComprador>").append(comprobante.getCliente().getNombreCliente()).append("</razonSocialComprador> \n")
                     .append("			<identificacionComprador>").append(comprobante.getCliente().getIdentificacion().trim()).append("</identificacionComprador> \n")
@@ -91,7 +92,7 @@ public class NotaCreditoServiceImp implements NotaCreditoService {
                     .append("					<valor>").append(utilitario.getFormatoNumero(comprobante.getIva())).append("</valor> \n")
                     .append("				</totalImpuesto> \n")
                     .append("			</totalConImpuestos> \n")
-                    .append("			<motivo>" + "DEVOLUCION" + "</motivo> \n")
+                    .append("			<motivo>" + "ANULACION" + "</motivo> \n")
                     .append("		</infoNotaCredito> \n")
                     .append("		<detalles> \n");
             for (DetalleComprobante detalle : comprobante.getDetalle()) {
@@ -100,31 +101,34 @@ public class NotaCreditoServiceImp implements NotaCreditoService {
                         .append("				<codigoAdicional>").append((detalle.getCodigoauxiliar() == null ? detalle.getCodigoprincipal() : detalle.getCodigoauxiliar())).append("</codigoAdicional> \n")
                         .append("				<descripcion>").append(detalle.getDescripciondet()).append("</descripcion> \n")
                         .append("				<cantidad>").append(utilitario.getFormatoNumero(detalle.getCantidad())).append("</cantidad> \n")
-                        .append("				<precioUnitario>").append(utilitario.getFormatoNumero(detalle.getPreciototalsinimpuesto())).append("</precioUnitario> \n")
+                        .append("				<precioUnitario>").append(utilitario.getFormatoNumero(detalle.getPreciounitario())).append("</precioUnitario> \n")
                         .append("				<descuento>").append((detalle.getDescuento() == null ? utilitario.getFormatoNumero(0) : utilitario.getFormatoNumero(detalle.getDescuento()))).append("</descuento> \n")
-                        .append("				<precioTotalSinImpuesto>").append(utilitario.getFormatoNumero(detalle.getPreciounitario())).append("</precioTotalSinImpuesto> \n")
+                        .append("				<precioTotalSinImpuesto>").append(utilitario.getFormatoNumero(detalle.getPreciototalsinimpuesto())).append("</precioTotalSinImpuesto> \n")
                         .append("				<impuestos> \n")
                         .append("					<impuesto> \n")
                         .append("						<codigo>").append(TipoImpuestoEnum.IVA.getCodigo()).append("</codigo> \n")
-                        .append("						<codigoPorcentaje>").append(TipoImpuestoIvaEnum.getCodigo(String.valueOf(detalle.getPorcentajeiva()))).append("</codigoPorcentaje> \n")
-                        .append("						<tarifa>").append(detalle.getPorcentajeiva()).append("</tarifa> \n")
-                        .append("						<baseImponible>").append(utilitario.getFormatoNumero(detalle.getPreciounitario())).append("</baseImponible> \n")
-                        .append("						<valor>").append(utilitario.getFormatoNumero((detalle.getPreciounitario().doubleValue() * (detalle.getPorcentajeiva().doubleValue() / 100)))).append("</valor> \n")
+                        .append("						<codigoPorcentaje>").append(TipoImpuestoIvaEnum.getCodigo(utilitario.getFormatoNumero(detalle.getPorcentajeiva()))).append("</codigoPorcentaje> \n")
+                        .append("						<tarifa>").append(utilitario.getFormatoNumero(detalle.getPorcentajeiva())).append("</tarifa> \n")
+                        .append("						<baseImponible>").append(utilitario.getFormatoNumero(detalle.getPreciototalsinimpuesto())).append("</baseImponible> \n")
+                        .append("						<valor>").append(utilitario.getFormatoNumero((detalle.getPreciototalsinimpuesto().doubleValue() * (detalle.getPorcentajeiva().doubleValue() / 100)))).append("</valor> \n")
                         .append("					</impuesto>             \n")
                         .append("				</impuestos> \n")
                         .append("			</detalle> \n");
             }
             str_xml.append("		</detalles> \n");
-            if (comprobante.getCliente().getCorreo() != null && comprobante.getCliente().getTelefono() != null) {
-                str_xml.append("		<infoAdicional> \n");
-                if (comprobante.getCliente().getCorreo() != null) {
-                    str_xml.append("      		<campoAdicional nombre=\"Email\">").append(comprobante.getCliente().getCorreo()).append("</campoAdicional> \n");
-                }
-                if (comprobante.getCliente().getTelefono() != null) {
-                    str_xml.append("      		<campoAdicional nombre=\"Teléfono\">").append(comprobante.getCliente().getTelefono()).append("</campoAdicional> \n");
-                }
-                str_xml.append("		</infoAdicional> \n");
+            str_xml.append("		<infoAdicional> \n");
+            if (comprobante.getCliente().getCorreo() != null && utilitario.isCorreoValido(comprobante.getCliente().getCorreo())) {
+                str_xml.append("      		<campoAdicional nombre=\"Email\">").append(comprobante.getCliente().getCorreo()).append("</campoAdicional> \n");
+            } else {
+                str_xml.append("      		<campoAdicional nombre=\"Email\">").append("nodispone@banecuador.fin.ec").append("</campoAdicional> \n");
             }
+            if (comprobante.getCliente().getTelefono() != null) {
+                str_xml.append("      		<campoAdicional nombre=\"Teléfono\">").append(comprobante.getCliente().getTelefono()).append("</campoAdicional> \n");
+            }
+            if (comprobante.getCliente().getDireccion() != null) {
+                str_xml.append("      		<campoAdicional nombre=\"Dirección\">").append(comprobante.getCliente().getDireccion()).append("</campoAdicional> \n");
+            }
+            str_xml.append("		</infoAdicional> \n");
             str_xml.append("     </notaCredito>");
         }
 

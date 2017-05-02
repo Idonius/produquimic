@@ -36,6 +36,18 @@ public enum TipoImpuestoEnum {
         return codigo;
     }
 
+    public static String getDescripcion(String codigo1) {
+        String valor = null;
+        if (codigo1.equals(String.valueOf(IVA.getCodigo()))) {
+            valor = IVA.getDescripcion();
+        } else if (codigo1.equals(String.valueOf(RENTA.getCodigo()))) {
+            valor = RENTA.getDescripcion();
+        } else if (codigo1.equals(String.valueOf(ICE.getCodigo()))) {
+            valor = ICE.getDescripcion();
+        }
+        return valor;
+    }
+
     public static TipoImpuestoEnum obtenerTipoImpuesto(int codigoImpuesto) {
         for (TipoImpuestoEnum tipoImpuestoEnum : TipoImpuestoEnum.values()) {
             if (tipoImpuestoEnum.getCodigo() == codigoImpuesto) {

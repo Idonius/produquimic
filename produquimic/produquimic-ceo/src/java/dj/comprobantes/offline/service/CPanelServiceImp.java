@@ -49,7 +49,7 @@ public class CPanelServiceImp implements CPanelService {
                         String sql = "insert into USUARIO(CODIGO_ESTADO,NOMBRE_USUARIO,IDENTIFICACION_USUARIO,"
                                 + "CORREO_USUARIO,CLAVE_USUARIO) values (?,?,?,?,?)";
                         ps = con.getPreparedStatement(sql);
-                        ps.setInt(1, EstadoUsuarioEnum.ACTIVO.getCodigo());
+                        ps.setInt(1, EstadoUsuarioEnum.NUEVO.getCodigo());
                         ps.setString(2, comprobante.getCliente().getNombreCliente());
                         ps.setString(3, comprobante.getCliente().getIdentificacion());
                         ps.setString(4, comprobante.getCliente().getCorreo());

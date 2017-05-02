@@ -21,7 +21,7 @@ public enum EstadoComprobanteEnum {
     RECHAZADO(4, "RECHAZADO"),
     NOAUTORIZADO(6, "NO AUTORIZADO"),
     PENDIENTE(5, "PENDIENTE"),
-    ENPROCESO(7, "EN PROCESO"), //Similar a Recibida - Nueva por el SRI
+    ENPROCESO(1, "EN PROCESO"), //Similar a Recibida - Nueva por el SRI
     ANULADO(0, "ANULADO");  //
     private final Integer codigo;
     private final String descripcion;
