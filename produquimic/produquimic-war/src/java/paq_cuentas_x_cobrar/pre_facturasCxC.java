@@ -7,6 +7,8 @@ package paq_cuentas_x_cobrar;
 
 import componentes.AsientoContable;
 import componentes.FacturaCxC;
+import componentes.Retencion;
+import dj.comprobantes.offline.enums.EstadoComprobanteEnum;
 import framework.componentes.Barra;
 import framework.componentes.Boton;
 import framework.componentes.Calendario;
@@ -58,6 +60,8 @@ public class pre_facturasCxC extends Pantalla {
 
     private Tabla tab_tabla;
 
+    private Tabla tab_tabla1;
+
     private GraficoCartesiano gca_facturas;
     private GraficoPastel gpa_facturas;
     private Combo com_periodo;
@@ -73,6 +77,9 @@ public class pre_facturasCxC extends Pantalla {
     private Mascara mas_secuencial;
 
     private Confirmar con_confirma = new Confirmar();
+
+    private Etiqueta eti1 = new Etiqueta();
+    private Retencion ret_retencion = new Retencion();
 
     @EJB
     private final ServicioIntegracion ser_integra = (ServicioIntegracion) utilitario.instanciarEJB(ServicioIntegracion.class);
@@ -149,6 +156,9 @@ public class pre_facturasCxC extends Pantalla {
         con_confirma.getBot_aceptar().setValue("Si");
         con_confirma.getBot_cancelar().setValue("No");
         agregarComponente(con_confirma);
+        ret_retencion.setId("ret_retencion");
+        ret_retencion.getBot_aceptar().setMetodo("guardar");
+        agregarComponente(ret_retencion);
     }
 
     public void dibujarImportar() {
@@ -166,25 +176,50 @@ public class pre_facturasCxC extends Pantalla {
         Boton bot_ver = new Boton();
         bot_ver.setValue("Ver Factura");
         bot_ver.setMetodo("abrirVerFactura");
+        bot_ver.setIcon("ui-icon-search");
         bar_menu.agregarComponente(bot_ver);
+        bar_menu.agregarSeparador();
 
         Boton bot_anular = new Boton();
         bot_anular.setValue("Anular Factura");
         bot_anular.setMetodo("abrirAnularFactura");
+        bot_anular.setIcon("ui-icon-cancel");
         bar_menu.agregarComponente(bot_anular);
+        bar_menu.agregarSeparador();
 
-        Boton bot_retención = new Boton();
-        bot_retención.setValue("Generar FE");
-        bot_retención.setMetodo("generarFacturaElectronica");
-        bar_menu.agregarBoton(bot_retención);
+        Boton bot_retencion = new Boton();
+        bot_retencion.setValue("Ingresar Retención");
+        bot_retencion.setMetodo("dibujarRetencion");
+        bot_retencion.setIcon("ui-icon-note");
+        bar_menu.agregarBoton(bot_retencion);
+
+        if (ser_factura.isFacturaElectronica()) {
+            bar_menu.agregarSeparador();
+
+            Boton bot_ride = new Boton();
+            bot_ride.setValue("Imprimir RIDE");
+            bot_ride.setMetodo("abrirRIDE");
+            bot_ride.setIcon("ui-icon-print");
+            bar_menu.agregarBoton(bot_ride);
+
+            Boton bot_enviar = new Boton();
+            bot_enviar.setValue("Enviar al SRI");
+            bot_enviar.setMetodo("enviarSRI");
+            bot_enviar.setIcon("ui-icon-signal-diag");
+            bar_menu.agregarBoton(bot_enviar);
+
+        }
 
         tab_tabla = new Tabla();
         tab_tabla.setId("tab_tabla");
         tab_tabla.setSql(ser_factura.getSqlFacturas(com_pto_emision.getValue() + "", cal_fecha_inicio.getFecha(), cal_fecha_fin.getFecha()));
         tab_tabla.setCampoPrimaria("ide_cccfa");
         tab_tabla.getColumna("ide_cccfa").setVisible(false);
+        tab_tabla.getColumna("ide_cncre").setVisible(false);
+        tab_tabla.getColumna("fecha_trans_cccfa").setVisible(false);
         tab_tabla.getColumna("ide_ccefa").setVisible(false);
         tab_tabla.getColumna("nombre_ccefa").setFiltroContenido();
+        tab_tabla.getColumna("fecha_emisi_cccfa").setNombreVisual("FECHA");
         tab_tabla.getColumna("nombre_ccefa").setVisible(true);
         tab_tabla.getColumna("nombre_ccefa").setNombreVisual("ESTADO");
         tab_tabla.getColumna("secuencial_cccfa").setFiltroContenido();
@@ -207,6 +242,9 @@ public class pre_facturasCxC extends Pantalla {
         tab_tabla.getColumna("total_cccfa").alinearDerecha();
         tab_tabla.getColumna("total_cccfa").setEstilo("font-size: 12px;font-weight: bold;");
         tab_tabla.getColumna("total_cccfa").setNombreVisual("TOTAL");
+        if (ser_factura.isFacturaElectronica()) {
+            tab_tabla.getColumna("ide_srcom").setVisible(false);
+        }
         tab_tabla.setRows(15);
         tab_tabla.setLectura(true);
         //COLOR VERDE FACTURAS NO CONTABILIZADAS
@@ -219,6 +257,56 @@ public class pre_facturasCxC extends Pantalla {
         gru.getChildren().add(bar_menu);
         gru.getChildren().add(pat_panel);
         mep_menu.dibujar(1, "LISTADO DE FACTURAS", gru);
+    }
+
+    public void abrirRIDE() {
+        if (tab_tabla.getValor("ide_cccfa") != null) {
+            if (tab_tabla.getValor("ide_srcom") != null) {
+                fcc_factura.visualizarRide(tab_tabla.getValor("ide_srcom"));
+            } else {
+                utilitario.agregarMensajeInfo("La factura seleccionada no es electrónica", "");
+            }
+        } else {
+            utilitario.agregarMensajeInfo("Seleccione una factura", "");
+        }
+    }
+
+    public void enviarSRI() {
+        if (tab_tabla.getValor("ide_cccfa") != null) {
+            //Valida que se encuentre en estado PENDIENTE
+            if (tab_tabla.getValor("nombre_ccefa") != null && tab_tabla.getValor("nombre_ccefa").equals(EstadoComprobanteEnum.PENDIENTE.getDescripcion())) {
+                String mensaje = ser_facElect.enviarComprobante(tab_tabla.getValor("clave_acceso"));
+                if (mensaje.isEmpty()) {
+                    utilitario.agregarMensaje("La factura se envio correctamente al SRI", "");
+                    String aux = tab_tabla.getValorSeleccionado();
+                    tab_tabla.actualizar();
+                    tab_tabla.setFilaActual(aux);
+                    tab_tabla.calcularPaginaActual();
+                } else {
+                    utilitario.agregarMensajeError(mensaje, "");
+                }
+
+            } else {
+                utilitario.agregarMensajeInfo("La Factura seleccionada no se encuentra en estado PENDIENTE", "");
+            }
+        } else {
+            utilitario.agregarMensajeInfo("Seleccione una factura", "");
+        }
+    }
+
+    public void dibujarRetencion() {
+        if (tab_tabla.getValor("ide_cccfa") != null) {
+            if (tab_tabla.getValor("ide_cncre") == null) {
+                ret_retencion.nuevaRetencionVenta(tab_tabla.getValor("ide_cccfa"));
+                ret_retencion.dibujar();
+            } else {
+                utilitario.agregarMensajeInfo("La Factura seleccionada ya tiene registrado un Comprobante de Retención", "");
+            }
+
+        } else {
+            utilitario.agregarMensajeInfo("Seleccione una factura", "");
+
+        }
     }
 
     public void generarFacturaElectronica() {
@@ -534,11 +622,13 @@ public class pre_facturasCxC extends Pantalla {
         tab_tabla = new Tabla();
         tab_tabla.setId("tab_tabla");
         tab_tabla.setTabla("sri_firma_digital", "ide_srfid", 9);
+        tab_tabla.getColumna("ide_srfid").setVisible(false);
         tab_tabla.setTipoFormulario(true);
         tab_tabla.setCampoOrden("disponible_srfid");
         tab_tabla.getColumna("password_srfid").setClave();
         tab_tabla.getColumna("disponible_srfid").setCheck();
         tab_tabla.getColumna("ruta_srfid").setControl("Texto");
+        tab_tabla.setMostrarNumeroRegistros(false);
         tab_tabla.dibujar();
 
         PanelTabla pat_panel = new PanelTabla();
@@ -553,8 +643,32 @@ public class pre_facturasCxC extends Pantalla {
         pat_panel.setPanelTabla(tab_tabla);
         pat_panel.getChildren().add(g1);
         pat_panel.getMenuTabla().getItem_guardar().setRendered(true);
-        pat_panel.getMenuTabla().getItem_eliminar().setRendered(true);
-        mep_menu.dibujar(9, "CONFIGURACIÓN FACTURAS ELECTRÓNICAS", pat_panel);
+        pat_panel.getMenuTabla().getItem_insertar().setRendered(false);
+        pat_panel.getMenuTabla().getItem_eliminar().setRendered(false);
+        pat_panel.getMenuTabla().getItem_buscar().setRendered(false);
+
+        tab_tabla1 = new Tabla();
+        tab_tabla1.setId("tab_tabla1");
+        tab_tabla1.setTabla("sri_emisor", "ide_sremi", 10);
+        tab_tabla1.getColumna("ide_sremi").setVisible(false);
+        tab_tabla1.setTipoFormulario(true);
+        tab_tabla1.getColumna("wsdl_recep_offline_sremi").setControl("Texto");
+        tab_tabla1.getColumna("wsdl_autori_offline_sremi").setControl("Texto");
+        tab_tabla1.setMostrarNumeroRegistros(false);
+        tab_tabla1.dibujar();
+        PanelTabla pat_panel1 = new PanelTabla();
+        pat_panel1.setPanelTabla(tab_tabla1);
+        pat_panel1.getMenuTabla().getItem_guardar().setRendered(true);
+        pat_panel1.getMenuTabla().getItem_insertar().setRendered(false);
+        pat_panel1.getMenuTabla().getItem_eliminar().setRendered(false);
+        pat_panel1.getMenuTabla().getItem_buscar().setRendered(false);
+
+        Grupo gru = new Grupo();
+        gru.getChildren().add(pat_panel);
+        gru.getChildren().add(pat_panel1);
+
+        mep_menu.dibujar(9, "CONFIGURACIÓN FACTURAS ELECTRÓNICAS", gru);
+
     }
 
     public void abrirVerFactura() {
@@ -641,10 +755,6 @@ public class pre_facturasCxC extends Pantalla {
 
     @Override
     public void insertar() {
-        if (mep_menu.getOpcion() == 9) { //CONF FE
-            tab_tabla.insertar();
-            return;
-        }
         fcc_factura.nuevaFactura();
         fcc_factura.dibujar();
     }
@@ -655,7 +765,9 @@ public class pre_facturasCxC extends Pantalla {
             //Actualiza parametro 
             ser_factura.setHaceFacturaElectronica(rad_facelectronica.getValue().toString());
             if (tab_tabla.guardar()) {
-                guardarPantalla();
+                if (tab_tabla1.guardar()) {
+                    guardarPantalla();
+                }
             }
             return;
         }
@@ -666,7 +778,15 @@ public class pre_facturasCxC extends Pantalla {
                 com_pto_emision.setValue(fcc_factura.getComboPuntoEmision().getValue());
                 dibujarFacturas();
                 tab_tabla.setFilaActual(fcc_factura.getTab_cab_factura().getValor("ide_cccfa"));
+                tab_tabla.calcularPaginaActual();
                 utilitario.addUpdate("com_pto_emision,tab_tabla");
+            }
+        } else if (ret_retencion.isVisible()) {
+            ret_retencion.guardar();
+            if (ret_retencion.isVisible() == false) {
+                dibujarFacturas();
+                tab_tabla.setFilaActual(ret_retencion.getIde_cccfa());
+                utilitario.addUpdate("tab_tabla");
             }
         } else if (asc_asiento.isVisible()) {
             asc_asiento.guardar();
@@ -704,9 +824,6 @@ public class pre_facturasCxC extends Pantalla {
 
     @Override
     public void eliminar() {
-        if (mep_menu.getOpcion() == 9) {
-            tab_tabla.eliminar();
-        }
     }
 
     public FacturaCxC getFcc_factura() {
@@ -779,6 +896,22 @@ public class pre_facturasCxC extends Pantalla {
 
     public void setCon_confirma(Confirmar con_confirma) {
         this.con_confirma = con_confirma;
+    }
+
+    public Retencion getRet_retencion() {
+        return ret_retencion;
+    }
+
+    public void setRet_retencion(Retencion ret_retencion) {
+        this.ret_retencion = ret_retencion;
+    }
+
+    public Tabla getTab_tabla1() {
+        return tab_tabla1;
+    }
+
+    public void setTab_tabla1(Tabla tab_tabla1) {
+        this.tab_tabla1 = tab_tabla1;
     }
 
 }
