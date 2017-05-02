@@ -70,7 +70,7 @@ public class Parametros {
         lis_parametros.add(new Parametro("2", "p_cxp_tipo_trans_pago_interes_inversion", "Indica que el tipo de transaccion pago de intereses de la inversion (Pago de intereses) ", "19", "cxp_tipo_transacc", "ide_cpttr", "nombre_cpttr"));
         lis_parametros.add(new Parametro("2", "p_cxp_tipo_trans_renova_interes_reinver", "Indica que el tipo de transaccion renovacion de intereses de inversion (Interes de Nueva Renovacion de Inversion) ", "20", "cxp_tipo_transacc", "ide_cpttr", "nombre_cpttr"));
         lis_parametros.add(new Parametro("2", "p_cxp_tipo_trans_retencion", "Indica que el tipo de transaccion Retencion ", "21", "cxp_tipo_transacc", "ide_cpttr", "nombre_cpttr"));
-
+        lis_parametros.add(new Parametro("2", "p_cxp_estado_factura_anulada", "Indica el estado de la factura (Anulada) ", "1", "cxp_estado_factur", "ide_cpefa", "nombre_cpefa"));
 
         /*
          * CUENTAS POR COBRAR MODULO =3
@@ -82,7 +82,7 @@ public class Parametros {
         lis_parametros.add(new Parametro("3", "p_cxc_tipo_trans_reversar_mas", "Indica que el tipo de transaccion es para reversar (+) una transaccion ", "15", "cxc_tipo_transacc", "ide_ccttr", "nombre_ccttr"));
         lis_parametros.add(new Parametro("3", "p_cxc_tipo_trans_reversar_menos", "Indica que el tipo de transaccion es para reversar (-)una transaccion ", "16", "cxc_tipo_transacc", "ide_ccttr", "nombre_ccttr"));
         lis_parametros.add(new Parametro("3", "p_cxc_estado_factura_anulada", "Indica el estado de la factura (Anulada) ", "1", "cxc_estado_factura", "ide_ccefa", "nombre_ccefa"));
-
+        lis_parametros.add(new Parametro("3", "p_cxc_tipo_trans_retencion", "Indica que el tipo de transaccion Retencion ", "8", "cxc_tipo_transacc", "ide_ccttr", "nombre_ccttr"));
 
         /*
          * ACTIVOS FIJOS MODULO =4
@@ -210,7 +210,7 @@ public class Parametros {
         /*
          * VENTAS =8
          */
- /*
+        /*
          * PRESTAMOS E INVERSIONES =9 *
          */
         lis_parametros.add(new Parametro("9", "p_iyp_activo", "Indica que se carga solo las cuentas de nivel de Activo", "0", "con_det_plan_cuen", "ide_cndpc", "codig_recur_cndpc"));
@@ -366,6 +366,8 @@ public class Parametros {
         lis_parametros.add(new Parametro("11", "p_producto", "Indica el producto", "3", "pre_nivel_funcion_programa", "ide_prnfp", "detalle_prnfp"));
         lis_parametros.add(new Parametro("11", "p_fase", "Indica el la fase", "4", "pre_nivel_funcion_programa", "ide_prnfp", "detalle_prnfp"));
         lis_parametros.add(new Parametro("11", "p_modulo_secuencialcertificacion", "Indica el modulo para generar el secuencial de las certificaciones", "21", "gen_modulo", "ide_gemod", "detalle_gemod"));
+        lis_parametros.add(new Parametro("11", "p_nombre_coordinador_fin", "Indica el nombre del Coordinador Financiero", "Ing. Juan Flores"));
+        lis_parametros.add(new Parametro("11", "p_nombre_jefe_presupuesto", "Indica el nombre del Jefe de Presupuesto", "Ing. Salasar Mishell"));
 ///*
         /*
          * MODULO GENERAL 12

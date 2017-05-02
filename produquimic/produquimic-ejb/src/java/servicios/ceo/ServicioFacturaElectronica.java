@@ -10,12 +10,18 @@ import dj.comprobantes.offline.enums.EstadoComprobanteEnum;
 import dj.comprobantes.offline.enums.TipoComprobanteEnum;
 import dj.comprobantes.offline.enums.TipoEmisionEnum;
 import dj.comprobantes.offline.exception.GenericException;
+import dj.comprobantes.offline.service.ArchivoService;
 import dj.comprobantes.offline.service.ComprobanteService;
 import framework.aplicacion.TablaGenerica;
+import java.io.File;
+import java.io.FileOutputStream;
+import java.io.IOException;
 import java.util.Formatter;
 import java.util.List;
 import javax.ejb.EJB;
 import javax.ejb.Stateless;
+import javax.faces.context.ExternalContext;
+import javax.faces.context.FacesContext;
 import servicios.ServicioBase;
 import servicios.contabilidad.ServicioConfiguracion;
 
@@ -26,12 +32,14 @@ import servicios.contabilidad.ServicioConfiguracion;
 @Stateless
 
 public class ServicioFacturaElectronica extends ServicioBase {
-    
+
     @EJB
     private ServicioConfiguracion ser_configuracion;
-    
+
     @EJB
     private ComprobanteService comprobanteService;
+    @EJB
+    private ArchivoService archivoService;
 
     /**
      * Genera un comprobante electrónico a partir de una factura ya guardada
@@ -41,7 +49,6 @@ public class ServicioFacturaElectronica extends ServicioBase {
      */
     public String generarFacturaElectronica(String ide_cccfa) {
         String ide_srcom = "-1";
-        
         TablaGenerica tab_factura = utilitario.consultar("select a.ide_cccfa,secuencial_cccfa,fecha_emisi_cccfa,serie_ccdaf,base_grabada_cccfa\n"
                 + ",base_tarifa0_cccfa,valor_iva_cccfa,total_cccfa,alterno_ats,identificac_geper\n"
                 + ",a.ide_geper,ide_cntdo,f.ide_inarti,codigo_inarti,observacion_ccdfa,nombre_inarti,cantidad_ccdfa\n"
@@ -53,7 +60,6 @@ public class ServicioFacturaElectronica extends ServicioBase {
                 + "inner join con_deta_forma_pago e on a.ide_cndfp=e.ide_cndfp\n"
                 + "inner join  inv_articulo f on c.ide_inarti =f.ide_inarti\n"
                 + "where a.ide_cccfa=" + ide_cccfa);
-        
         if (tab_factura.isEmpty() == false) {
             if (tab_factura.getValor("ide_srcom") != null) {
                 ide_srcom = tab_factura.getValor("ide_srcom");
@@ -70,6 +76,8 @@ public class ServicioFacturaElectronica extends ServicioBase {
             //Inserta cabecera
             if (tab_cabecara.isEmpty()) {
                 tab_cabecara.insertar();
+            } else {
+                tab_cabecara.modificar(tab_cabecara.getFilaActual());
             }
             double dou_base0 = 0;
             double dou_basegraba = 0;
@@ -83,7 +91,7 @@ public class ServicioFacturaElectronica extends ServicioBase {
             } catch (Exception e) {
             }
             dou_subtotal = dou_base0 + dou_basegraba;
-            
+
             tab_cabecara.setValor("ide_sresc", String.valueOf(EstadoComprobanteEnum.PENDIENTE.getCodigo()));
             tab_cabecara.setValor("coddoc_srcom", TipoComprobanteEnum.FACTURA.getCodigo());
             tab_cabecara.setValor("tipoemision_srcom", TipoEmisionEnum.NORMAL.getCodigo());
@@ -109,32 +117,30 @@ public class ServicioFacturaElectronica extends ServicioBase {
 
             tab_cabecara.guardar();
             ide_srcom = tab_cabecara.getValor("ide_srcom");
-            
-            if (tab_detalle.isEmpty() == false) {
-                for (int i = 0; i < tab_detalle.getTotalFilas(); i++) {
-                    tab_detalle.modificar(i);
-                    tab_detalle.setValor("ide_srcom", null);
-                }
-            }
+
             for (int i = 0; i < tab_factura.getTotalFilas(); i++) {
                 tab_detalle.insertar();
                 tab_detalle.setValor("ide_srcom", ide_srcom);
                 tab_detalle.setValor("codigo_principal_srdec", tab_factura.getValor(i, "ide_inarti"));
                 tab_detalle.setValor("codigo_auxiliar_srdec", tab_factura.getValor(i, "codigo_inarti"));
-                tab_detalle.setValor("descripcion_srdec", tab_factura.getValor(i, "observacion_ccdfa"));
+                tab_detalle.setValor("descripcion_srdec", tab_factura.getValor(i, "nombre_inarti"));
                 tab_detalle.setValor("cantidad_srdec", tab_factura.getValor(i, "cantidad_ccdfa"));
                 tab_detalle.setValor("precio_srdec", tab_factura.getValor(i, "precio_ccdfa"));
                 tab_detalle.setValor("descuento_detalle_srdec", "0.00");
                 tab_detalle.setValor("total_detalle_srdec", tab_factura.getValor(i, "total_ccdfa"));
-                
+
                 if (tab_factura.getValor(i, "iva_inarti_ccdfa").equalsIgnoreCase("1")) {
                     tab_detalle.setValor("porcentaje_iva_srdec", String.valueOf((ser_configuracion.getPorcentajeIva() * 100)));
                 } else {
                     tab_detalle.setValor("porcentaje_iva_srdec", "0");
                 }
             }
+            if (tab_cabecara.isFilaModificada()) {
+                //elimina detalles si modifica
+                utilitario.getConexion().agregarSqlPantalla("delete from sri_detalle_comprobante where ide_srcom is null");
+            }
             tab_detalle.guardar();
-            utilitario.getConexion().agregarSqlPantalla("delete from sri_detalle_comprobante where ide_srcom is null");
+
             if (utilitario.getConexion().ejecutarListaSql().isEmpty()) {
                 //Asigna secuencial a la factura
                 String strSecuencialF = getSecuencialFactura();
@@ -147,10 +153,9 @@ public class ServicioFacturaElectronica extends ServicioBase {
                 } catch (NumberFormatException | GenericException e) {
                     e.printStackTrace();
                 }
-                
+
             }
         }
-        
         return ide_srcom;
     }
 
@@ -174,5 +179,30 @@ public class ServicioFacturaElectronica extends ServicioBase {
         fmt.close();
         return secuencial;
     }
-    
+
+    public String enviarComprobante(String claveAcceso) {
+        String mensaje = "";
+        try {
+            comprobanteService.enviarComprobante(claveAcceso);
+        } catch (Exception e) {
+            mensaje = e.getMessage() + "";
+        }
+        return mensaje;
+    }
+
+    public void getRIDE(String ide_srcom) throws GenericException {
+        try {
+            byte[] ar = archivoService.getPdf(comprobanteService.getComprobantePorId(new Integer(ide_srcom)));
+            //crea el archivo
+            FacesContext fc = FacesContext.getCurrentInstance();
+            ExternalContext ec = fc.getExternalContext();
+            String realPath = (String) ec.getRealPath("/reportes");
+            File fil_reporte = new File(realPath + "/reporte" + utilitario.getVariable("IDE_USUA") + ".pdf");
+            FileOutputStream fileOuputStream = new FileOutputStream(fil_reporte);
+            fileOuputStream.write(ar);
+        } catch (NumberFormatException | GenericException | IOException e) {
+            e.printStackTrace();
+        }
+    }
+
 }
