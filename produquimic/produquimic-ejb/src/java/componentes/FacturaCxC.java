@@ -14,7 +14,6 @@ import framework.componentes.Espacio;
 import framework.componentes.Etiqueta;
 import framework.componentes.Grid;
 import framework.componentes.Grupo;
-import framework.componentes.Mensaje;
 import framework.componentes.PanelTabla;
 import framework.componentes.Tabla;
 import framework.componentes.Tabulador;
@@ -603,9 +602,9 @@ public class FacturaCxC extends Dialogo {
         tab_deta_factura.getColumna("ALTERNO_CCDFA").setValorDefecto("00");
         tab_deta_factura.setScrollable(true);
         if (isFacturaElectronica() == false) {
-            tab_deta_factura.setScrollHeight(getAltoPanel() - 350);
-        } else {
             tab_deta_factura.setScrollHeight(getAltoPanel() - 300);
+        } else {
+            tab_deta_factura.setScrollHeight(getAltoPanel() - 360);
         }
 
         tab_deta_factura.setRecuperarLectura(true);
