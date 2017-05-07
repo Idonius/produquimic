@@ -85,7 +85,6 @@ public interface ComprobanteService {
      * envia un comprobante al SRI
      *
      * @param claveAcceso
-     * @return
      * @throws GenericException
      */
     public void enviarComprobante(String claveAcceso) throws GenericException;

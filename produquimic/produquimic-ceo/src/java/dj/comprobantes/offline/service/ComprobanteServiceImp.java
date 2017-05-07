@@ -210,31 +210,38 @@ public class ComprobanteServiceImp implements ComprobanteService {
         if (comprobanteActual == null) {
             throw new GenericException("ERROR. No existe el comprobante " + claveAcceso);
         }
-        if (comprobanteActual.getCodigoestado() != EstadoComprobanteEnum.PENDIENTE.getCodigo()) {
-            throw new GenericException("ERROR. El comprobante " + claveAcceso + " no se encuentra en estado PENDIENTE.");
+        if (comprobanteActual.getCodigoestado() == EstadoComprobanteEnum.PENDIENTE.getCodigo()) {
+            String xml = "";
+            //genera xml de la factura 
+            if (comprobanteActual.getCoddoc().equals(TipoComprobanteEnum.FACTURA.getCodigo())) {
+                xml = facturaService.getXmlFactura(comprobanteActual);
+            } else if (comprobanteActual.getCoddoc().equals(TipoComprobanteEnum.NOTA_DE_CREDITO.getCodigo())) {
+                xml = notaCreditoService.getXmlNotaCredito(comprobanteActual);
+            } else if (comprobanteActual.getCoddoc().equals(TipoComprobanteEnum.COMPROBANTE_DE_RETENCION.getCodigo())) {
+                xml = retencionService.getXmlRetencion(comprobanteActual);
+            }
+            xml = utilitario.reemplazarCaracteresEspeciales(xml);
+            recepcionService.enviarRecepcionOfflineSRI(comprobanteActual, xml);
+            //verifica que se encuentre en estado RECIBIDA
+            comprobanteActual = getComprobantePorClaveAcceso(claveAcceso);
+            if (comprobanteActual.getCodigoestado() != EstadoComprobanteEnum.RECIBIDA.getCodigo()) {
+                throw new GenericException("ERROR. El Comprobante " + claveAcceso + " no pudo ser enviado al SRI");
+            } else {
+                try {
+                    //Esperamos 6 segundos por recomendacion del SRI
+                    Thread.sleep(6 * 1000);
+                } catch (Exception e) {
+                }
+            }
         }
-        String xml = "";
-        //genera xml de la factura 
-        if (comprobanteActual.getCoddoc().equals(TipoComprobanteEnum.FACTURA.getCodigo())) {
-            xml = facturaService.getXmlFactura(comprobanteActual);
-        } else if (comprobanteActual.getCoddoc().equals(TipoComprobanteEnum.NOTA_DE_CREDITO.getCodigo())) {
-            xml = notaCreditoService.getXmlNotaCredito(comprobanteActual);
-        } else if (comprobanteActual.getCoddoc().equals(TipoComprobanteEnum.COMPROBANTE_DE_RETENCION.getCodigo())) {
-            xml = retencionService.getXmlRetencion(comprobanteActual);
-        }
-        xml = utilitario.reemplazarCaracteresEspeciales(xml);
-        recepcionService.enviarRecepcionOfflineSRI(comprobanteActual, xml);
-        //verifica que se encuentre en estado RECIBIDA
-        comprobanteActual = getComprobantePorClaveAcceso(claveAcceso);
-        if (comprobanteActual.getCodigoestado() != EstadoComprobanteEnum.RECIBIDA.getCodigo()) {
-            throw new GenericException("ERROR. Comprobante " + claveAcceso + " RECHAZADO");
-        }
-
-        autorizacionService.enviarRecibidosOfflineSRI(comprobanteActual);
-        //verifica si se autorizo
-        comprobanteActual = getComprobantePorClaveAcceso(claveAcceso);
-        if (comprobanteActual.getCodigoestado() != EstadoComprobanteEnum.AUTORIZADO.getCodigo()) {
-            throw new GenericException("ERROR. Comprobante " + claveAcceso + "NO AUTORIZADO");
+        if (comprobanteActual.getCodigoestado() == EstadoComprobanteEnum.RECIBIDA.getCodigo()) {
+            autorizacionService.enviarRecibidosOfflineSRI(comprobanteActual);
+            //verifica si se autorizo
+            comprobanteActual = getComprobantePorClaveAcceso(claveAcceso);
+            if (comprobanteActual.getCodigoestado() != EstadoComprobanteEnum.AUTORIZADO.getCodigo()) {
+                throw new GenericException("ERROR. El Comprobante " + claveAcceso + " no pudo ser Autorizado por el SRI.");
+            }
         }
     }
+
 }
