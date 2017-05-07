@@ -116,11 +116,13 @@ public class Retencion extends Dialogo {
         tab_dto_proveedor.getColumna("nom_geper").setOrden(1);
         tab_dto_proveedor.getColumna("nom_geper").setNombreVisual("PROVEEDOR");
         tab_dto_proveedor.getColumna("nom_geper").setLectura(true);
+        tab_dto_proveedor.getColumna("nom_geper").setEtiqueta();
         tab_dto_proveedor.getColumna("direccion_geper").setNombreVisual("DIRECCIÓN");
+        tab_dto_proveedor.getColumna("direccion_geper").setEtiqueta();
         tab_dto_proveedor.getColumna("direccion_geper").setOrden(2);
         tab_dto_proveedor.getColumna("ide_geper").setVisible(false);
-
         tab_dto_proveedor.setNumeroTabla(-1);
+        tab_dto_proveedor.setLectura(true);
         tab_dto_proveedor.setTipoFormulario(true);
         tab_dto_proveedor.getGrid().setColumns(4);
         tab_dto_proveedor.setMostrarNumeroRegistros(false);
