@@ -1,14 +1,15 @@
 <!doctype html>
 <html lang="en">
     <head>
+        <link rel="icon" href="img/favicon.png">
         <meta charset="UTF-8">
         <meta name="viewport" content="width=device-width, initial-scale=1">
         <title>Comprobantes Electrónicos</title>
         <!-- STYLES -->
         <!-- build:css lib/css/main.min.css -->
+        <link rel="stylesheet" type="text/css" href="components/bootstrap/dist/css/bootstrap.css">
         <link rel="stylesheet" type="text/css" href="components/angular-material/angular-material.css">
         <link rel="stylesheet" type="text/css" href="components/Ionicons/css/ionicons.css">
-        <link rel="stylesheet" type="text/css" href="components/angular-ui-grid/ui-grid.css">
         <link rel="stylesheet" type="text/css" href="components/angular-loading-bar/build/loading-bar.css">
         <!-- endbuild -->
         <!-- Custom Style -->
@@ -22,8 +23,8 @@
         <script type="text/javascript" src="components/angular-material/angular-material.js"></script>
         <script type="text/javascript" src="components/angular-route/angular-route.js"></script>
         <script type="text/javascript" src="components/angular-cookies/angular-cookies.js"></script>
-        <script type="text/javascript" src="components/angular-ui-grid/ui-grid.js"></script>
         <script type="text/javascript" src="components/angular-loading-bar/build/loading-bar.js"></script>
+        <script type="text/javascript" src="components/angular-smart-table/dist/smart-table.js"></script>
         <!-- endbuild -->
         <!-- Custom Scripts -->
         <script type="text/javascript" src="js/dashboard.min.js"></script>
@@ -34,7 +35,7 @@
                 <md-progress-circular class="framework-cargando" md-mode="indeterminate"></md-progress-circular>
             </div>
         </div>
-        <div ng-controller="MenuCtrl" layout-fill layout="column">
+        <div ng-controller="SeguridadCtrl" layout-fill layout="column">
             <md-toolbar>
             <div class="md-toolbar-tools">
                 <md-button class="md-icon-button" aria-label="Opciones" ng-click="toggleRight()">
@@ -43,27 +44,53 @@
                 <h3>
                 Comprobantes Electrónicos
                 </h3>
+                <md-menu ng-show="isLogin">
+                <md-button aria-label="Menu Usuario" ng-click="openMenu($mdOpenMenu, $event)">
+                <img src="img/im_usuario.png" height="38" style="padding-top: 5px;" />
+                </md-button>
+                <md-menu-content width="2">
+                <md-subheader class="md-primary">{{nombreUsuario}}</md-subheader>
+                <md-menu-item>
+                <md-button href="#/miPerfil" ng-click="$mdMenu.close($event)">
+                <md-icon md-font-icon="ion-compose s24" md-colors="{color: 'blue'}" md-menu-align-target></md-icon> Editar Perfil
+                </md-button>
+                </md-menu-item>
+                <md-menu-item>
+                <md-button href="#/cambiaClave" ng-click="$mdMenu.close($event)">
+                <md-icon md-font-icon="ion-key s24" md-colors="{color: 'amber'}" md-menu-align-target></md-icon> Cambiar Contraseña
+                </md-button>
+                </md-menu-item>
+                <md-divider></md-divider>
+                <md-menu-item>
+                <md-button ng-click="cerrarSesion()">
+                <md-icon md-font-icon="ion-power s24" md-colors="{color: 'red'}" md-menu-align-target></md-icon> Cerrar Sesión
+                </md-button>
+                </md-menu-item>
+                </md-menu-content>
+                </md-menu>
             </div>
+            
             </md-toolbar>
-            <md-content  layout-padding  md-scroll-y layout="column" flex >
-            <div data-ng-view="" id="ng-view" class=" slide-animation" >
+            <md-content layout-fill  layout-padding layout="column" flex >
+            <div ng-view="">
             </div>
             </md-content>
-            
-            <section layout="row" flex >
-                <md-sidenav class="md-sidenav-left md-whiteframe-4dp nav" md-component-id="right" >
-                <md-toolbar class="md-tall"  ng-style="{background: '#fcfcfd'}">
-                <div flex layout="row" layout-sm="column" layout-align="center center" >
-                    <img src="img/im_ceo.png"/>
-                </div>
-                </md-toolbar>
-                <md-divider></md-divider>
-                <md-list-item ng-click="abrirPagina(pagina.state, $index)"  ng-repeat="pagina in paginas" ng-class="{selectedIndexNav: selectedIndex===$index}">
-                <md-icon  md-colors="selectedIndex === $index ? {color: 'grey-50' } : { color: '{{pagina.color}}' }"  md-font-icon="{{pagina.icono}}"></md-icon>
-                <p> {{ pagina.nombre }} </p>
-                </md-list-item>
-                </md-sidenav>
-            </section>
+            <div flex  md-swipe-left="cerrarSideNav()">
+                <section layout="row" flex >
+                    <md-sidenav class="md-sidenav-left md-whiteframe-4dp nav" md-component-id="right" md-swipe-left="cerrarSideNav()">
+                    <md-toolbar class="md-tall"  ng-style="{background: '#fcfcfd'}">
+                    <div flex layout="row" layout-sm="column" layout-align="center center" >
+                        <img src="img/im_ceo.png"/>
+                    </div>
+                    </md-toolbar>
+                    <md-divider></md-divider>
+                    <md-list-item ng-click="abrirPagina(pagina.state, $index)"  ng-repeat="pagina in paginas" ng-class="{selectedIndexNav: selectedIndex===$index}">
+                    <md-icon  md-colors="selectedIndex === $index ? {color: 'grey-50' } : { color: '{{pagina.color}}' }"  md-font-icon="{{pagina.icono}}"></md-icon>
+                    <p> {{ pagina.nombre }} </p>
+                    </md-list-item>
+                    </md-sidenav>
+                </section>
+            </div>
         </div>
     </body>
 </html>
