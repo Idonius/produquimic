@@ -143,10 +143,10 @@ public class Retencion extends Dialogo {
         tab_cb_retencion.getColumna("numero_cncre").setMascara("999-999-99999999");
         tab_cb_retencion.getColumna("numero_cncre").setQuitarCaracteresEspeciales(false);
         tab_cb_retencion.getColumna("numero_cncre").setEstilo("font-size: 12px;font-weight: bold");
-        tab_cb_retencion.getColumna("autorizacion_cncre").setMascara("9999999999");
+        ////tab_cb_retencion.getColumna("autorizacion_cncre").setMascara("9999999999");
         tab_cb_retencion.getColumna("autorizacion_cncre").setOrden(2);
         tab_cb_retencion.getColumna("autorizacion_cncre").setNombreVisual("NUM. AUTORIZACIÓN");
-        tab_cb_retencion.getColumna("autorizacion_cncre").setQuitarCaracteresEspeciales(true);
+        ////tab_cb_retencion.getColumna("autorizacion_cncre").setQuitarCaracteresEspeciales(true);
         tab_cb_retencion.getColumna("autorizacion_cncre").setEstilo("font-size: 12px;font-weight: bold");
         tab_cb_retencion.getColumna("numero_cncre").setQuitarCaracteresEspeciales(true);
         tab_cb_retencion.getColumna("OBSERVACION_CNCRE").setVisible(false);

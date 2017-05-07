@@ -52,13 +52,14 @@ public class ServicioFacturaElectronica extends ServicioBase {
         TablaGenerica tab_factura = utilitario.consultar("select a.ide_cccfa,secuencial_cccfa,fecha_emisi_cccfa,serie_ccdaf,base_grabada_cccfa\n"
                 + ",base_tarifa0_cccfa,valor_iva_cccfa,total_cccfa,alterno_ats,identificac_geper\n"
                 + ",a.ide_geper,ide_cntdo,f.ide_inarti,codigo_inarti,observacion_ccdfa,nombre_inarti,cantidad_ccdfa\n"
-                + ",precio_ccdfa,iva_inarti_ccdfa,total_ccdfa,ide_srcom\n"
+                + ",precio_ccdfa,iva_inarti_ccdfa,total_ccdfa,ide_srcom,nombre_inuni\n"
                 + "from cxc_cabece_factura  a \n"
                 + "inner join gen_persona b on a.ide_geper = b.ide_geper  \n"
                 + "inner join cxc_deta_factura c on a.ide_cccfa=c.ide_cccfa \n"
                 + "inner join cxc_datos_fac d on a.ide_ccdaf=d.ide_ccdaf\n"
                 + "inner join con_deta_forma_pago e on a.ide_cndfp=e.ide_cndfp\n"
                 + "inner join  inv_articulo f on c.ide_inarti =f.ide_inarti\n"
+                + "left join  inv_unidad g on c.ide_inuni =g.ide_inuni\n"
                 + "where a.ide_cccfa=" + ide_cccfa);
         if (tab_factura.isEmpty() == false) {
             if (tab_factura.getValor("ide_srcom") != null) {
@@ -98,6 +99,7 @@ public class ServicioFacturaElectronica extends ServicioBase {
             tab_cabecara.setValor("estab_srcom", tab_factura.getValor("serie_ccdaf").substring(0, 3));
             tab_cabecara.setValor("ptoemi_srcom", tab_factura.getValor("serie_ccdaf").substring(3, 6));
             tab_cabecara.setValor("fechaemision_srcom", tab_factura.getValor("fecha_emisi_cccfa"));
+            tab_cabecara.setValor("reutiliza_srcom", "false");//no reutiliza por defecto
             tab_cabecara.setValor("fecha_sistema_srcom", utilitario.getFechaActual());
             tab_cabecara.setValor("ip_genera_srcom", utilitario.getIp());
             tab_cabecara.setValor("subtotal0_srcom", utilitario.getFormatoNumero(dou_base0));
@@ -123,7 +125,12 @@ public class ServicioFacturaElectronica extends ServicioBase {
                 tab_detalle.setValor("ide_srcom", ide_srcom);
                 tab_detalle.setValor("codigo_principal_srdec", tab_factura.getValor(i, "ide_inarti"));
                 tab_detalle.setValor("codigo_auxiliar_srdec", tab_factura.getValor(i, "codigo_inarti"));
-                tab_detalle.setValor("descripcion_srdec", tab_factura.getValor(i, "nombre_inarti"));
+                String descripcion = "";
+                if (tab_factura.getValor(i, "nombre_inuni") != null) {
+                    descripcion += tab_factura.getValor(i, "nombre_inuni");
+                }
+                descripcion += " " + tab_factura.getValor(i, "nombre_inarti");
+                tab_detalle.setValor("descripcion_srdec", descripcion.trim());
                 tab_detalle.setValor("cantidad_srdec", tab_factura.getValor(i, "cantidad_ccdfa"));
                 tab_detalle.setValor("precio_srdec", tab_factura.getValor(i, "precio_ccdfa"));
                 tab_detalle.setValor("descuento_detalle_srdec", "0.00");
@@ -145,6 +152,8 @@ public class ServicioFacturaElectronica extends ServicioBase {
                 //Asigna secuencial a la factura
                 String strSecuencialF = getSecuencialFactura();
                 utilitario.getConexion().ejecutarSql("UPDATE sri_comprobante SET secuencial_srcom='" + strSecuencialF + "' where ide_srcom=" + ide_srcom);
+                utilitario.getConexion().ejecutarSql("UPDATE sri_comprobante SET reutiliza_srcom= false where secuencial_srcom='" + strSecuencialF + "' and reutiliza_srcom=true and coddoc_srcom='" + TipoComprobanteEnum.FACTURA.getCodigo() + "'");
+
                 try {
                     Comprobante comprobanteFactura = comprobanteService.getComprobantePorId(Integer.parseInt(ide_srcom));
                     String strClaveAcceso = comprobanteService.getClaveAcceso(comprobanteFactura);
@@ -166,6 +175,15 @@ public class ServicioFacturaElectronica extends ServicioBase {
      */
     public String getSecuencialFactura() {
         long maximo = 0;
+        //reutiliza secuenciales si existe
+        try {
+            StringBuilder sql = new StringBuilder();
+            sql.append("SELECT secuencial_srcom FROM sri_comprobante where coddoc_srcom='").append(TipoComprobanteEnum.FACTURA.getCodigo()).append("' and reutiliza_srcom=true order by secuencial_srcom limit 1");
+            List lisResultado = utilitario.getConexion().consultar(sql.toString());
+            return (String.valueOf(lisResultado.get(0)));
+        } catch (Exception e) {
+        }
+
         try {
             StringBuilder sql = new StringBuilder();
             sql.append("SELECT MAX(secuencial_srcom) FROM sri_comprobante where coddoc_srcom='").append(TipoComprobanteEnum.FACTURA.getCodigo()).append("'");

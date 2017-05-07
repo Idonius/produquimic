@@ -133,7 +133,7 @@ public class FacturaCxC extends Dialogo {
         dia_creacion_cliente = new Dialogo();
         dia_creacion_cliente.setId("dia_creacion_cliente");
         dia_creacion_cliente.setTitle("CREAR CLIENTE");
-        dia_creacion_cliente.setHeight("65%");
+        dia_creacion_cliente.setHeight("75%");
         dia_creacion_cliente.setWidth("55%");
         utilitario.getPantalla().getChildren().add(dia_creacion_cliente);
 
@@ -338,7 +338,7 @@ public class FacturaCxC extends Dialogo {
             tab_creacion_cliente.setRuta("pre_index.clase." + getId());
             tab_creacion_cliente.setIdCompleto("tab_factura:tab_creacion_cliente");
             ser_cliente.configurarTablaCliente(tab_creacion_cliente);
-            tab_creacion_cliente.setTabla("gen_persona", "ide_geper", -1);
+            tab_creacion_cliente.setTabla("gen_persona", "ide_geper", 900);
             tab_creacion_cliente.setCondicion("ide_geper=-1");
             tab_creacion_cliente.getGrid().setColumns(2);
             tab_creacion_cliente.getColumna("ide_geper").setVisible(false);
@@ -349,7 +349,7 @@ public class FacturaCxC extends Dialogo {
             tab_creacion_cliente.getColumna("FAX_GEPER").setVisible(false);
             tab_creacion_cliente.getColumna("PAGINA_WEB_GEPER").setVisible(false);
             tab_creacion_cliente.getColumna("REPRE_LEGAL_GEPER").setVisible(false);
-
+            tab_creacion_cliente.getColumna("GEN_IDE_GEPER").setNombreVisual("GRUPO");
             tab_creacion_cliente.getColumna("IDE_GETID").setNombreVisual("TIPO DE IDENTIFICACION");
             tab_creacion_cliente.getColumna("IDE_GETID").setOrden(1);
             tab_creacion_cliente.getColumna("IDENTIFICAC_GEPER").setNombreVisual("IDENTIFICACION");
@@ -551,14 +551,13 @@ public class FacturaCxC extends Dialogo {
             tab_electronica.getColumna("ide_sresc").setNombreVisual("ESTADO");
             tab_electronica.getColumna("ide_sresc").setOrden(1);
             tab_electronica.getColumna("claveacceso_srcom").setVisible(true);
-            tab_electronica.getColumna("claveacceso_srcom").setNombreVisual("CLAVE DE ACCESO");
+            tab_electronica.getColumna("claveacceso_srcom").setNombreVisual("NUM. AUTORIZACIÓN");
             tab_electronica.getColumna("claveacceso_srcom").setOrden(2);
+            tab_electronica.getColumna("claveacceso_srcom").setEtiqueta();
             tab_electronica.getColumna("fechaautoriza_srcom").setVisible(true);
             tab_electronica.getColumna("fechaautoriza_srcom").setNombreVisual("FECHA AUTORIZACIÓN");
             tab_electronica.getColumna("fechaautoriza_srcom").setOrden(3);
-            tab_electronica.getColumna("autorizacion_srcomn").setVisible(true);
-            tab_electronica.getColumna("autorizacion_srcomn").setNombreVisual("NUM. AUTORIZACIÓN");
-            tab_electronica.getColumna("autorizacion_srcomn").setOrden(4);
+            tab_electronica.getColumna("autorizacion_srcomn").setVisible(false);
             tab_electronica.setMostrarNumeroRegistros(false);
             tab_electronica.dibujar();
 
@@ -573,8 +572,13 @@ public class FacturaCxC extends Dialogo {
         tab_deta_factura.getColumna("ide_inarti").setCombo("inv_articulo", "ide_inarti", "nombre_inarti", "nivel_inarti='HIJO'");
         tab_deta_factura.getColumna("ide_inarti").setAutoCompletar();
         tab_deta_factura.getColumna("ide_inarti").setNombreVisual("ARTICULO");
+        tab_deta_factura.getColumna("ide_inarti").setOrden(0);
         tab_deta_factura.getColumna("ide_inarti").setMetodoChangeRuta(tab_deta_factura.getRuta() + ".seleccionarProducto");
         tab_deta_factura.getColumna("ide_inarti").setRequerida(true);
+        tab_deta_factura.getColumna("ide_inuni").setCombo("inv_unidad", "ide_inuni", "nombre_inuni", "");
+        tab_deta_factura.getColumna("ide_inuni").setOrden(1);
+        tab_deta_factura.getColumna("ide_inuni").setNombreVisual("UNIDAD");
+        tab_deta_factura.getColumna("ide_inuni").setLongitud(-1);
         tab_deta_factura.getColumna("ide_cccfa").setVisible(false);
         tab_deta_factura.getColumna("SECUENCIAL_CCDFA").setVisible(false);
         tab_deta_factura.getColumna("ide_inarti").setOrden(1);
@@ -940,8 +944,15 @@ public class FacturaCxC extends Dialogo {
         tab_deta_factura.modificar(evt);
         if (tab_deta_factura.getValor("ide_inarti") != null) {
             tab_deta_factura.setValor("precio_ccdfa", String.valueOf(ser_producto.getUltimoPrecioProductoCliente(tab_cab_factura.getValor("ide_geper"), tab_deta_factura.getValor("ide_inarti"))));
-            //Carga la configuracion de iva del producto seleccionado
-            tab_deta_factura.setValor("iva_inarti_ccdfa", String.valueOf(ser_producto.getIvaProducto(tab_deta_factura.getValor("ide_inarti"))));
+
+            TablaGenerica tab_producto = ser_producto.getProducto(tab_deta_factura.getValor("ide_inarti"));
+            if (!tab_producto.isEmpty()) {
+                //Carga la configuracion de iva del producto seleccionado
+                tab_deta_factura.setValor("iva_inarti_ccdfa", tab_producto.getValor("iva_inarti"));
+                //Carga la Unidad del producto seleccionado
+                tab_deta_factura.setValor("ide_inuni", tab_producto.getValor("ide_inuni"));
+            }
+
             //Carga configuracion del producto que compra el cliente 
             String str_aux_iva = ser_producto.getUltimoIvaProductoCliente(tab_cab_factura.getValor("ide_geper"), tab_deta_factura.getValor("ide_inarti"));
             if (str_aux_iva != null && str_aux_iva.isEmpty() == false) {
@@ -951,7 +962,7 @@ public class FacturaCxC extends Dialogo {
         } else {
             tab_deta_factura.setValor("precio_ccdfa", "0,00");
         }
-        utilitario.addUpdateTabla(tab_deta_factura, "precio_ccdfa,iva_inarti_ccdfa", "");
+        utilitario.addUpdateTabla(tab_deta_factura, "precio_ccdfa,iva_inarti_ccdfa,ide_inuni", "");
         calcularTotalDetalleFactura();
 
     }

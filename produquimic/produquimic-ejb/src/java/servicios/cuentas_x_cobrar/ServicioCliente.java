@@ -123,7 +123,7 @@ public class ServicioCliente extends ServicioBase {
         tabla.getColumna("ide_rhcon").setVisible(false);
         tabla.getColumna("ide_teban").setVisible(false);
         tabla.getColumna("ide_getid").setCombo("gen_tipo_identifi", "ide_getid", "nombre_getid", "");
-        tabla.getColumna("ide_georg").setCombo("gen_organigrama", "ide_georg", "nombre_georg", "");
+       // tabla.getColumna("ide_georg").setCombo("gen_organigrama", "ide_georg", "nombre_georg", "");
         tabla.getColumna("identificac_geper").setUnico(true);
         tabla.getColumna("nivel_geper").setRequerida(true);
         tabla.getColumna("ide_rheem").setVisible(false);
@@ -162,10 +162,10 @@ public class ServicioCliente extends ServicioBase {
         tabla.getColumna("ide_tetcb").setVisible(false);
         tabla.getColumna("ide_coepr").setVisible(false);
         tabla.getColumna("es_proveedo_geper").setVisible(false);
-        tabla.getColumna("ide_geubi").setCombo("gen_ubicacion", "ide_geubi", "nombre_geubi", "nivel_geubi='HIJO'");
-        tabla.getColumna("ide_gegen").setCombo("gen_genero", "ide_gegen", "nombre_gegen", "");
-        tabla.getColumna("ide_vgtcl").setCombo("ven_tipo_cliente", "ide_vgtcl", "nombre_vgtcl", "");
-        tabla.getColumna("ide_vgecl").setCombo("ven_estado_client", "ide_vgecl", "nombre_vgecl", "");
+        //tabla.getColumna("ide_geubi").setCombo("gen_ubicacion", "ide_geubi", "nombre_geubi", "nivel_geubi='HIJO'");
+        //tabla.getColumna("ide_gegen").setCombo("gen_genero", "ide_gegen", "nombre_gegen", "");
+        //tabla.getColumna("ide_vgtcl").setCombo("ven_tipo_cliente", "ide_vgtcl", "nombre_vgtcl", "");
+        //tabla.getColumna("ide_vgecl").setCombo("ven_estado_client", "ide_vgecl", "nombre_vgecl", "");
         tabla.getColumna("ide_vgven").setVisible(false);
         tabla.getColumna("jornada_inicio_geper").setVisible(false);
         tabla.getColumna("jornada_fin_geper").setVisible(false);
