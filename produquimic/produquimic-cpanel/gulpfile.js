@@ -13,13 +13,12 @@ var gulp = require('gulp'),
 
 var paths = {
     scripts: 'src/js/**/*.*',
-    styles: 'src/less/**/*.*',
+    styles: 'src/css/**/*.*',
     images: 'src/img/**/*.*',
     views: 'src/views/**/*.{html,php}',
     framework: 'src/framework/**/*.*',
-    Slim: 'src/Slim/**/*.*',
     index: 'src/*.{html,php}',
-    bower_fonts: 'src/components/**/*.{ttf,woff,woff2,eof,svg}',
+    bower_fonts: 'src/components/**/*.{ttf,woff,woff2,eof,svg}',	
 };
 
 /**
@@ -50,7 +49,7 @@ gulp.task('copy-bower_fonts', function() {
 /**
  * Handle custom files
  */
-gulp.task('build-custom', ['custom-images', 'custom-js', 'custom-less', 'custom-views', 'custom-framework', 'custom-Slim']);
+gulp.task('build-custom', ['custom-images', 'custom-js', 'custom-less', 'custom-views', 'custom-framework']);
 
 gulp.task('custom-images', function() {
     return gulp.src(paths.images)
@@ -77,16 +76,11 @@ gulp.task('custom-views', function() {
 });
 
 gulp.task('custom-framework', function() {
-    return gulp.src(paths.framework)
-        .pipe(minifyHTML())
+    return gulp.src(paths.framework)        
         .pipe(gulp.dest('dist/framework'));
 });
 
 
-gulp.task('custom-Slim', function() {
-    return gulp.src(paths.Slim)        
-        .pipe(gulp.dest('dist/Slim'));
-});
 
 
 
@@ -97,8 +91,7 @@ gulp.task('watch', function() {
     gulp.watch([paths.images], ['custom-images']);
     gulp.watch([paths.styles], ['custom-less']);
     gulp.watch([paths.scripts], ['custom-js']);
-    gulp.watch([paths.views], ['custom-views']);
-    gulp.watch([paths.Slim], ['custom-Slim']);
+    gulp.watch([paths.views], ['custom-views']);    
     gulp.watch([paths.framework], ['custom-framework']);
     gulp.watch([paths.index], ['usemin']);
 });
