@@ -1,28 +1,25 @@
-var app = angular.module('jdframework', ['ngMaterial', 'ngMessages', 'ngRoute', 'ngAnimate', 'ngCookies', 'ui.grid',
-    'ui.grid.cellNav',
-    'ui.grid.selection',
-    'ui.grid.pagination',
-    'angular-loading-bar'
-]);
+var app = angular.module('jdframework', ['ngMaterial', 'ngMessages', 'ngRoute', 'ngAnimate', 'ngCookies', 'angular-loading-bar', 'smart-table']);
 
 app.config(['$routeProvider',
         function($routeProvider) {
             $routeProvider.
             when('/login', {
                     title: 'Login',
-                    templateUrl: 'views/login.html',
-                    controller: 'SeguridadCtrl'
+                    templateUrl: 'views/login.html'
                 })
                 .when('/', {
                     title: 'Login',
-                    templateUrl: 'views/login.html',
-                    controller: 'SeguridadCtrl',
-                    role: '0'
+                    templateUrl: 'views/login.html'
                 })
                 .when('/registro', {
                     title: 'Registro',
                     templateUrl: 'views/registro.html',
                     controller: 'RegistroCtrl'
+                })
+                .when('/comprobantes/:TipoComprobante', {
+                    title: 'Comprobantes',
+                    templateUrl: 'views/comprobante.html',
+                    controller: 'ComprobanteCtrl'
                 })
                 .when('/principal', {
                     title: 'Principal',
@@ -36,9 +33,23 @@ app.config(['$routeProvider',
                     controller: 'RecordarClaveCtrl'
 
                 })
+                .when('/miPerfil', {
+                    title: 'MiPerfil',
+                    templateUrl: 'views/perfil.html',
+                    controller: 'MiPerfilCtrl'
+                })
+                .when('/cambiaClave', {
+                    title: 'cambiaClave',
+                    templateUrl: 'views/cambiaClave.html',
+                    controller: 'MiPerfilCtrl'
+                })
                 .when('/preguntas', {
                     title: 'Preguntas',
                     templateUrl: 'views/preguntas.html'
+                })
+                .when('/acerca', {
+                    title: 'Acerca',
+                    templateUrl: 'views/acercaDe.html'
                 })
                 .otherwise({
                     redirectTo: '/login'
@@ -59,6 +70,8 @@ app.config(['$routeProvider',
                     $location.path('/registro');
                 } else if ($location.path() == '/preguntas') {
                     $location.path('/preguntas');
+                } else if ($location.path() == '/acerca') {
+                    $location.path('/acerca');
                 } else if ($location.path() == '/recordarClave') {
                     $location.path('/recordarClave');
                 } else if ($location.path() !== '/login' && !$rootScope.globals.currentUser) {
@@ -86,4 +99,4 @@ app.config(function($mdThemingProvider) {
 
 app.config(['cfpLoadingBarProvider', function(cfpLoadingBarProvider) {
     cfpLoadingBarProvider.includeSpinner = false;
-  }]);
+}]);

@@ -1,5 +1,5 @@
-app.factory('Utilitario', ['$http', '$rootScope', '$mdToast', '$mdDialog', '$q',
-  function($http, $rootScope, $mdToast, $mdDialog, $q) {
+app.factory('Utilitario', ['$http', '$rootScope', '$mdToast', '$mdDialog', '$q', '$timeout',
+  function($http, $rootScope, $mdToast, $mdDialog, $q, $timeout) {
     var service = {};
 
     service.agregarMensajeError = function(mensaje) {
@@ -114,7 +114,8 @@ app.factory('Utilitario', ['$http', '$rootScope', '$mdToast', '$mdDialog', '$q',
 
 
     service.consumirWebService = function(metodo, jsonParametro) {
-      deferred = $q.defer();
+      var defered = $q.defer();
+      var promise = defered.promise;
       $http({
         method: 'post',
         url: metodo,
@@ -128,15 +129,22 @@ app.factory('Utilitario', ['$http', '$rootScope', '$mdToast', '$mdDialog', '$q',
         // With the data succesfully returned, we can resolve promise and we can access it in controller
         if (data.error == true) {
           service.agregarDialogoMensajeError("Error", data.mensaje);
-          deferred.reject(data);
+          defered.reject(data);
         } else {
-          deferred.resolve(data);
+          defered.resolve(data);
         }
       }).error(function(err) {
         service.agregarDialogoMensajeError("Error", err.mensaje);
-        deferred.reject(err);
+        defered.reject(err);
       });
-      return deferred.promise;
+      return promise;
+    };
+
+    service.isLogin = function(metodo, jsonParametro) { 
+      if (sessionStorage.getItem('isLogin') == null) {
+        return false;
+      }
+      return sessionStorage.getItem('isLogin');
     };
 
     return service;

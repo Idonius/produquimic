@@ -1,16 +1,9 @@
-<div layout="row"  layout-sm="column"  layout-align="end end" layout-wrap>
-  <md-button class="md-primary" ng-href="#/login" aria-label="Inicio">
-  <md-icon md-font-icon="ion-ios-home" class="s36"></md-icon>
-  Inicio
-  </md-button>
-</div>
-<md-content layout-gt-sm="row" layout-padding layout-align="center center">
+<md-content layout-sm="column" layout="row" layout-align="center center">
 <form name="frmRegistro" >
   <md-card>
   <md-card-title>
   <md-card-title-text>
-  <span class="md-headline">Formulario de Registro</span>
-  <span class="md-subhead">Por favor complete la siguiente Información para el uso de la facturación electrónica.</span>
+  <span class="md-headline">Mi Perfil</span>
   </md-card-title-text>
   </md-card-title>
   <md-card-content layout-padding>
@@ -18,9 +11,9 @@
     <div layout-gt-xs="row">
       <md-input-container class="md-block" style="width: 155px;">
       <label>Identificación :</label>
-      <input ng-model="identificacion" ng-blur="buscarCliente()" maxlength="13" required type="text" placeholder="RUC / CEDULA" ng-required="true" fw-numeros>
+      <input ng-model="usuario.IDENTIFICACION_USUARIO" disabled>
       </md-input-container>
-      <md-input-container class="md-block" flex-gt-xs >
+      <md-input-container class="md-block" style="width: 455px;" >
       <label>Nombre de la Empresa:</label>
       <input ng-model="usuario.NOMBRE_USUARIO" disabled>
       </md-input-container>
@@ -56,9 +49,8 @@
   </div>
   </md-card-content>
   <md-card-actions layout="row" layout-align="center center">
-  <md-button class="md-raised md-primary" ng-click="registrarUsuario()" aria-label="Aceptar"
-  ng-disabled="procesa ||frmRegistro.$invalid">
-  <i class="ion-checkmark-circled"></i>
+  <md-button class="md-raised md-primary" ng-click="actualizarDatos()" aria-label="Aceptar"
+  ng-disabled="frmRegistro.$invalid">
   Aceptar
   </md-button>
   </md-card-actions>

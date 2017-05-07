@@ -18,34 +18,32 @@ md-row-height-gt-md="1:0.6" md-row-height="2:0.9" md-gutter="12px"  >
 </md-card>
 </md-grid-tile>
 </md-grid-list>
-<md-card>
-<md-card-content>
-<div layout="row" layout-align="center center" >
-    <form name="frmConsulta">
-        <md-input-container style="width: 155px;height:20px;">
-        <label>Tipo de Comprobante</label>
-        <md-select  ng-model="tipoComprobante">
-        <md-option ng-repeat="actualTipoComprobante in listaTipoComprobante" value="{{actualTipoComprobante}}">{{actualTipoComprobante}}</md-option>
-        </md-select>
-        </md-input-container>
-        <md-input-container style="width: 185px; height:20px;">
-        <label>Fecha Desde</label>
-        <md-datepicker title="DD-MM-YYYY" ng-model="fechaDesde" placeholder="Fecha Desde" md-max-date="fechaMaxima" ng-required="true" required>
-        </md-datepicker>
-        </md-input-container>
-        <md-input-container style="width: 185px;height:20px;">
-        <label>Fecha Hasta</label>
-        <md-datepicker title="DD-MM-YYYY" ng-model="fechaHasta" placeholder="Fecha Hasta" md-max-date="fechaMaxima" ng-required="true" required>
-        </md-datepicker>
-        </md-input-container>
-        <md-input-container style="padding-left:15px;height:40px;">
-        <md-button class="md-raised md-primary" ng-click="buscar()" aria-label="Buscar" data-ng-disabled="frmConsulta.$invalid">
-        <i class="ion-android-search"></i>
-        Buscar
-        </md-button>
-        </md-input-container>
-    </form>
+<div layout="column" class="card">
+    <md-toolbar  md-colors="{background: 'blue-700' }" class="tituloPanel">
+    <div class="md-toolbar-tools">
+        <span class="md-flex titulo">Últimos Comprobantes</span>
+    </div>
+    </md-toolbar>
+    <div class="table-responsive" >
+        <md-content layout-xs="column" layout="row" ng-style="{background:'white', padding : '10px'}">
+        <table st-table="ultimosComprobantes" class="table table-striped">
+            <thead>
+                <tr>
+                    <th>FECHA</th>
+                    <th>DOCUMENTO</th>
+                    <th>SECUENCIAL</th>
+                    <th>TOTAL</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr ng-repeat="row in ultimosComprobantes">
+                    <td>{{row.FECHA_EMISION}}</td>
+                    <td>{{row.NOMBRE_DOCUMENTO}}</td>
+                    <td>{{row.SECUENCIAL}}</td>
+                    <td>{{row.TOTAL}}</td>
+                </tr>
+            </tbody>
+        </table>
+        </md-content>
+    </div>
 </div>
-<div layout="row" style="width: 100%;height: 300px;" ui-grid-pagination ui-grid-cellnav ui-grid-selection ui-grid="gridOptions"></div>
-</md-card-content>
-</md-card>

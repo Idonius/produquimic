@@ -1,18 +1,21 @@
-app.factory('ServicioAutenticacion',['Encripta', '$http', '$cookieStore', '$rootScope', '$timeout','Utilitario',
-  function (Encripta, $http, $cookieStore, $rootScope, $timeout, Utilitario) {
+app.factory('ServicioAutenticacion', ['Encripta', '$http', '$cookieStore', '$rootScope', '$timeout', 'Utilitario',
+  function(Encripta, $http, $cookieStore, $rootScope, $timeout, Utilitario) {
     var service = {};
-    service.login = function (usuario,  callback) {
-      usuario.clave=Encripta.encode(usuario.clave);
+    service.login = function(usuario, callback) {
+      usuario.clave = Encripta.encode(usuario.clave);
 
       Utilitario.consumirWebService('framework/servicios/ServicioSeguridad.php/validarLogin',
         usuario).then(function(data) {
-            callback(data);
-      }).catch(function(err){
-            callback(err);
+        callback(data);
+      }).catch(function(err) {
+        callback(err);
+        sessionStorage.setItem('isLogin', false);
+        sessionStorage.removeItem('identificacion');
+         sessionStorage.removeItem('nombre');
       });
-      };
+    };
 
-    service.generarToken = function (usuario, success) {
+    service.generarToken = function(usuario, success) {
       var authdata = Encripta.encode(success.datos.CODIGO_USUARIO + ':' + usuario);
       $rootScope.globals = {
         currentUser: {
@@ -20,24 +23,33 @@ app.factory('ServicioAutenticacion',['Encripta', '$http', '$cookieStore', '$root
           authdata: authdata
         }
       };
-      $http.defaults.headers.common['Authorization'] = 'AccesToken ' + authdata; 
+      $http.defaults.headers.common['Authorization'] = 'AccesToken ' + authdata;
       $cookieStore.put('globals', $rootScope.globals);
+      sessionStorage.setItem('isLogin', true);
+      sessionStorage.setItem('identificacion', usuario);
+      sessionStorage.setItem('nombre', success.datos.NOMBRE_USUARIO);      
     };
 
-    service.logout = function () {
+    service.logout = function() {
+      Utilitario.consumirWebService('framework/servicios/ServicioSeguridad.php/cerrarSesion',
+        null).then(function(data) {});
+      sessionStorage.setItem('isLogin', false);
+      sessionStorage.removeItem('identificacion');
+      sessionStorage.removeItem('nombre');
       $rootScope.globals = {};
       $cookieStore.remove('globals');
       $http.defaults.headers.common.Authorization = 'AccesToken ';
+
     };
+    return service;
+  }
+])
 
-return service;
-}])
-
-.factory('Encripta', function () {
+.factory('Encripta', function() {
 
   var keyStr = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+/=';
   return {
-    encode: function (input) {
+    encode: function(input) {
       var output = "";
       var chr1, chr2, chr3 = "";
       var enc1, enc2, enc3, enc4 = "";
@@ -57,10 +69,10 @@ return service;
         }
 
         output = output +
-        keyStr.charAt(enc1) +
-        keyStr.charAt(enc2) +
-        keyStr.charAt(enc3) +
-        keyStr.charAt(enc4);
+          keyStr.charAt(enc1) +
+          keyStr.charAt(enc2) +
+          keyStr.charAt(enc3) +
+          keyStr.charAt(enc4);
         chr1 = chr2 = chr3 = "";
         enc1 = enc2 = enc3 = enc4 = "";
       } while (i < input.length);
@@ -68,46 +80,46 @@ return service;
       return output;
     },
 
-    decode: function (input) {
+    decode: function(input) {
       var output = "";
       var chr1, chr2, chr3 = "";
       var enc1, enc2, enc3, enc4 = "";
-      var i = 0;      
+      var i = 0;
 
-var base64test = /[^A-Za-z0-9\+\/\=]/g;
-if (base64test.exec(input)) {
-  window.alert("There were invalid base64 characters in the input text.\n" +
-    "Valid base64 characters are A-Z, a-z, 0-9, '+', '/',and '='\n" +
-    "Expect errors in decoding.");
-}
-input = input.replace(/[^A-Za-z0-9\+\/\=]/g, "");
+      var base64test = /[^A-Za-z0-9\+\/\=]/g;
+      if (base64test.exec(input)) {
+        window.alert("There were invalid base64 characters in the input text.\n" +
+          "Valid base64 characters are A-Z, a-z, 0-9, '+', '/',and '='\n" +
+          "Expect errors in decoding.");
+      }
+      input = input.replace(/[^A-Za-z0-9\+\/\=]/g, "");
 
-do {
-  enc1 = keyStr.indexOf(input.charAt(i++));
-  enc2 = keyStr.indexOf(input.charAt(i++));
-  enc3 = keyStr.indexOf(input.charAt(i++));
-  enc4 = keyStr.indexOf(input.charAt(i++));
+      do {
+        enc1 = keyStr.indexOf(input.charAt(i++));
+        enc2 = keyStr.indexOf(input.charAt(i++));
+        enc3 = keyStr.indexOf(input.charAt(i++));
+        enc4 = keyStr.indexOf(input.charAt(i++));
 
-  chr1 = (enc1 << 2) | (enc2 >> 4);
-  chr2 = ((enc2 & 15) << 4) | (enc3 >> 2);
-  chr3 = ((enc3 & 3) << 6) | enc4;
+        chr1 = (enc1 << 2) | (enc2 >> 4);
+        chr2 = ((enc2 & 15) << 4) | (enc3 >> 2);
+        chr3 = ((enc3 & 3) << 6) | enc4;
 
-  output = output + String.fromCharCode(chr1);
+        output = output + String.fromCharCode(chr1);
 
-  if (enc3 != 64) {
-    output = output + String.fromCharCode(chr2);
-  }
-  if (enc4 != 64) {
-    output = output + String.fromCharCode(chr3);
-  }
+        if (enc3 != 64) {
+          output = output + String.fromCharCode(chr2);
+        }
+        if (enc4 != 64) {
+          output = output + String.fromCharCode(chr3);
+        }
 
-  chr1 = chr2 = chr3 = "";
-  enc1 = enc2 = enc3 = enc4 = "";
+        chr1 = chr2 = chr3 = "";
+        enc1 = enc2 = enc3 = enc4 = "";
 
-} while (i < input.length);
+      } while (i < input.length);
 
-return output;
-}
-};
+      return output;
+    }
+  };
 
 });

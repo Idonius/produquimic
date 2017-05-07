@@ -1,6 +1,6 @@
-var appD = angular.module('jdframework');
 
-appD.directive('fwNumeros', function () {
+
+app.directive('fwNumeros', function () {
     return {
         require: 'ngModel',
         restrict: 'A',
@@ -16,7 +16,7 @@ appD.directive('fwNumeros', function () {
     };
 });
 
-appD.directive('fwMayusculas', function () {
+app.directive('fwMayusculas', function () {
     return {
         require: 'ngModel',
         restrict: 'A',
@@ -32,7 +32,7 @@ appD.directive('fwMayusculas', function () {
 
 
 
-appD.directive("fwCargando", function ($rootScope) {
+app.directive("fwCargando", function ($rootScope) {
        return function($scope, element, attrs) {
            $scope.$on("loader_show", function () {
                if (element.hasClass("hidden")) {

@@ -1,0 +1,38 @@
+<md-content layout-gt-sm="row" layout-padding layout-align="center center">
+<form name="frmCambia" class="form-horizontal" role="form">
+    <md-card>
+    <md-card-title>
+    <md-card-title-text>
+    <span class="md-headline">Cambiar Contraseña</span>
+    </md-card-title-text>
+    </md-card-title>
+    <md-card-content layout-padding>
+    <div>
+        <p>
+            Ingrese su nueva contraseña y repita para confirmarla.
+        </p>
+        <br/>
+        <md-input-container class="md-block">
+        <label>Contraseña Nueva:</label>
+        <input ng-model="cambia.claveNueva" type="password" name="txtClaveNueva" ng-required="true" required>
+        <div ng-messages="frmCambia.txtClaveNueva.$error">
+            <div ng-message="required">Contraseña Nueva es un campo obligatorio.</div>
+        </div>
+        </md-input-container>
+        <md-input-container class="md-block">
+        <label>Confirme Contraseña Nueva:</label>
+        <input ng-model="cambia.confirmaClaveNueva" type="password" name="txtClaveActual"  ng-required="true" required>
+        <div ng-messages="frmCambia.txtClaveActual.$error">
+            <div ng-message="required">Confirme Contraseña Nueva es un campo obligatorio.</div>
+        </div>
+        </md-input-container>
+    </div>
+    </md-card-content>
+    <md-card-actions layout="row" layout-align="center center">
+    <md-button class="md-raised md-primary" ng-click="cambiarClave()"  ng-disabled="frmCambia.$invalid">
+    Aceptar
+    </md-button>
+    </md-card-actions>
+    </md-card>
+</form>
+</md-content>

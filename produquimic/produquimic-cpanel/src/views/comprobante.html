@@ -1,0 +1,58 @@
+<div layout-sm="column"  layout="row" layout-align="center center" >
+    <md-content class="md-padding" >
+    <md-card>
+    <md-card-title>
+    <md-card-title-text>
+    <span class="md-headline">{{tipoComprobante}}</span>
+    </md-card-title-text>
+    </md-card-title>
+    <md-divider></md-divider>
+    <md-card-content layout-padding>
+    <div layout="row" layout-align="center center" >
+        <form name="frmConsulta">
+            <md-input-container style="width: 195px; height:20px;">
+            <label>Fecha Desde</label>
+            <md-datepicker title="DD-MM-YYYY" ng-model="fechaDesde" placeholder="Fecha Desde" md-max-date="fechaMaxima" ng-required="true">
+            </md-datepicker>
+            </md-input-container>
+            <md-input-container style="width: 195px;height:20px;">
+            <label>Fecha Hasta</label>
+            <md-datepicker title="DD-MM-YYYY" ng-model="fechaHasta" placeholder="Fecha Hasta" md-max-date="fechaMaxima" ng-required="true">
+            </md-datepicker>
+            </md-input-container>
+            <md-input-container style="padding-left:15px;height:40px;">
+            <md-button class="md-raised md-primary" ng-click="buscar()" aria-label="Buscar" data-ng-disabled="frmConsulta.$invalid">
+            <i class="ion-android-search"></i>
+            Buscar
+            </md-button>
+            </md-input-container>
+        </form>
+    </div>
+    <div class="table-responsive">
+        <md-content layout-xs="column" layout="row" ng-style="{background:'white', padding : '10px'}">
+        <table st-table="listaComprobantes" class="table table-striped">
+            <thead>
+                <tr>
+                    <th style="width:100px;">FECHA</th>
+                    <th style="width:160px;">SECUENCIAL</th>
+                    <th style="width:80px;">TOTAL</th>
+                    <th style="width:30px;">PDF</th>
+                    <th style="width:30px;">XML</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr ng-repeat="row in listaComprobantes">
+                    <td>{{row.FECHA_EMISION}}</td>
+                    <td>{{row.SECUENCIAL}}</td>
+                    <td>{{row.TOTAL}}</td>
+                    <td><a ng-click="getPDF(row)"  target="_blank"><img src="img/im_pdf.png"/></a></td>
+                    <td><a ng-click="getXML(row)"  target="_blank"><img src="img/im_xml.png"/></a></td>
+                </tr>
+            </tbody>
+        </table>
+        </md-content>
+    </div>
+    </md-card-content>
+    </md-card>
+    </md-content>
+</div>

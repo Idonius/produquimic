@@ -11,7 +11,7 @@ $app = new \Slim\Slim();
 
 $app->post('/validarLogin', 'validarLogin');
 $app->post('/cambiarClave', 'cambiarClave');
-$app->post('/cerrarSession', 'cerrarSession');
+$app->post('/cerrarSesion', 'cerrarSesion');
 
 $app->run();
 
@@ -22,7 +22,7 @@ function validarLogin() {
         $request = \Slim\Slim::getInstance()->request();
         $usuario = json_decode($request->getBody());
         try {
-            $sql = "SELECT CODIGO_USUARIO,IDENTIFICACION_USUARIO,CLAVE_USUARIO,CODIGO_ESTADO,REGISTRADO_USUARIO FROM USUARIO WHERE IDENTIFICACION_USUARIO = :usuario";
+            $sql = "SELECT CODIGO_USUARIO,IDENTIFICACION_USUARIO,CLAVE_USUARIO,CODIGO_ESTADO,REGISTRADO_USUARIO,NOMBRE_USUARIO FROM USUARIO WHERE IDENTIFICACION_USUARIO = :usuario";
             $valoresSql = array(":usuario" => $usuario->identificacion);
             $db = new Conexion();
             $resultadoSQL = $db->consultarUnico($sql, $valoresSql);
@@ -44,7 +44,8 @@ function validarLogin() {
                             $resultadoSQL->setMensaje("Acceso Correcto");
                             //Respuesta del servicio
                             $datos = array("CODIGO_ESTADO" => $resultadoSQL->getDatos()->CODIGO_ESTADO,
-                                "CODIGO_USUARIO" => $resultadoSQL->getDatos()->CODIGO_USUARIO);
+                                "CODIGO_USUARIO" => $resultadoSQL->getDatos()->CODIGO_USUARIO,
+                                "NOMBRE_USUARIO" => $resultadoSQL->getDatos()->NOMBRE_USUARIO);
                             $resultadoSQL->setDatos($datos);
                         }
                     } else {
@@ -71,7 +72,7 @@ function cambiarClave() {
         $request = \Slim\Slim::getInstance()->request();
         $param = json_decode($request->getBody());
         try {
-            $columnas = array("CLAVE_USUARIO" => base64_decode($param->CLAVE_USUARIO),
+            $columnas = array("CLAVE_USUARIO" => $param->CLAVE_USUARIO,
                 "CODIGO_ESTADO" => $param->CODIGO_ESTADO);
             $condiciones = array("IDENTIFICACION_USUARIO" => $param->IDENTIFICACION_USUARIO);
             $db = new Conexion();
@@ -88,9 +89,10 @@ function cambiarClave() {
     }
 }
 
-function cerrarSession() {
+function cerrarSesion() {
     $response = \Slim\Slim::getInstance()->response();
     if (Util::isToken($response)) {
+        $resultadoSQL = new ResultadoSQL();
         $response->header('Content-Type', 'text/html;charset=utf-8');
         if (!isset($_SESSION)) {
             session_start();
@@ -100,7 +102,9 @@ function cerrarSession() {
             unset($_SESSION['CODIGO_USUARIO']);
             unset($_SESSION['IDENTIFICACION_USUARIO']);
         }
+        Util::validarResultado($response, $resultadoSQL);
     }
+    
 }
 
 ?>

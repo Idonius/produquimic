@@ -1,3 +1,7 @@
+body{
+  font-family: Roboto, "Helvetica Neue", sans-serif;   
+}
+
 .errorToast .md-toast-content {
   background: #C95D58;
   color: #fafafa;
@@ -62,6 +66,13 @@
 
 .negrilla{
   font-weight: bold;
+}
+
+.titulo{  
+  font-family: "Helvetica Neue", Helvetica, Arial, sans-serif;
+  font-weight: 300;
+  line-height: 1.5em;
+  font-size: 17px;
 }
 
 *{
@@ -207,28 +218,12 @@
   padding-top: 10px;
 }
 
-
-md-menu-content {
-    display: -webkit-flex;
-    display: -ms-flexbox;
-    display: flex;
-    -webkit-flex-direction: column;
-    -ms-flex-direction: column;
-    flex-direction: column;
-    padding: 8px 0;
-    max-height: 360px;
-    overflow-y: auto;
+.tituloPanel{
+ height:30px;
+ min-height:30px;
+ max-height:30px;
 }
 
-.md-open-menu-container md-menu-divider {
-    margin-top: 3px;
-    margin-bottom: 3px;
-    height: 1px;
-    width: calc(100% - 20px);
-    position: relative;
-    left: 10px;
+a{
+  cursor:pointer;
 }
-
-
-
-
