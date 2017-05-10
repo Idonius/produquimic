@@ -21,7 +21,7 @@ import javax.faces.event.AjaxBehaviorEvent;
 import org.primefaces.event.SelectEvent;
 import servicios.contabilidad.ServicioConfiguracion;
 import servicios.cuentas_x_cobrar.ServicioCliente;
-import servicios.cuentas_x_cobrar.ServicioFacturaCxC;
+import servicios.cuentas_x_cobrar.ServicioCuentasCxC;
 import servicios.inventario.ServicioInventario;
 import servicios.inventario.ServicioProducto;
 import sistema.aplicacion.Pantalla;
@@ -45,7 +45,7 @@ public class pre_modifica_factura extends Pantalla {
     private Tabla tab_deta_factura = new Tabla();
 
     @EJB
-    private final ServicioFacturaCxC ser_factura = (ServicioFacturaCxC) utilitario.instanciarEJB(ServicioFacturaCxC.class);
+    private final ServicioCuentasCxC ser_factura = (ServicioCuentasCxC) utilitario.instanciarEJB(ServicioCuentasCxC.class);
     @EJB
     private final ServicioCliente ser_cliente = (ServicioCliente) utilitario.instanciarEJB(ServicioCliente.class);
     @EJB

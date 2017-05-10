@@ -37,7 +37,7 @@ import javax.ejb.EJB;
 import javax.faces.event.ActionEvent;
 import org.primefaces.component.fieldset.Fieldset;
 import servicios.ceo.ServicioFacturaElectronica;
-import servicios.cuentas_x_cobrar.ServicioFacturaCxC;
+import servicios.cuentas_x_cobrar.ServicioCuentasCxC;
 import servicios.integracion.ServicioIntegracion;
 
 import sistema.aplicacion.Pantalla;
@@ -51,7 +51,7 @@ public class pre_facturasCxC extends Pantalla {
     private final MenuPanel mep_menu = new MenuPanel();
 
     @EJB
-    private final ServicioFacturaCxC ser_factura = (ServicioFacturaCxC) utilitario.instanciarEJB(ServicioFacturaCxC.class);
+    private final ServicioCuentasCxC ser_factura = (ServicioCuentasCxC) utilitario.instanciarEJB(ServicioCuentasCxC.class);
 
     private final Combo com_pto_emision = new Combo();
     private final Calendario cal_fecha_inicio = new Calendario();
@@ -102,9 +102,9 @@ public class pre_facturasCxC extends Pantalla {
         com_pto_emision.setCombo(ser_factura.getSqlPuntosEmision());
         com_pto_emision.setMetodo("actualizarFacturas");
         com_pto_emision.eliminarVacio();
-        bar_botones.agregarComponente(new Etiqueta("FACTURACIÓN:"));
+        bar_botones.agregarComponente(new Etiqueta("PUNTO DE EMISIÓN:"));
         bar_botones.agregarComponente(com_pto_emision);
-
+        bar_botones.agregarSeparador();
         bar_botones.agregarComponente(new Etiqueta("FECHA DESDE :"));
         cal_fecha_inicio.setValue(utilitario.getFecha(utilitario.getAnio(utilitario.getFechaActual()) + "-01-01"));
         bar_botones.agregarComponente(cal_fecha_inicio);

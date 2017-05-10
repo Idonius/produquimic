@@ -27,7 +27,7 @@ import org.primefaces.component.separator.Separator;
 import org.primefaces.event.SelectEvent;
 import servicios.contabilidad.ServicioComprobanteContabilidad;
 import servicios.contabilidad.ServicioContabilidadGeneral;
-import servicios.cuentas_x_cobrar.ServicioFacturaCxC;
+import servicios.cuentas_x_cobrar.ServicioCuentasCxC;
 import servicios.integracion.ServicioIntegracion;
 import servicios.inventario.ServicioProducto;
 import sistema.aplicacion.Pantalla;
@@ -65,7 +65,7 @@ public class pre_articulos extends Pantalla {
 
     //Opcion 8,9
     @EJB
-    private final ServicioFacturaCxC ser_factura = (ServicioFacturaCxC) utilitario.instanciarEJB(ServicioFacturaCxC.class);
+    private final ServicioCuentasCxC ser_factura = (ServicioCuentasCxC) utilitario.instanciarEJB(ServicioCuentasCxC.class);
 
     private GraficoCartesiano gca_grafico;
     private Combo com_periodo;
@@ -119,7 +119,7 @@ public class pre_articulos extends Pantalla {
             tab_tabla.setNumeroTabla(13);
             tab_tabla.setConexion(ser_integra.getConexionEscritorio());
             tab_tabla.setLectura(true);
-            tab_tabla.setSql(ser_integra.getSqlKardexProducto(aut_productos.getValorArreglo(2)));
+            tab_tabla.setSql(ser_integra.getSqlKardexProducto_Escritorio(aut_productos.getValorArreglo(2)));
             tab_tabla.setCampoPrimaria("CODIGOKP");
             tab_tabla.getColumna("CODIGOKP").setVisible(false);
             tab_tabla.getColumna("COD_PROD").setVisible(false);

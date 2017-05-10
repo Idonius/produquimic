@@ -33,7 +33,7 @@ import org.primefaces.component.separator.Separator;
 import org.primefaces.event.SelectEvent;
 import org.primefaces.event.UnselectEvent;
 import servicios.cuentas_x_cobrar.ServicioCliente;
-import servicios.cuentas_x_cobrar.ServicioFacturaCxC;
+import servicios.cuentas_x_cobrar.ServicioCuentasCxC;
 import servicios.cuentas_x_pagar.ServicioCuentasCxP;
 import servicios.cuentas_x_pagar.ServicioProveedor;
 import servicios.tesoreria.ServicioTesoreria;
@@ -61,7 +61,7 @@ public class pre_libro_bancos extends Pantalla {
     private final ServicioCliente ser_cliente = (ServicioCliente) utilitario.instanciarEJB(ServicioCliente.class);
     ////CXC
     @EJB
-    private final ServicioFacturaCxC ser_factura = (ServicioFacturaCxC) utilitario.instanciarEJB(ServicioFacturaCxC.class);
+    private final ServicioCuentasCxC ser_factura = (ServicioCuentasCxC) utilitario.instanciarEJB(ServicioCuentasCxC.class);
 
     ///Cuentas por Pagar
     ////PROVEEDORES

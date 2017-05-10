@@ -29,7 +29,7 @@ import org.primefaces.event.SelectEvent;
 import servicios.contabilidad.ServicioComprobanteContabilidad;
 import servicios.contabilidad.ServicioContabilidadGeneral;
 import servicios.cuentas_x_cobrar.ServicioCliente;
-import servicios.cuentas_x_cobrar.ServicioFacturaCxC;
+import servicios.cuentas_x_cobrar.ServicioCuentasCxC;
 import servicios.integracion.ServicioIntegracion;
 import servicios.prestamo.ServicioPrestamo;
 import sistema.aplicacion.Pantalla;
@@ -44,7 +44,7 @@ public class pre_clientes extends Pantalla {
     private final ServicioCliente ser_cliente = (ServicioCliente) utilitario.instanciarEJB(ServicioCliente.class);
 
     @EJB
-    private final ServicioFacturaCxC ser_factura = (ServicioFacturaCxC) utilitario.instanciarEJB(ServicioFacturaCxC.class);
+    private final ServicioCuentasCxC ser_factura = (ServicioCuentasCxC) utilitario.instanciarEJB(ServicioCuentasCxC.class);
 
     private final MenuPanel mep_menu = new MenuPanel();
     private AutoCompletar aut_clientes = new AutoCompletar();
@@ -186,7 +186,7 @@ public class pre_clientes extends Pantalla {
             tab_tabla.setNumeroTabla(13);
             tab_tabla.setConexion(ser_integra.getConexionEscritorio());
             tab_tabla.setLectura(true);
-            tab_tabla.setSql(ser_integra.getSqlKardexCliente(aut_clientes.getValorArreglo(1)));
+            tab_tabla.setSql(ser_integra.getSqlKardexCliente_Escritorio(aut_clientes.getValorArreglo(1)));
             tab_tabla.setCampoPrimaria("CODIGOKC");
             tab_tabla.getColumna("CODIGOKC").setVisible(false);
             tab_tabla.getColumna("COD_CLIE").setVisible(false);
