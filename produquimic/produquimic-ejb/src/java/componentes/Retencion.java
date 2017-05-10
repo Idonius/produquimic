@@ -20,7 +20,7 @@ import javax.faces.event.AjaxBehaviorEvent;
 import org.primefaces.component.separator.Separator;
 import org.primefaces.event.SelectEvent;
 import servicios.contabilidad.ServicioRetenciones;
-import servicios.cuentas_x_cobrar.ServicioFacturaCxC;
+import servicios.cuentas_x_cobrar.ServicioCuentasCxC;
 import servicios.cuentas_x_pagar.ServicioCuentasCxP;
 import sistema.aplicacion.Utilitario;
 
@@ -42,7 +42,7 @@ public class Retencion extends Dialogo {
     @EJB
     private final ServicioRetenciones ser_retencion = (ServicioRetenciones) utilitario.instanciarEJB(ServicioRetenciones.class);
     @EJB
-    private final ServicioFacturaCxC ser_cuentas_cxc = (ServicioFacturaCxC) utilitario.instanciarEJB(ServicioFacturaCxC.class);
+    private final ServicioCuentasCxC ser_cuentas_cxc = (ServicioCuentasCxC) utilitario.instanciarEJB(ServicioCuentasCxC.class);
 
     private final AreaTexto ate_observacion = new AreaTexto();
     private final Texto tex_total = new Texto();
