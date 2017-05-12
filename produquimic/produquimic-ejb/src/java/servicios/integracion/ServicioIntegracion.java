@@ -9,6 +9,8 @@ import framework.aplicacion.TablaGenerica;
 import java.util.Date;
 import javax.ejb.EJB;
 import javax.ejb.Stateless;
+import javax.ejb.TransactionManagement;
+import javax.ejb.TransactionManagementType;
 import persistencia.Conexion;
 import servicios.ServicioBase;
 import servicios.inventario.ServicioInventario;
@@ -18,7 +20,7 @@ import servicios.inventario.ServicioInventario;
  * @author DIEGOFERNANDOJACOMEG
  */
 @Stateless
-
+@TransactionManagement(TransactionManagementType.BEAN)
 public class ServicioIntegracion extends ServicioBase {
 
     @EJB
@@ -502,7 +504,7 @@ public class ServicioIntegracion extends ServicioBase {
      */
     public void guardarKardexFactura(String ide_cccfa) {
         TablaGenerica tab_factura = utilitario.consultar("select codigo_inarti,cantidad_ccdfa,precio_ccdfa,"
-                + "codigo_geper,nom_geper,ide_cntco,serie_ccdaf || secuencial_cccfa as numfactura\n"
+                + "codigo_geper,nom_geper,ide_cntco,serie_ccdaf || secuencial_cccfa as numfactura,\n"
                 + "base_grabada_cccfa+base_tarifa0_cccfa+base_no_objeto_iva_cccfa as subtotal,valor_iva_cccfa,total_cccfa from cxc_deta_factura a\n"
                 + "inner join cxc_cabece_factura b on a.ide_cccfa=b.ide_cccfa\n"
                 + "inner join cxc_datos_fac c on b.ide_ccdaf=c.ide_ccdaf\n"
@@ -512,7 +514,7 @@ public class ServicioIntegracion extends ServicioBase {
         //Guarda Kardex de productos de todos detalles de la factura
         if (tab_factura.isEmpty() == false) {
             Conexion con_conecta = getConexionEscritorio();
-            String fechae = utilitario.getFormatoFecha(new Date(), "yyyy-mm-dd");
+            String fechae = utilitario.getFormatoFecha(new Date(), "yyyy-MM-dd");
             String numFactura = tab_factura.getValor("numfactura");
             for (int i = 0; i < tab_factura.getTotalFilas(); i++) {
                 ///Kardex Productos
@@ -616,7 +618,7 @@ public class ServicioIntegracion extends ServicioBase {
      */
     public void anularFactura_Escritorio(String ide_cccfa) {
         TablaGenerica tab_factura = utilitario.consultar("select codigo_inarti,cantidad_ccdfa,precio_ccdfa,"
-                + "codigo_geper,nom_geper,ide_cntco,serie_ccdaf || secuencial_cccfa as numfactura\n"
+                + "codigo_geper,nom_geper,ide_cntco,serie_ccdaf || secuencial_cccfa as numfactura,\n"
                 + "base_grabada_cccfa+base_tarifa0_cccfa+base_no_objeto_iva_cccfa as subtotal,valor_iva_cccfa,total_cccfa from cxc_deta_factura a\n"
                 + "inner join cxc_cabece_factura b on a.ide_cccfa=b.ide_cccfa\n"
                 + "inner join cxc_datos_fac c on b.ide_ccdaf=c.ide_ccdaf\n"
@@ -653,7 +655,7 @@ public class ServicioIntegracion extends ServicioBase {
      * @return
      */
     public Double getExisteciaProducto_Escritorio(String codigoProducto) {
-        String sql = "SELECT EXISTENCIA from productos where COD_PROD='" + codigoProducto + "'";
+        String sql = "SELECT COD_PROD,EXISTENCIA from productos where COD_PROD='" + codigoProducto + "'";
         TablaGenerica tab = new TablaGenerica();
         Conexion con_conecta = getConexionEscritorio();
         tab.setConexion(con_conecta);
@@ -677,7 +679,7 @@ public class ServicioIntegracion extends ServicioBase {
      * @return
      */
     public Double getSaldoCliente_Escritorio(String codigoCliente) {
-        String sql = "SELECT EXISTENCIA from CLIENTES where COD_CLIE='" + codigoCliente + "'";
+        String sql = "SELECT COD_CLIE,EXISTENCIA from CLIENTES where COD_CLIE='" + codigoCliente + "'";
         TablaGenerica tab = new TablaGenerica();
         Conexion con_conecta = getConexionEscritorio();
         tab.setConexion(con_conecta);
@@ -692,5 +694,4 @@ public class ServicioIntegracion extends ServicioBase {
         }
         return dou_existencia;
     }
-
 }

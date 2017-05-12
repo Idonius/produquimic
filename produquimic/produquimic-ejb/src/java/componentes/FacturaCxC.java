@@ -452,6 +452,9 @@ public class FacturaCxC extends Dialogo {
         tab_cab_factura.getColumna("ide_vgven").setVisible(false);
         
         tab_cab_factura.getColumna("ide_srcom").setVisible(false);  //FE
+        
+        tab_cab_factura.getColumna("ret_fuente_cccfa").setVisible(false); //produquimic
+        tab_cab_factura.getColumna("ret_iva_cccfa").setVisible(false); //produquimic
 
         tab_cab_factura.getColumna("telefono_cccfa").setNombreVisual("TELEFONO");
         tab_cab_factura.getColumna("telefono_cccfa").setOrden(5);
