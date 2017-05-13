@@ -20,8 +20,9 @@ public enum ParametrosSistemaEnum {
     PROXY_PORT(""),
     MAIL_SMTP_HOST("mail.produquimic.com.ec"),
     MAIL_SMTP_PORT("465"),//25  //465
-    MAIL_PASSWORD("sami2008"),
-    MAIL_GENERIC("comprobanteselectronicos@produquimic.com.ec");
+    MAIL_PASSWORD("password"),
+    MAIL_GENERIC("comprobantes@produquimic.com.ec"),
+    CODIGO_EMPR("1"); //CEO PRODUQUIMIC MG
 
     private final String codigo;
 

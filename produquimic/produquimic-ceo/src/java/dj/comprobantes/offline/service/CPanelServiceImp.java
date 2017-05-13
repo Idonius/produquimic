@@ -10,6 +10,7 @@ import dj.comprobantes.offline.dao.ComprobanteDAO;
 import dj.comprobantes.offline.dto.Comprobante;
 import dj.comprobantes.offline.enums.EstadoComprobanteEnum;
 import dj.comprobantes.offline.enums.EstadoUsuarioEnum;
+import dj.comprobantes.offline.enums.ParametrosSistemaEnum;
 import dj.comprobantes.offline.exception.GenericException;
 import java.io.File;
 import java.io.FileInputStream;
@@ -28,13 +29,13 @@ import javax.ejb.Stateless;
  */
 @Stateless
 public class CPanelServiceImp implements CPanelService {
-    
+
     @EJB
     private ArchivoService archivoService;
-    
+
     @EJB
     private ComprobanteDAO comprobanteDAO;
-    
+
     @Override
     public boolean guardarComprobanteNube(Comprobante comprobante) throws GenericException {
         boolean guardo = false;
@@ -46,14 +47,18 @@ public class CPanelServiceImp implements CPanelService {
                 if (isExisteCliente(comprobante.getCliente().getIdentificacion()) == false) {
                     PreparedStatement ps = null;
                     try {
-                        String sql = "insert into USUARIO(CODIGO_ESTADO,NOMBRE_USUARIO,IDENTIFICACION_USUARIO,"
-                                + "CORREO_USUARIO,CLAVE_USUARIO) values (?,?,?,?,?)";
+                        String sql = "insert into usuario(CODIGO_ESTADO,NOMBRE_USUARIO,IDENTIFICACION_USUARIO,"
+                                + "CORREO_USUARIO,CLAVE_USUARIO,TELEFONO_USUARIO,DIRECCION_USUARIO,REGISTRADO_USUARIO"
+                                + ") values (?,?,?,?,?,?,?,?)";
                         ps = con.getPreparedStatement(sql);
                         ps.setInt(1, EstadoUsuarioEnum.NUEVO.getCodigo());
                         ps.setString(2, comprobante.getCliente().getNombreCliente());
                         ps.setString(3, comprobante.getCliente().getIdentificacion());
                         ps.setString(4, comprobante.getCliente().getCorreo());
                         ps.setString(5, comprobante.getCliente().getIdentificacion());
+                        ps.setString(6, comprobante.getCliente().getTelefono());
+                        ps.setString(7, comprobante.getCliente().getDireccion());
+                        ps.setBoolean(8, false);
                         ps.executeUpdate();
                     } catch (GenericException | SQLException e) {
                         if (ps != null) {
@@ -71,9 +76,9 @@ public class CPanelServiceImp implements CPanelService {
                 if (isExisteComprobante(comprobante.getCodigocomprobante()) == false) {
                     PreparedStatement ps = null;
                     try {
-                        String sql = "insert into COMPROBANTE(PK_CODIGO_COMP,CODIGO_DOCUMENTO,	ESTADO,CLAVE_ACCESO,"
+                        String sql = "insert into comprobante(PK_CODIGO_COMP,CODIGO_DOCUMENTO,	ESTADO,CLAVE_ACCESO,"
                                 + "SECUENCIAL,CLIENTE,IDENTIFICACION,FECHA_EMISION,NUM_AUTORIZACION,FECHA_AUTORIZACION,"
-                                + "ESTABLECIM,PTO_EMISION,TOTAL) values (?,?,?,?,?,?,?,?,?,?,?,?,?)";
+                                + "ESTABLECIM,PTO_EMISION,TOTAL,ENVIADO,CODIGO_EMPR) values (?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)";
                         ps = con.getPreparedStatement(sql);
                         ps.setLong(1, comprobante.getCodigocomprobante());
                         ps.setString(2, comprobante.getCoddoc());
@@ -88,6 +93,8 @@ public class CPanelServiceImp implements CPanelService {
                         ps.setString(11, comprobante.getEstab());
                         ps.setString(12, comprobante.getPtoemi());
                         ps.setDouble(13, comprobante.getImportetotal().doubleValue());
+                        ps.setBoolean(14, false);
+                        ps.setInt(15, Integer.parseInt(ParametrosSistemaEnum.CODIGO_EMPR.getCodigo()));
                         ps.executeUpdate();
                     } catch (GenericException | SQLException e) {
                         if (ps != null) {
@@ -118,7 +125,7 @@ public class CPanelServiceImp implements CPanelService {
                         fosXML.close();
                         FileInputStream fisPDF = new FileInputStream(filPDF);
                         FileInputStream fisXML = new FileInputStream(filXML);
-                        String sql = "insert into RIDE_COMPROBANTE(PK_CODIGO_COMP,ARCHIVO_PDF,ARCHIVO_XML) values (?,?,?)";
+                        String sql = "insert into ride_comprobante(PK_CODIGO_COMP,ARCHIVO_PDF,ARCHIVO_XML) values (?,?,?)";
                         ps = con.getPreparedStatement(sql);
                         ps.setLong(1, comprobante.getCodigocomprobante());
                         ps.setBinaryStream(2, fisPDF, (int) filPDF.length());
@@ -136,7 +143,7 @@ public class CPanelServiceImp implements CPanelService {
                         throw new GenericException(e);
                     }
                 }
-                
+
                 guardo = true;
                 con.desconectar();
             } else {
@@ -145,14 +152,14 @@ public class CPanelServiceImp implements CPanelService {
         }
         return guardo;
     }
-    
+
     public boolean isExisteComprobante(Long codigoComprobante) throws GenericException {
         boolean existe = false;
         ConexionCPanel con = new ConexionCPanel();
         PreparedStatement ps = null;
         ResultSet res = null;
         try {
-            String sql = "SELECT PK_CODIGO_COMP FROM COMPROBANTE  WHERE PK_CODIGO_COMP = ?";
+            String sql = "SELECT PK_CODIGO_COMP FROM comprobante  WHERE PK_CODIGO_COMP = ?";
             ps = con.getPreparedStatement(sql);
             ps.setLong(1, codigoComprobante);
             res = ps.executeQuery();
@@ -175,14 +182,14 @@ public class CPanelServiceImp implements CPanelService {
         }
         return existe;
     }
-    
+
     public boolean isExisteArchivoComprobante(Long codigoComprobante) throws GenericException {
         boolean existe = false;
         ConexionCPanel con = new ConexionCPanel();
         PreparedStatement ps = null;
         ResultSet res = null;
         try {
-            String sql = "SELECT PK_CODIGO_COMP FROM RIDE_COMPROBANTE  WHERE PK_CODIGO_COMP = ?";
+            String sql = "SELECT PK_CODIGO_COMP FROM ride_comprobante  WHERE PK_CODIGO_COMP = ?";
             ps = con.getPreparedStatement(sql);
             ps.setLong(1, codigoComprobante);
             res = ps.executeQuery();
@@ -205,14 +212,14 @@ public class CPanelServiceImp implements CPanelService {
         }
         return existe;
     }
-    
+
     public boolean isExisteCliente(String identificacion) throws GenericException {
         boolean existe = false;
         ConexionCPanel con = new ConexionCPanel();
         PreparedStatement ps = null;
         ResultSet res = null;
         try {
-            String sql = "SELECT IDENTIFICACION_USUARIO FROM USUARIO  WHERE IDENTIFICACION_USUARIO = ?";
+            String sql = "SELECT IDENTIFICACION_USUARIO FROM usuario  WHERE IDENTIFICACION_USUARIO = ?";
             ps = con.getPreparedStatement(sql);
             ps.setString(1, identificacion);
             res = ps.executeQuery();
@@ -235,7 +242,7 @@ public class CPanelServiceImp implements CPanelService {
         }
         return existe;
     }
-    
+
     @Override
     public void subirComprobantesPendientes() throws GenericException {
         List<Comprobante> lisCompPendientes = comprobanteDAO.getComprobantesAutorizadosNoNube();
@@ -244,4 +251,11 @@ public class CPanelServiceImp implements CPanelService {
             comprobanteDAO.actualizar(comprobanteActual);
         }
     }
+
+    @Override
+    public void subirComprobante(Comprobante comprobanteActual) throws GenericException {
+        comprobanteActual.setEnNube(guardarComprobanteNube(comprobanteActual));
+        comprobanteDAO.actualizar(comprobanteActual);
+    }
+
 }

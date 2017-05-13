@@ -28,7 +28,7 @@ import javax.ejb.Stateless;
  */
 @Stateless
 public class ComprobanteServiceImp implements ComprobanteService {
-
+    
     @EJB
     private ComprobanteDAO comprobanteDAO;
     @EJB
@@ -45,9 +45,11 @@ public class ComprobanteServiceImp implements ComprobanteService {
     private NotaCreditoService notaCreditoService;
     @EJB
     private RetencionService retencionService;
-
+    @EJB
+    private CPanelService cPanelService;
+    
     private final UtilitarioCeo utilitario = new UtilitarioCeo();
-
+    
     @Override
     public void enviarRecepcionSRI() throws GenericException {
         try {
@@ -76,7 +78,7 @@ public class ComprobanteServiceImp implements ComprobanteService {
             throw new GenericException(e);
         }
     }
-
+    
     @Override
     public void enviarAutorizacionSRI() throws GenericException {
         try {
@@ -92,7 +94,7 @@ public class ComprobanteServiceImp implements ComprobanteService {
             throw new GenericException(e);
         }
     }
-
+    
     @Override
     public String getClaveAcceso(Comprobante comprobante) throws GenericException {
         String fechaEmision = utilitario.getFormatoFecha(comprobante.getFechaemision(), "dd/MM/yyyy");
@@ -128,7 +130,7 @@ public class ComprobanteServiceImp implements ComprobanteService {
         }
         return clave.toString();
     }
-
+    
     @Override
     public void actualizarRecepcionComprobante(String xmlFirmado, Comprobante comprobante, String mensajeRespuesta) throws GenericException {
         // Actualiza comprobante            
@@ -142,9 +144,9 @@ public class ComprobanteServiceImp implements ComprobanteService {
         sriComp.setCodigoestado(comprobante.getCodigoestado());
         // Guarda o actualiza el SRI comporbnate
         sriComprobanteDAO.guardar(sriComp);
-
+        
     }
-
+    
     @Override
     public void actualizarAutorizacionComprobante(String xmlFirmado, Comprobante comprobante, String mensajeRespuesta) throws GenericException {
         // Actualiza comprobante            
@@ -192,20 +194,20 @@ public class ComprobanteServiceImp implements ComprobanteService {
         }
         return verificador;
     }
-
+    
     @Override
     public Comprobante getComprobantePorClaveAcceso(String claveAcceso) throws GenericException {
         return comprobanteDAO.getComprobantePorClaveAcceso(claveAcceso);
     }
-
+    
     @Override
     public Comprobante getComprobantePorId(Integer ide_srcom) throws GenericException {
         return comprobanteDAO.getComprobantePorId(ide_srcom);
     }
-
+    
     @Override
     public void enviarComprobante(String claveAcceso) throws GenericException {
-
+        
         Comprobante comprobanteActual = getComprobantePorClaveAcceso(claveAcceso);
         if (comprobanteActual == null) {
             throw new GenericException("ERROR. No existe el comprobante " + claveAcceso);
@@ -241,7 +243,8 @@ public class ComprobanteServiceImp implements ComprobanteService {
             if (comprobanteActual.getCodigoestado() != EstadoComprobanteEnum.AUTORIZADO.getCodigo()) {
                 throw new GenericException("ERROR. El Comprobante " + claveAcceso + " no pudo ser Autorizado por el SRI.");
             }
+            cPanelService.subirComprobante(comprobanteActual);
         }
     }
-
+    
 }

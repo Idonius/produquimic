@@ -41,8 +41,8 @@ public class AutorizacionServiceImp implements AutorizacionService {
     private EmisorService emisorService;
     @EJB
     private ComprobanteService comprobanteService;
-    @EJB
-    private MailService mailService;
+//    @EJB
+//    private MailService mailService;
 
     private final UtilitarioCeo utilitario = new UtilitarioCeo();
 
@@ -87,7 +87,7 @@ public class AutorizacionServiceImp implements AutorizacionService {
                                 .append("<comprobante><![CDATA[").append(autorizacion.getComprobante()).append("]]></comprobante>\n")
                                 .append("</autorizacion>");
                         comprobanteService.actualizarAutorizacionComprobante(stb_xml.toString(), comprobateActual, mensajesAutorizacion.toString());
-                        mailService.agregarCorreo(comprobateActual);
+                        //  mailService.agregarCorreo(comprobateActual);
 
                     } else {
                         comprobanteService.actualizarAutorizacionComprobante(autorizacion.getComprobante(), comprobateActual, mensajesAutorizacion.toString());
@@ -97,7 +97,7 @@ public class AutorizacionServiceImp implements AutorizacionService {
                 }
                 break;
             }
-            mailService.enviarTodos();
+            //   mailService.enviarTodos();
         }
     }
 
