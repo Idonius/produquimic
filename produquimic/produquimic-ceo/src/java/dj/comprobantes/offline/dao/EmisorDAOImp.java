@@ -38,8 +38,8 @@ public class EmisorDAOImp implements EmisorDAO {
                     emisor = new Emisor();
                     emisor.setCodigoemisor(resultSet.getInt("ide_sremi"));
                     emisor.setRuc(resultSet.getString("identificacion_empr"));
-                    emisor.setRazonsocial(resultSet.getString("nom_corto_empr"));
-                    emisor.setNombrecomercial(resultSet.getString("nom_empr"));
+                    emisor.setRazonsocial(resultSet.getString("nom_empr"));
+                    emisor.setNombrecomercial(resultSet.getString("nom_corto_empr"));
                     emisor.setDirmatriz(resultSet.getString("direccion_empr"));
                     emisor.setContribuyenteespecial(resultSet.getString("contribuyenteespecial_empr"));
                     emisor.setObligadocontabilidad(resultSet.getString("obligadocontabilidad_empr"));

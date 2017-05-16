@@ -100,6 +100,8 @@ public class FacturaServiceImp implements FacturaService {
                     .append("                           <pago> \n")
                     .append("                                    <formaPago>").append(comprobante.getFormaCobro()).append("</formaPago> \n")
                     .append("                                    <total>").append(utilitario.getFormatoNumero(comprobante.getImportetotal())).append("</total> \n")
+                    .append("                                    <plazo>").append(comprobante.getDiasCredito()).append("</plazo> \n")
+                    .append("                                    <unidadTiempo>").append("dias").append("</unidadTiempo> \n")
                     .append("                           </pago> \n")
                     .append("                   </pagos>\n")
                     .append("		</infoFactura> \n")
@@ -137,13 +139,16 @@ public class FacturaServiceImp implements FacturaService {
             if (comprobante.getCliente().getCorreo() != null && utilitario.isCorreoValido(comprobante.getCliente().getCorreo())) {
                 str_xml.append("      		<campoAdicional nombre=\"Email\">").append(comprobante.getCliente().getCorreo()).append("</campoAdicional> \n");
             } else {
-                str_xml.append("      		<campoAdicional nombre=\"Email\">").append("nodispone@banecuador.fin.ec").append("</campoAdicional> \n");
+                str_xml.append("      		<campoAdicional nombre=\"Email\">").append("nodispone@produquimic.com.ec").append("</campoAdicional> \n");
             }
             if (comprobante.getCliente().getTelefono() != null) {
                 str_xml.append("      		<campoAdicional nombre=\"Teléfono\">").append(comprobante.getCliente().getTelefono()).append("</campoAdicional> \n");
             }
             if (comprobante.getCliente().getDireccion() != null) {
                 str_xml.append("      		<campoAdicional nombre=\"Dirección\">").append(comprobante.getCliente().getDireccion()).append("</campoAdicional> \n");
+            }
+            if (comprobante.getNumOrdenCompra() != null) {
+                str_xml.append("      		<campoAdicional nombre=\"Orden de Compra\">").append(comprobante.getNumOrdenCompra()).append("</campoAdicional> \n");
             }
             str_xml.append("		</infoAdicional> \n");
             str_xml.append("     </factura>");

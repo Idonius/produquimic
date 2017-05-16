@@ -242,6 +242,10 @@ public class ArchivoServiceImp implements ArchivoService {
             parametros.put("AMBIENTE", utilitario.getValorEtiqueta(cadenaXML, "ambiente"));
             parametros.put("NOM_COMERCIAL", utilitario.getValorEtiqueta(cadenaXML, "nombreComercial"));
 
+            parametros.put("FORMA_PAGO", utilitario.getValorEtiqueta(cadenaXML, "formaPago"));
+            parametros.put("PLAZO", utilitario.getValorEtiqueta(cadenaXML, "plazo"));
+            parametros.put("UNIDAD_TIEMPO", utilitario.getValorEtiqueta(cadenaXML, "unidadTiempo"));
+
             if (comprobante.getCoddoc().equals(TipoComprobanteEnum.COMPROBANTE_DE_RETENCION.getCodigo())) {
                 parametros.put("EJERCICIO_FISCAL", utilitario.getValorEtiqueta(cadenaXML, "periodoFiscal"));
                 parametros.put("RS_COMPRADOR", utilitario.getValorEtiqueta(cadenaXML, "razonSocialSujetoRetenido"));

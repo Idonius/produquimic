@@ -92,7 +92,7 @@ public class NotaCreditoServiceImp implements NotaCreditoService {
                     .append("					<valor>").append(utilitario.getFormatoNumero(comprobante.getIva())).append("</valor> \n")
                     .append("				</totalImpuesto> \n")
                     .append("			</totalConImpuestos> \n")
-                    .append("			<motivo>" + "ANULACION" + "</motivo> \n")
+                    .append("			<motivo>").append(comprobante.getMotivo()).append("</motivo> \n")
                     .append("		</infoNotaCredito> \n")
                     .append("		<detalles> \n");
             for (DetalleComprobante detalle : comprobante.getDetalle()) {
@@ -120,7 +120,7 @@ public class NotaCreditoServiceImp implements NotaCreditoService {
             if (comprobante.getCliente().getCorreo() != null && utilitario.isCorreoValido(comprobante.getCliente().getCorreo())) {
                 str_xml.append("      		<campoAdicional nombre=\"Email\">").append(comprobante.getCliente().getCorreo()).append("</campoAdicional> \n");
             } else {
-                str_xml.append("      		<campoAdicional nombre=\"Email\">").append("nodispone@banecuador.fin.ec").append("</campoAdicional> \n");
+                str_xml.append("      		<campoAdicional nombre=\"Email\">").append("nodispone@produquimic.com.ec").append("</campoAdicional> \n");
             }
             if (comprobante.getCliente().getTelefono() != null) {
                 str_xml.append("      		<campoAdicional nombre=\"Teléfono\">").append(comprobante.getCliente().getTelefono()).append("</campoAdicional> \n");

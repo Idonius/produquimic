@@ -59,6 +59,10 @@ public final class Comprobante implements Serializable {
     private Boolean enNube = false;
     private List<DetalleImpuesto> impuesto;
     private String formaCobro = "01"; //por defecto efectivo
+    private String motivo;
+    private String numGuiaRemision;
+    private int diasCredito;
+    private String numOrdenCompra;
 
     public Comprobante() {
     }
@@ -84,15 +88,20 @@ public final class Comprobante implements Serializable {
             this.periodofiscal = resultado.getString("periodo_fiscal_srcom");
             // this.rise = resultado.getString("");
             this.coddocmodificado = resultado.getString("codigo_docu_mod_srcom");
-            this.numdocmodificado = resultado.getString("num_doc_mod_srcom"); ///0010010000001
+            this.numdocmodificado = resultado.getString("num_doc_mod_srcom");
             this.fechaemisiondocsustento = resultado.getDate("fecha_emision_mod_srcom");
             this.valormodificacion = resultado.getBigDecimal("valor_mod_srcom");
             this.numAutorizacion = resultado.getString("autorizacion_srcomn");
+
+            this.diasCredito = resultado.getInt("dias_credito_srcom");
+            this.numGuiaRemision = resultado.getString("num_guia_srcom");
+            this.numOrdenCompra = resultado.getString("orden_compra_srcom");
+
             if (resultado.getString("en_nube_srcom") != null) {
                 this.enNube = resultado.getBoolean("en_nube_srcom");
             }
             this.oficina = "1";// SUCURSAL 1 
-
+            this.motivo = resultado.getString("motivo_srcom");
             if (resultado.getString("ide_srfid") != null) {
                 this.codigofirma = new Firma(resultado.getInt("ide_srfid"));
             }
@@ -438,4 +447,37 @@ public final class Comprobante implements Serializable {
     public void setImpuesto(List<DetalleImpuesto> impuesto) {
         this.impuesto = impuesto;
     }
+
+    public String getMotivo() {
+        return motivo;
+    }
+
+    public void setMotivo(String motivo) {
+        this.motivo = motivo;
+    }
+
+    public String getNumGuiaRemision() {
+        return numGuiaRemision;
+    }
+
+    public void setNumGuiaRemision(String numGuiaRemision) {
+        this.numGuiaRemision = numGuiaRemision;
+    }
+
+    public int getDiasCredito() {
+        return diasCredito;
+    }
+
+    public void setDiasCredito(int diasCredito) {
+        this.diasCredito = diasCredito;
+    }
+
+    public String getNumOrdenCompra() {
+        return numOrdenCompra;
+    }
+
+    public void setNumOrdenCompra(String numOrdenCompra) {
+        this.numOrdenCompra = numOrdenCompra;
+    }
+
 }
