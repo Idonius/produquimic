@@ -117,6 +117,7 @@ public class ServicioCliente extends ServicioBase {
         tabla.setCondicion("es_cliente_geper=true");
         tabla.getColumna("es_cliente_geper").setValorDefecto("true");
         tabla.getColumna("es_cliente_geper").setVisible(false);
+        tabla.getColumna("codigo_geper").setLectura(true);
         tabla.getColumna("nivel_geper").setValorDefecto("HIJO");
         tabla.getColumna("nivel_geper").setPermitirNullCombo(true);
         tabla.getColumna("ide_rhtro").setVisible(false);

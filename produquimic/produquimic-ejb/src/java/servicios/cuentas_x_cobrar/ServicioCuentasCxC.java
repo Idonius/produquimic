@@ -74,7 +74,7 @@ public class ServicioCuentasCxC extends ServicioBase {
         if (isFacturaElectronica()) { //si tiene facturacion electrónica
             return "select a.ide_cccfa, secuencial_cccfa,ide_cnccc,a.ide_ccefa,nombre_sresc as nombre_ccefa, fecha_emisi_cccfa,(select numero_cncre from con_cabece_retenc where ide_cncre=a.ide_cncre)as NUM_RETENCION,nom_geper,identificac_geper,base_grabada_cccfa as ventas12,"
                     + "base_tarifa0_cccfa+base_no_objeto_iva_cccfa as ventas0,valor_iva_cccfa,total_cccfa, "
-                    + "claveacceso_srcom as CLAVE_ACCESO, fecha_trans_cccfa,ide_cncre,d.ide_srcom  "
+                    + "claveacceso_srcom as CLAVE_ACCESO, fecha_trans_cccfa,ide_cncre,d.ide_srcom,a.ide_geper,direccion_cccfa  "
                     + "from cxc_cabece_factura a "
                     + "inner join gen_persona b on a.ide_geper=b.ide_geper "
                     + "left join sri_comprobante d on a.ide_srcom=d.ide_srcom "
@@ -86,7 +86,7 @@ public class ServicioCuentasCxC extends ServicioBase {
         } else {
             return "select a.ide_cccfa, secuencial_cccfa, ide_cnccc,a.ide_ccefa,nombre_ccefa ,fecha_emisi_cccfa,(select numero_cncre from con_cabece_retenc where ide_cncre=a.ide_cncre)as NUM_RETENCION,nom_geper,identificac_geper,base_grabada_cccfa as ventas12,"
                     + "base_tarifa0_cccfa+base_no_objeto_iva_cccfa as ventas0,valor_iva_cccfa,total_cccfa, "
-                    + "observacion_cccfa, fecha_trans_cccfa "
+                    + "observacion_cccfa, fecha_trans_cccfa,ide_cncre,a.ide_geper,direccion_cccfa "
                     + "from cxc_cabece_factura a "
                     + "inner join gen_persona b on a.ide_geper=b.ide_geper "
                     + "inner join cxc_estado_factura c on  a.ide_ccefa=c.ide_ccefa "
@@ -464,7 +464,7 @@ public class ServicioCuentasCxC extends ServicioBase {
         String fechaFin = utilitario.getUltimaFechaMes(fechaInicio);
         return "select a.ide_cccfa,fecha_emisi_cccfa, secuencial_cccfa,"
                 + "nom_geper,identificac_geper,base_grabada_cccfa as ventas12,"
-                + "base_tarifa0_cccfa+base_no_objeto_iva_cccfa as ventas0,valor_iva_cccfa,total_cccfa,"
+                + "base_tarifa0_cccfa+base_no_objeto_iva_cccfa as ventas0,valor_iva_cccfa,total_cccfa,ret_fuente_cccfa as RET_FUENTE,ret_iva_cccfa as RET_IVA, "
                 + "observacion_cccfa "
                 + "from cxc_cabece_factura a "
                 + "inner join gen_persona b on a.ide_geper=b.ide_geper "
@@ -673,6 +673,110 @@ public class ServicioCuentasCxC extends ServicioBase {
     public int getSecuencialNotaCredito(String ide_ccdaf) {
         int max = 0;
         TablaGenerica tab_secuencia = utilitario.consultar("select ide_ccdaf,max(CAST(coalesce(numero_cpcno, '0') AS Integer)) as num_max FROM cxp_cabecera_nota where ide_ccdaf=" + ide_ccdaf + " GROUP BY ide_ccdaf ");
+        if (tab_secuencia.isEmpty() == false) {
+            try {
+                max = Integer.parseInt(tab_secuencia.getValor("num_max"));
+            } catch (Exception e) {
+            }
+        }
+        max++;
+        return max;
+    }
+
+    public TablaGenerica getFacturaPorSecuencial(String num_doc_mod_cpcno) {
+        if (num_doc_mod_cpcno != null) {
+            num_doc_mod_cpcno = num_doc_mod_cpcno.replace("-", "");
+        }
+        String secuencial_cccfa = num_doc_mod_cpcno.substring(6, 15);
+        String serie_ccdaf = num_doc_mod_cpcno.substring(0, 6);
+        return utilitario.consultar("select ide_geper,fecha_emisi_cccfa,total_cccfa,base_grabada_cccfa,base_no_objeto_iva_cccfa,base_tarifa0_cccfa,valor_iva_cccfa,\n"
+                + "ide_inarti,ide_inuni,cantidad_ccdfa,precio_ccdfa,total_ccdfa,iva_inarti_ccdfa\n"
+                + "from cxc_cabece_factura a\n"
+                + "inner join cxc_deta_factura b on a.ide_cccfa=b.ide_cccfa\n"
+                + "inner join cxc_datos_fac c on a.ide_ccdaf=c.ide_ccdaf\n"
+                + "where secuencial_cccfa='" + secuencial_cccfa + "'\n"
+                + "and serie_ccdaf='" + serie_ccdaf + "'");
+    }
+
+    public String getSqlNotas(String ide_ccdaf, String fechaInicio, String fechaFin) {
+        if (isFacturaElectronica()) { //si tiene facturacion electrónica
+            return "select a.ide_cpcno, numero_cpcno,ide_cnccc,a.ide_cpeno,nombre_sresc as nombre_cpeno, fecha_emisi_cpcno,motivo_srcom as MOTIVO,nom_geper,identificac_geper,base_grabada_cpcno as ventas12,"
+                    + "base_tarifa0_cpcno+base_no_objeto_iva_cpcno as ventas0,valor_iva_cpcno,total_cpcno, "
+                    + "claveacceso_srcom as CLAVE_ACCESO, fecha_trans_cpcno,d.ide_srcom  "
+                    + "from cxp_cabecera_nota a "
+                    + "inner join gen_persona b on a.ide_geper=b.ide_geper "
+                    + "left join sri_comprobante d on a.ide_srcom=d.ide_srcom "
+                    + "left join sri_estado_comprobante f on d.ide_sresc=f.ide_sresc "
+                    + "where fecha_emisi_cpcno BETWEEN  '" + fechaInicio + "' and '" + fechaFin + "' "
+                    + "and ide_ccdaf=" + ide_ccdaf + " "
+                    // + " and a.IDE_SUCU =" + utilitario.getVariable("IDE_SUCU") + " " 
+                    + "ORDER BY numero_cpcno desc,ide_cpcno desc";
+        } else {
+            return "select a.ide_cpcno, numero_cpcno, ide_cnccc,a.ide_cpeno,nombre_cpeno ,fecha_emisi_cpcno,nom_geper,identificac_geper,base_grabada_cpcno as ventas12,"
+                    + "base_tarifa0_cpcno+base_no_objeto_iva_cpcno as ventas0,valor_iva_cpcno,total_cpcno, "
+                    + "observacion_cccfa, fecha_trans_cpcno "
+                    + "from cxp_cabecera_nota a "
+                    + "inner join gen_persona b on a.ide_geper=b.ide_geper "
+                    + "inner join cxc_estado_factura c on  a.ide_cpeno=c.ide_cpeno "
+                    + "where fecha_emisi_cpcno BETWEEN  '" + fechaInicio + "' and '" + fechaFin + "' "
+                    + "and ide_ccdaf=" + ide_ccdaf + " "
+                    // + " and a.IDE_SUCU =" + utilitario.getVariable("IDE_SUCU") + " "
+                    + "ORDER BY numero_cpcno desc,ide_cpcno desc";
+        }
+
+    }
+
+    public String getSqlNotasAnuladas(String ide_ccdaf, String fechaInicio, String fechaFin) {
+
+        return "select a.ide_cpcno, numero_cpcno,nombre_cpeno ,fecha_emisi_cpcno,nom_geper,identificac_geper,base_grabada_cpcno as ventas12,"
+                + "base_tarifa0_cpcno+base_no_objeto_iva_cpcno as ventas0,valor_iva_cpcno,total_cpcno, "
+                + "observacion_cccfa, fecha_trans_cpcno "
+                + "from cxp_cabecera_nota a "
+                + "inner join gen_persona b on a.ide_geper=b.ide_geper "
+                + "inner join cxc_estado_factura c on  a.ide_cpeno=c.ide_cpeno "
+                + "where fecha_emisi_cpcno BETWEEN  '" + fechaInicio + "' and '" + fechaFin + "' "
+                + "and ide_ccdaf=" + ide_ccdaf + " and ide_cpeno=0 "
+                // + " and a.IDE_SUCU =" + utilitario.getVariable("IDE_SUCU") + " "
+                + "ORDER BY numero_cpcno desc,ide_cpcno desc";
+
+    }
+
+    /**
+     * Cambia de estado a anulado la factura y la transaccion cxc
+     *
+     * @param ide_cpcno
+     */
+    public void anularNotaCredito(String ide_cpcno) {
+        //Anula Fctura
+        utilitario.getConexion().agregarSqlPantalla("update cxp_cabecera_nota set ide_cpeno=0,ide_cnccc=null where ide_cpcno=" + ide_cpcno);//0 anulado
+////        //Transaccion CXC Generar reverso de la transaccion FACTURA
+////        TablaGenerica tab_cab = utilitario.consultar("SELECT a.ide_cpcno,ide_ccctr,secuencial_cccfa,ide_srcom from cxc_cabece_transa a inner join cxc_cabece_factura b on a.ide_cccfa=b.ide_cccfa where a.ide_cccfa=" + ide_cccfa + " and ide_ccefa=" + parametros.get("p_cxc_estado_factura_normal"));
+        TablaGenerica tab_cab = utilitario.consultar("SELECT ide_cpcno,ide_srcom from cxp_cabecera_nota where ide_cpcno=" + ide_cpcno);
+////        if (tab_cab.getTotalFilas() > 0) {
+////            reversarTransaccionCxC(tab_cab.getValor("ide_ccctr"), "V./ ANULACIÓN FACTURA : " + tab_cab.getValor("secuencial_cccfa"));
+////        }
+////        //Anula transaccion inventario
+////        utilitario.getConexion().agregarSqlPantalla("update inv_cab_comp_inve set ide_inepi=" + utilitario.getVariable("p_inv_estado_anulado") + " where ide_incci in (select ide_incci from inv_det_comp_inve where ide_cccfa=" + ide_cccfa + " group by ide_incci)");
+////        ////////****!!!!!!!!!!!crear variable  p_inv_estado_anulado
+////
+        if (isFacturaElectronica()) {
+            //cambia de estado el compobante pendiente
+            if (tab_cab.getValor("ide_srcom") != null) {
+                utilitario.getConexion().agregarSql("update sri_comprobante set ide_sresc=" + EstadoComprobanteEnum.ANULADO.getCodigo() + ",reutiliza_srcom=true  where ide_srcom=" + tab_cab.getValor("ide_srcom") + " and ide_sresc=" + EstadoComprobanteEnum.PENDIENTE.getCodigo());
+            }
+        }
+////        //Produquimic elimina kardex
+////        ser_integracion.anularFactura_Escritorio(ide_cccfa);
+    }
+
+    /**
+     * Retorna el secuencial de las Guias de Remision
+     *
+     * @return
+     */
+    public int getSecuencialGuia() {
+        int max = 0;
+        TablaGenerica tab_secuencia = utilitario.consultar("select ide_ccgui,max(CAST(coalesce(numero_ccgui, '0') AS Integer)) as num_max FROM cxc_guia GROUP BY ide_ccgui");
         if (tab_secuencia.isEmpty() == false) {
             try {
                 max = Integer.parseInt(tab_secuencia.getValor("num_max"));

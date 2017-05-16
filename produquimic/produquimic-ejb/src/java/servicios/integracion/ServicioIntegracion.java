@@ -83,39 +83,39 @@ public class ServicioIntegracion extends ServicioBase {
         TablaGenerica tab_cod = new TablaGenerica();
         tab_cod.setTabla("gen_persona", "ide_geper", -1);
         tab_cod.setCondicion("es_cliente_geper=true and gen_ide_geper=572");
-        tab_cod.getColumna("identificac_geper").setQuitarCaracteresEspeciales(true);
+        tab_cod.getColumna("codigo_geper").setQuitarCaracteresEspeciales(true);
         tab_cod.setGenerarPrimaria(false);
         tab_cod.ejecutarSql();
         tab_cod.getColumna("ide_geper").setExterna(false);
-        String str_cod = tab_cod.getStringColumna("identificac_geper");
+        String str_cod = tab_cod.getStringColumna("codigo_geper");
         tab_cod.limpiar();
 
         Conexion con_conecta = getConexionEscritorio();
         TablaGenerica tab_clie = new TablaGenerica();
         tab_clie.setConexion(con_conecta);
         if (str_cod != null && str_cod.isEmpty() == false) {
-            tab_clie.setSql("select * from clientes where cedula not in(" + str_cod + ",'')");
+            tab_clie.setSql("select * from clientes where cod_clie not in(" + str_cod + ",'')");
         } else {
             tab_clie.setCampoPrimaria("cod_clie");
             tab_clie.setSql("select * from clientes");
         }
         tab_clie.ejecutarSql();
         long int_maximo_cliente = utilitario.getConexion().getMaximo("gen_persona", "ide_geper", tab_clie.getTotalFilas());
-        TablaGenerica tab_cabcxc = new TablaGenerica();
-        tab_cabcxc.setTabla("cxc_cabece_transa", "ide_ccctr", -1);
-        tab_cabcxc.setCondicion("ide_ccctr=-1");
-        tab_cabcxc.setGenerarPrimaria(false);
-        tab_cabcxc.getColumna("ide_ccctr").setExterna(false);
-        tab_cabcxc.ejecutarSql();
-        long int_maximo_cab = utilitario.getConexion().getMaximo("cxc_cabece_transa", "ide_ccctr", tab_clie.getTotalFilas());
-
-        TablaGenerica tab_detcxc = new TablaGenerica();
-        tab_detcxc.setTabla("cxc_detall_transa", "ide_ccdtr", -1);
-        tab_detcxc.setCondicion("ide_ccdtr=-1");
-        tab_detcxc.setGenerarPrimaria(false);
-        tab_detcxc.getColumna("ide_ccdtr").setExterna(false);
-        tab_detcxc.ejecutarSql();
-        long int_maximo_det = utilitario.getConexion().getMaximo("cxc_detall_transa", "ide_ccdtr", tab_clie.getTotalFilas());
+//////        TablaGenerica tab_cabcxc = new TablaGenerica();
+//////        tab_cabcxc.setTabla("cxc_cabece_transa", "ide_ccctr", -1);
+//////        tab_cabcxc.setCondicion("ide_ccctr=-1");
+//////        tab_cabcxc.setGenerarPrimaria(false);
+//////        tab_cabcxc.getColumna("ide_ccctr").setExterna(false);
+//////        tab_cabcxc.ejecutarSql();
+//////        long int_maximo_cab = utilitario.getConexion().getMaximo("cxc_cabece_transa", "ide_ccctr", tab_clie.getTotalFilas());
+//////
+//////        TablaGenerica tab_detcxc = new TablaGenerica();
+//////        tab_detcxc.setTabla("cxc_detall_transa", "ide_ccdtr", -1);
+//////        tab_detcxc.setCondicion("ide_ccdtr=-1");
+//////        tab_detcxc.setGenerarPrimaria(false);
+//////        tab_detcxc.getColumna("ide_ccdtr").setExterna(false);
+//////        tab_detcxc.ejecutarSql();
+//////        long int_maximo_det = utilitario.getConexion().getMaximo("cxc_detall_transa", "ide_ccdtr", tab_clie.getTotalFilas());
 
         for (int i = 0; i < tab_clie.getTotalFilas(); i++) {
 
@@ -137,11 +137,11 @@ public class ServicioIntegracion extends ServicioBase {
                 if (ide_getid.length() > 10) {
                     ide_getid = "1";//RUC
                 } else {
-                    ide_getid = "2";//CEDULA    
+                    ide_getid = "0";//CEDULA    
                 }
             }
             tab_cod.setValor("ide_getid", ide_getid);
-            tab_cod.setValor("identificac_geper", tab_clie.getValor(i, "cedula"));
+            tab_cod.setValor("identificac_geper", tab_clie.getValor(i, "cedula").replace("-", ""));
             tab_cod.setValor("nom_geper", tab_clie.getValor(i, "nom_clie"));
             tab_cod.setValor("nombre_compl_geper", tab_clie.getValor(i, "nom_clie"));
             tab_cod.setValor("direccion_geper", tab_clie.getValor(i, "dir_clie"));
@@ -172,51 +172,50 @@ public class ServicioIntegracion extends ServicioBase {
             }
             tab_cod.setValor("ide_cntco", ide_cntco);
 
-            double dou_saldo_inicial = 0;
-            try {
-                dou_saldo_inicial = Double.parseDouble(tab_clie.getValor(i, "existencia"));
-            } catch (Exception e) {
-            }
-
-            if (dou_saldo_inicial != 0) {
-                //Creo la transaccion
-                tab_cabcxc.insertar();
-                tab_cabcxc.setValor("ide_ccctr", String.valueOf(int_maximo_cab));
-                tab_cabcxc.setValor("ide_ccttr", "13");
-                tab_cabcxc.setValor("ide_sucu", "0");
-                tab_cabcxc.setValor("ide_empr", "0");
-                tab_cabcxc.setValor("ide_geper", String.valueOf(int_maximo_cliente));
-                tab_cabcxc.setValor("fecha_trans_ccctr", utilitario.getFechaActual());
-                tab_cabcxc.setValor("observacion_ccctr", "Saldo inicial al " + utilitario.getFechaActual());
-
-                tab_detcxc.insertar();
-                tab_detcxc.setValor("ide_ccdtr", String.valueOf(int_maximo_det));
-                tab_detcxc.setValor("ide_ccctr", String.valueOf(int_maximo_cab));
-                tab_detcxc.setValor("ide_ccttr", "13");
-                tab_detcxc.setValor("ide_sucu", "0");
-                tab_detcxc.setValor("ide_empr", "0");
-                tab_detcxc.setValor("ide_usua", utilitario.getVariable("ide_usua"));
-                tab_detcxc.setValor("fecha_trans_ccdtr", utilitario.getFechaActual());
-                tab_detcxc.setValor("fecha_venci_ccdtr", utilitario.getFechaActual());
-                tab_detcxc.setValor("numero_pago_ccdtr", "0");
-                tab_detcxc.setValor("valor_ccdtr", utilitario.getFormatoNumero(dou_saldo_inicial));
-                tab_detcxc.setValor("observacion_ccdtr", "Saldo inicial al " + utilitario.getFechaActual());
-
-                int_maximo_cab++;
-                int_maximo_det++;
-
-            }
+//////            double dou_saldo_inicial = 0;
+//////            try {
+//////                dou_saldo_inicial = Double.parseDouble(tab_clie.getValor(i, "existencia"));
+//////            } catch (Exception e) {
+//////            }
+//////            if (dou_saldo_inicial != 0) {
+//////                //Creo la transaccion
+//////                tab_cabcxc.insertar();
+//////                tab_cabcxc.setValor("ide_ccctr", String.valueOf(int_maximo_cab));
+//////                tab_cabcxc.setValor("ide_ccttr", "13");
+//////                tab_cabcxc.setValor("ide_sucu", "0");
+//////                tab_cabcxc.setValor("ide_empr", "0");
+//////                tab_cabcxc.setValor("ide_geper", String.valueOf(int_maximo_cliente));
+//////                tab_cabcxc.setValor("fecha_trans_ccctr", utilitario.getFechaActual());
+//////                tab_cabcxc.setValor("observacion_ccctr", "Saldo inicial al " + utilitario.getFechaActual());
+//////
+//////                tab_detcxc.insertar();
+//////                tab_detcxc.setValor("ide_ccdtr", String.valueOf(int_maximo_det));
+//////                tab_detcxc.setValor("ide_ccctr", String.valueOf(int_maximo_cab));
+//////                tab_detcxc.setValor("ide_ccttr", "13");
+//////                tab_detcxc.setValor("ide_sucu", "0");
+//////                tab_detcxc.setValor("ide_empr", "0");
+//////                tab_detcxc.setValor("ide_usua", utilitario.getVariable("ide_usua"));
+//////                tab_detcxc.setValor("fecha_trans_ccdtr", utilitario.getFechaActual());
+//////                tab_detcxc.setValor("fecha_venci_ccdtr", utilitario.getFechaActual());
+//////                tab_detcxc.setValor("numero_pago_ccdtr", "0");
+//////                tab_detcxc.setValor("valor_ccdtr", utilitario.getFormatoNumero(dou_saldo_inicial));
+//////                tab_detcxc.setValor("observacion_ccdtr", "Saldo inicial al " + utilitario.getFechaActual());
+//////
+//////                int_maximo_cab++;
+//////                int_maximo_det++;
+//////
+//////            }
             int_maximo_cliente++;
 
         }
 
         tab_cod.guardar();
-        tab_cabcxc.guardar();
-        tab_detcxc.guardar();
+//////        tab_cabcxc.guardar();
+//////        tab_detcxc.guardar();
 
         if (utilitario.getConexion().ejecutarListaSql().isEmpty()) {
-            if (tab_clie.getTotalFilas() > 0) {
-                utilitario.agregarMensaje("Se importaron correctamente ", tab_clie.getTotalFilas() + " CLIENTES del sistema de facturación");
+            if (tab_cod.getTotalFilas() > 0) {
+                utilitario.agregarMensaje("Se importaron correctamente ", tab_cod.getTotalFilas() + " CLIENTES del sistema de facturación");
             }
         }
 
@@ -400,28 +399,28 @@ public class ServicioIntegracion extends ServicioBase {
 
         long int_maximo_articulo = utilitario.getConexion().getMaximo("inv_articulo", "ide_inarti", tab_quimi.getTotalFilas());
 
-        TablaGenerica tab_inventario = new TablaGenerica();
-        tab_inventario.setTabla("inv_det_comp_inve", "ide_indci", -1);
-        tab_inventario.setCondicion("ide_indci=-1");
-
-        TablaGenerica tab_cab_inventario = new TablaGenerica();
-        tab_cab_inventario.setTabla("inv_cab_comp_inve", "ide_incci", -1);
-        tab_cab_inventario.setCondicion("ide_incci=-1");
-        tab_cab_inventario.ejecutarSql();
-        tab_cab_inventario.insertar();
-        tab_cab_inventario.setValor("ide_geper", "542");
-        tab_cab_inventario.setValor("ide_inepi", "1");
-        tab_cab_inventario.setValor("ide_intti", "30");
-        tab_cab_inventario.setValor("ide_sucu", "0");
-        tab_cab_inventario.setValor("ide_empr", "0");
-        tab_cab_inventario.setValor("ide_usua", utilitario.getVariable("IDE_USUA"));
-        tab_cab_inventario.setValor("ide_inbod", "1");
-        tab_cab_inventario.setValor("numero_incci", ser_inventario.getSecuencialComprobanteInventario("1"));
-        tab_cab_inventario.setValor("fecha_trans_incci", utilitario.getFechaActual());
-        tab_cab_inventario.setValor("observacion_incci", "Importa Productos Saldo inicial al " + utilitario.getFechaActual());
-        tab_cab_inventario.setValor("fecha_siste_incci", utilitario.getFechaActual());
-        tab_cab_inventario.setValor("hora_sistem_incci", utilitario.getHoraActual());
-        tab_cab_inventario.guardar();
+//////        TablaGenerica tab_inventario = new TablaGenerica();
+//////        tab_inventario.setTabla("inv_det_comp_inve", "ide_indci", -1);
+//////        tab_inventario.setCondicion("ide_indci=-1");
+//////
+//////        TablaGenerica tab_cab_inventario = new TablaGenerica();
+//////        tab_cab_inventario.setTabla("inv_cab_comp_inve", "ide_incci", -1);
+//////        tab_cab_inventario.setCondicion("ide_incci=-1");
+//////        tab_cab_inventario.ejecutarSql();
+//////        tab_cab_inventario.insertar();
+//////        tab_cab_inventario.setValor("ide_geper", "542");
+//////        tab_cab_inventario.setValor("ide_inepi", "1");
+//////        tab_cab_inventario.setValor("ide_intti", "30");
+//////        tab_cab_inventario.setValor("ide_sucu", "0");
+//////        tab_cab_inventario.setValor("ide_empr", "0");
+//////        tab_cab_inventario.setValor("ide_usua", utilitario.getVariable("IDE_USUA"));
+//////        tab_cab_inventario.setValor("ide_inbod", "1");
+//////        tab_cab_inventario.setValor("numero_incci", ser_inventario.getSecuencialComprobanteInventario("1"));
+//////        tab_cab_inventario.setValor("fecha_trans_incci", utilitario.getFechaActual());
+//////        tab_cab_inventario.setValor("observacion_incci", "Importa Productos Saldo inicial al " + utilitario.getFechaActual());
+//////        tab_cab_inventario.setValor("fecha_siste_incci", utilitario.getFechaActual());
+//////        tab_cab_inventario.setValor("hora_sistem_incci", utilitario.getHoraActual());
+//////        tab_cab_inventario.guardar();
         for (int i = 0; i < tab_quimi.getTotalFilas(); i++) {
             tab_cod.insertar();
             if (str_ide_inarti.isEmpty() == false) {
@@ -467,28 +466,28 @@ public class ServicioIntegracion extends ServicioBase {
                 tab_cod.setValor("hace_kardex_inarti", "false");
             }
 
-            tab_inventario.insertar();
-            tab_inventario.setValor("ide_inarti", String.valueOf(int_maximo_articulo));
-            tab_inventario.setValor("ide_empr", "0");
-            tab_inventario.setValor("ide_sucu", "0");
-            tab_inventario.setValor("ide_incci", tab_cab_inventario.getValor("ide_incci"));
-            tab_inventario.setValor("precio_promedio_indci", tab_quimi.getValor(i, "precio_compra"));
-            tab_inventario.setValor("precio_indci", tab_quimi.getValor(i, "precio_venta"));
-            tab_inventario.setValor("cantidad_indci", tab_quimi.getValor(i, "existencia"));
-            tab_inventario.setValor("observacion_indci", "Saldo anterior sistema de Inventario");
-            try {
-                tab_inventario.setValor("valor_indci", utilitario.getFormatoNumero(Double.parseDouble(tab_quimi.getValor(i, "existencia")) * Double.parseDouble(tab_quimi.getValor(i, "precio_compra"))));
-            } catch (Exception e) {
-            }
+//////            tab_inventario.insertar();
+//////            tab_inventario.setValor("ide_inarti", String.valueOf(int_maximo_articulo));
+//////            tab_inventario.setValor("ide_empr", "0");
+//////            tab_inventario.setValor("ide_sucu", "0");
+//////            tab_inventario.setValor("ide_incci", tab_cab_inventario.getValor("ide_incci"));
+//////            tab_inventario.setValor("precio_promedio_indci", tab_quimi.getValor(i, "precio_compra"));
+//////            tab_inventario.setValor("precio_indci", tab_quimi.getValor(i, "precio_venta"));
+//////            tab_inventario.setValor("cantidad_indci", tab_quimi.getValor(i, "existencia"));
+//////            tab_inventario.setValor("observacion_indci", "Saldo anterior sistema de Inventario");
+//////            try {
+//////                tab_inventario.setValor("valor_indci", utilitario.getFormatoNumero(Double.parseDouble(tab_quimi.getValor(i, "existencia")) * Double.parseDouble(tab_quimi.getValor(i, "precio_compra"))));
+//////            } catch (Exception e) {
+//////            }
 
             int_maximo_articulo++;
         }
         tab_cod.guardar();
-        tab_inventario.guardar();
+//////        tab_inventario.guardar();
 
         if (utilitario.getConexion().ejecutarListaSql().isEmpty()) {
-            if (tab_quimi.getTotalFilas() > 0) {
-                utilitario.agregarMensaje("Se importaron correctamente ", tab_quimi.getTotalFilas() + " PRODUCTOS QUIMICOS del sistema de facturación");
+            if (tab_cod.getTotalFilas() > 0) {
+                utilitario.agregarMensaje("Se importaron correctamente ", tab_cod.getTotalFilas() + " PRODUCTOS QUIMICOS del sistema de facturación");
             }
         }
 
