@@ -21,7 +21,7 @@ import framework.componentes.Tabla;
 import framework.componentes.VisualizarPDF;
 import javax.ejb.EJB;
 import javax.faces.event.AjaxBehaviorEvent;
-import servicios.ceo.ServicioNotaCreditoElectronica;
+import servicios.ceo.ServicioComprobanteElectronico;
 import servicios.contabilidad.ServicioConfiguracion;
 import servicios.cuentas_x_cobrar.ServicioCuentasCxC;
 import servicios.inventario.ServicioProducto;
@@ -40,7 +40,7 @@ public class pre_nota_credito extends Pantalla {
     @EJB
     private final ServicioConfiguracion ser_configuracion = (ServicioConfiguracion) utilitario.instanciarEJB(ServicioConfiguracion.class);
     @EJB
-    private final ServicioNotaCreditoElectronica ser_nocCreditoElectronica = (ServicioNotaCreditoElectronica) utilitario.instanciarEJB(ServicioNotaCreditoElectronica.class);
+    private final ServicioComprobanteElectronico ser_comprobante_electronico = (ServicioComprobanteElectronico) utilitario.instanciarEJB(ServicioComprobanteElectronico.class);
 
     private final Combo com_pto_emision = new Combo();
     private final Calendario cal_fecha_inicio = new Calendario();
@@ -212,7 +212,7 @@ public class pre_nota_credito extends Pantalla {
         tab_tabla2.dibujar();
         PanelTabla pat_panel2 = new PanelTabla();
         pat_panel2.setPanelTabla(tab_tabla2);
-        pat_panel2.getMenuTabla().getItem_actualizar().setRendered(false);        
+        pat_panel2.getMenuTabla().getItem_actualizar().setRendered(false);
         pat_panel2.getMenuTabla().getItem_buscar().setRendered(false);
 
         Grupo gru = new Grupo();
@@ -439,7 +439,7 @@ public class pre_nota_credito extends Pantalla {
         if (tab_tabla1.getValor("ide_cpcno") != null) {
             if (tab_tabla1.getValor("ide_srcom") != null) {
                 try {
-                    ser_nocCreditoElectronica.getRIDE(tab_tabla1.getValor("ide_srcom"));
+                    ser_comprobante_electronico.getRIDE(tab_tabla1.getValor("ide_srcom"));
                     vpd_nota_ride.setVisualizarPDFUsuario();
                     vpd_nota_ride.dibujar();
                 } catch (Exception e) {
@@ -458,7 +458,7 @@ public class pre_nota_credito extends Pantalla {
         if (tab_tabla1.getValor("ide_cpcno") != null) {
             //Valida que se encuentre en estado PENDIENTE o RECIBIDA
             if ((tab_tabla1.getValor("nombre_cpeno")) != null && (tab_tabla1.getValor("nombre_cpeno").equals(EstadoComprobanteEnum.PENDIENTE.getDescripcion())) || tab_tabla1.getValor("nombre_cpeno").equals(EstadoComprobanteEnum.RECIBIDA.getDescripcion())) {
-                String mensaje = ser_nocCreditoElectronica.enviarComprobante(tab_tabla1.getValor("clave_acceso"));
+                String mensaje = ser_comprobante_electronico.enviarComprobante(tab_tabla1.getValor("clave_acceso"));
 
                 String aux = tab_tabla1.getValorSeleccionado();
                 tab_tabla1.actualizar();
@@ -508,7 +508,7 @@ public class pre_nota_credito extends Pantalla {
                 if (tab_tabla2.guardar()) {
                     if (guardarPantalla().isEmpty()) {
                         if (ser_factura.isFacturaElectronica()) {
-                            ser_nocCreditoElectronica.generarNotaCreditoElectronica(tab_tabla1.getValor("ide_cpcno"));
+                            ser_comprobante_electronico.generarNotaCreditoElectronica(tab_tabla1.getValor("ide_cpcno"));
                             String aux = tab_tabla1.getValor("ide_cpcno");
                             dibujarNotaCredito();
                             tab_tabla1.setFilaActual(aux);
