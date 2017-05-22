@@ -1422,7 +1422,7 @@ public class FacturaCxC extends Dialogo {
     @Override
     public void cerrar() {
         //Activa las tab
-        descativarTabs();
+        //descativarTabs();
         super.cerrar(); //To change body of generated methods, choose Tools | Templates.
     }
 
@@ -1528,7 +1528,7 @@ public class FacturaCxC extends Dialogo {
 
     public void setActivarGuiaRemision(boolean activarGuiaRemision) {
         tab_factura.getTab(4).setRendered(activarGuiaRemision);
-        tab_factura.getTab(4).setDisabled(false);
+        tab_factura.getTab(4).setDisabled(!activarGuiaRemision);
     }
 
     public boolean isActivarRetencion() {
