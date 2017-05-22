@@ -176,8 +176,7 @@ public class FacturaCxC extends Dialogo {
         tab_factura.getTab(4).getChildren().add(dibujarGuiaRemision());
         utilitario.getConexion().getSqlPantalla().clear();//LIMPIA SQL EXISTENTES
         ocultarTabs(); //Ocilta todas las tabas
-        setActivarFactura(true); //activa solo tab de Fcatura de venta
-        setActivarGuiaRemision(true);
+        setActivarFactura(true); //activa solo tab de Fcatura de venta        
         seleccionarTab(0);
         this.getBot_aceptar().setRendered(true);
         tab_cab_factura.limpiar();
@@ -195,7 +194,7 @@ public class FacturaCxC extends Dialogo {
         tex_subtotal12.setValue("0,00");
         tex_total.setValue("0,00");
         cargarMaximoSecuencialFactura();
-
+        setActivarGuiaRemision(true);
         //Activa click derecho insertar y eliminar
         try {
             PanelTabla pat_panel = (PanelTabla) tab_deta_factura.getParent();
@@ -1337,7 +1336,7 @@ public class FacturaCxC extends Dialogo {
      * Desactiva todas las tabs
      */
     private void descativarTabs() {
-        for (int i = 0; i < 4; i++) {
+        for (int i = 0; i < (tab_factura.getChildren().size() - 1); i++) {
             tab_factura.getTab(i).setDisabled(true);
         }
     }
@@ -1529,7 +1528,7 @@ public class FacturaCxC extends Dialogo {
 
     public void setActivarGuiaRemision(boolean activarGuiaRemision) {
         tab_factura.getTab(4).setRendered(activarGuiaRemision);
-        tab_factura.getTab(4).setDisabled(!activarGuiaRemision);
+        tab_factura.getTab(4).setDisabled(false);
     }
 
     public boolean isActivarRetencion() {
