@@ -46,6 +46,8 @@ public class ComprobanteServiceImp implements ComprobanteService {
     @EJB
     private RetencionService retencionService;
     @EJB
+    private GuiaRemisionService guiaRemisionService;
+    @EJB
     private CPanelService cPanelService;
 
     private final UtilitarioCeo utilitario = new UtilitarioCeo();
@@ -67,6 +69,8 @@ public class ComprobanteServiceImp implements ComprobanteService {
                     xml = notaCreditoService.getXmlNotaCredito(comprobanteActual);
                 } else if (comprobanteActual.getCoddoc().equals(TipoComprobanteEnum.COMPROBANTE_DE_RETENCION.getCodigo())) {
                     xml = retencionService.getXmlRetencion(comprobanteActual);
+                } else if (comprobanteActual.getCoddoc().equals(TipoComprobanteEnum.GUIA_DE_REMISION.getCodigo())) {
+                    xml = guiaRemisionService.getXmlGuiaRemision(comprobanteActual);
                 }
                 xml = utilitario.reemplazarCaracteresEspeciales(xml);
                 try {
@@ -243,7 +247,7 @@ public class ComprobanteServiceImp implements ComprobanteService {
             if (comprobanteActual.getCodigoestado() != EstadoComprobanteEnum.AUTORIZADO.getCodigo()) {
                 throw new GenericException("ERROR. El Comprobante " + claveAcceso + " no pudo ser Autorizado por el SRI.");
             }
-            try {                
+            try {
                 cPanelService.subirComprobante(comprobanteActual);
             } catch (Exception e) {
                 System.out.println("ERROR. al subir a la nube " + e.getMessage());

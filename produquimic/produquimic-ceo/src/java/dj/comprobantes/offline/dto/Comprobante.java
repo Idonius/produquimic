@@ -10,11 +10,13 @@
 package dj.comprobantes.offline.dto;
 
 import dj.comprobantes.offline.conexion.ConexionCEO;
+import dj.comprobantes.offline.enums.TipoComprobanteEnum;
 import dj.comprobantes.offline.exception.GenericException;
 import java.io.Serializable;
 import java.math.BigDecimal;
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.sql.Statement;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
@@ -64,10 +66,18 @@ public final class Comprobante implements Serializable {
     private int diasCredito;
     private String numOrdenCompra;
 
+    //Campos para guias de remisión
+    private String dirPartida;
+    private Date fechaIniTransporte;
+    private Date fechaFinTransporte;
+    private String placa;
+    private Destinatario destinatario;
+    private Long codigoComprobanteFactura;
+
     public Comprobante() {
     }
 
-    public Comprobante(ResultSet resultado) {
+    public Comprobante(ResultSet resultado, ConexionCEO con) {
         try {
             this.codigocomprobante = resultado.getLong("ide_srcom");
             this.tipoemision = resultado.getString("tipoemision_srcom");
@@ -127,53 +137,80 @@ public final class Comprobante implements Serializable {
 
             //Busca el cliente 
             try {
-                ConexionCEO con = new ConexionCEO();
-                ResultSet res = con.consultar("SELECT ide_geper,identificac_geper,alterno2_getid,nom_geper,direccion_geper,telefono_geper,movil_geper,correo_geper FROM gen_persona a "
+                Statement sentensia = con.getConnection().createStatement();
+                String sql = "SELECT ide_geper,identificac_geper,alterno2_getid,nom_geper,direccion_geper,telefono_geper,movil_geper,correo_geper FROM gen_persona a "
                         + "inner join gen_tipo_identifi b on a.ide_getid=b.ide_getid "
-                        + " where ide_geper=" + resultado.getString("ide_geper"));
+                        + " where ide_geper=" + resultado.getString("ide_geper");
+                ResultSet res = sentensia.executeQuery(sql);
                 if (res.next()) {
                     cliente = new Cliente(res);
                 }
+                sentensia.close();
                 res.close();
-                con.desconectar();
-            } catch (GenericException | SQLException e) {
+            } catch (Exception e) {
                 e.printStackTrace();
             }
 
-            //Busca los detalles de impuestos del Comprobante
-            try {
-                impuesto = new ArrayList();
-                ConexionCEO con = new ConexionCEO();
-                ResultSet res = con.consultar("SELECT * FROM sri_imp_comprobante where ide_srcom=" + this.codigocomprobante);
-                while (res.next()) {
-                    DetalleImpuesto di = new DetalleImpuesto(res);
-                    di.setComprobante(this);
-                    impuesto.add(di);
+            if (this.coddoc.equals(TipoComprobanteEnum.FACTURA.getCodigo()) || this.coddoc.equals(TipoComprobanteEnum.NOTA_DE_CREDITO.getCodigo())) {
+                //Busca los detalles del Comprobante
+                try {
+                    //!!!!!!!!!!CAMBIAR AL DETALLE DE LA FACTURA CXC Y AL DETALLE DE LA NOTA DE CREDITO CXP
+                    detalle = new ArrayList<>();
+                    String sql = "SELECT * FROM sri_detalle_comprobante where ide_srcom=" + this.codigocomprobante;
+                    Statement sentensia = con.getConnection().createStatement();
+                    ResultSet res = sentensia.executeQuery(sql);
+                    while (res.next()) {
+                        DetalleComprobante dt = new DetalleComprobante(res);
+                        dt.setComprobante(this);
+                        detalle.add(dt);
+                    }
+                    sentensia.close();
+                    res.close();
+                } catch (Exception e) {
+                    e.printStackTrace();
                 }
-                res.close();
-                con.desconectar();
-            } catch (GenericException | SQLException e) {
-                e.printStackTrace();
-            }
+            } else if (this.coddoc.equals(TipoComprobanteEnum.GUIA_DE_REMISION.getCodigo())) {
 
+                destinatario = new Destinatario(resultado);
+                //Busca los detalles del Comprobante Factura asociado a la guia
+                try {
+                    detalle = new ArrayList<>();
+                    String sql = "SELECT * FROM sri_detalle_comprobante where ide_srcom=" + this.codigoComprobanteFactura;
+                    Statement sentensia = con.getConnection().createStatement();
+                    ResultSet res = sentensia.executeQuery(sql);
+                    while (res.next()) {
+                        DetalleComprobante dt = new DetalleComprobante(res);
+                        dt.setComprobante(this);
+                        detalle.add(dt);
+                    }
+                    sentensia.close();
+                    res.close();
+                } catch (Exception e) {
+                    e.printStackTrace();
+                }
+            } else if (this.coddoc.equals(TipoComprobanteEnum.COMPROBANTE_DE_RETENCION.getCodigo())) {
+                //Busca los detalles de impuestos del Comprobante
+                try {
+                    impuesto = new ArrayList();
+                    String sql = "SELECT * FROM sri_imp_comprobante where ide_srcom=" + this.codigocomprobante;
+                    Statement sentensia = con.getConnection().createStatement();
+                    ResultSet res = sentensia.executeQuery(sql);
+                    while (res.next()) {
+                        DetalleImpuesto di = new DetalleImpuesto(res);
+                        di.setComprobante(this);
+                        impuesto.add(di);
+                    }
+                    sentensia.close();
+                    res.close();
+
+                } catch (Exception e) {
+                    e.printStackTrace();
+                }
+            }
         } catch (SQLException e) {
             e.printStackTrace();
         }
-        //Busca los detalles del Comprobante
-        try {
-            detalle = new ArrayList<>();
-            ConexionCEO con = new ConexionCEO();
-            ResultSet res = con.consultar("SELECT * FROM sri_detalle_comprobante where ide_srcom=" + this.codigocomprobante);
-            while (res.next()) {
-                DetalleComprobante dt = new DetalleComprobante(res);
-                dt.setComprobante(this);
-                detalle.add(dt);
-            }
-            res.close();
-            con.desconectar();
-        } catch (GenericException | SQLException e) {
-            e.printStackTrace();
-        }
+
     }
 
     public Long getCodigocomprobante() {
@@ -480,4 +517,51 @@ public final class Comprobante implements Serializable {
         this.numOrdenCompra = numOrdenCompra;
     }
 
+    public String getDirPartida() {
+        return dirPartida;
+    }
+
+    public void setDirPartida(String dirPartida) {
+        this.dirPartida = dirPartida;
+    }
+
+    public Date getFechaIniTransporte() {
+        return fechaIniTransporte;
+    }
+
+    public void setFechaIniTransporte(Date fechaIniTransporte) {
+        this.fechaIniTransporte = fechaIniTransporte;
+    }
+
+    public Date getFechaFinTransporte() {
+        return fechaFinTransporte;
+    }
+
+    public void setFechaFinTransporte(Date fechaFinTransporte) {
+        this.fechaFinTransporte = fechaFinTransporte;
+    }
+
+    public String getPlaca() {
+        return placa;
+    }
+
+    public void setPlaca(String placa) {
+        this.placa = placa;
+    }
+
+    public Destinatario getDestinatario() {
+        return destinatario;
+    }
+
+    public void setDestinatario(Destinatario destinatario) {
+        this.destinatario = destinatario;
+    }
+
+    public Long getCodigoComprobanteFactura() {
+        return codigoComprobanteFactura;
+    }
+
+    public void setCodigoComprobanteFactura(Long codigoComprobanteFactura) {
+        this.codigoComprobanteFactura = codigoComprobanteFactura;
+    }
 }

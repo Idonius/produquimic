@@ -14,7 +14,6 @@ import dj.comprobantes.offline.dto.Comprobante;
 import dj.comprobantes.offline.enums.EstadoComprobanteEnum;
 import dj.comprobantes.offline.enums.TipoComprobanteEnum;
 import dj.comprobantes.offline.exception.GenericException;
-import dj.comprobantes.offline.util.UtilitarioCeo;
 
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
@@ -31,8 +30,6 @@ import javax.ejb.Stateless;
 @Stateless
 public class ComprobanteDAOImp implements ComprobanteDAO {
 
-    private final UtilitarioCeo utilitario = new UtilitarioCeo();
-
     @Override
     public List<Comprobante> getComprobantesPorEstado(EstadoComprobanteEnum estado) throws GenericException {
         List<Comprobante> listaComprobantes = new ArrayList<>();
@@ -45,7 +42,7 @@ public class ComprobanteDAOImp implements ComprobanteDAO {
             ps.setInt(1, estado.getCodigo());
             res = ps.executeQuery();
             while (res.next()) {
-                listaComprobantes.add(new Comprobante(res));
+                listaComprobantes.add(new Comprobante(res, con));
             }
         } catch (SQLException e) {
             throw new GenericException(e);
@@ -76,7 +73,7 @@ public class ComprobanteDAOImp implements ComprobanteDAO {
             ps.setString(1, claveAcceso);
             res = ps.executeQuery();
             if (res.next()) {
-                comprobante = new Comprobante(res);
+                comprobante = new Comprobante(res, con);
             }
         } catch (SQLException e) {
             throw new GenericException(e);
@@ -108,7 +105,7 @@ public class ComprobanteDAOImp implements ComprobanteDAO {
             ps.setString(2, codigoDocumento.getCodigo());
             res = ps.executeQuery();
             while (res.next()) {
-                listaComprobantes.add(new Comprobante(res));
+                listaComprobantes.add(new Comprobante(res, con));
             }
         } catch (SQLException e) {
             throw new GenericException(e);
@@ -170,7 +167,7 @@ public class ComprobanteDAOImp implements ComprobanteDAO {
     }
 
     @Override
-    public Comprobante getComprobantePorId(Integer ide_srcom) throws GenericException {        
+    public Comprobante getComprobantePorId(Integer ide_srcom) throws GenericException {
         Comprobante comprobante = null;
         ConexionCEO con = new ConexionCEO();
         PreparedStatement ps = null;
@@ -181,7 +178,7 @@ public class ComprobanteDAOImp implements ComprobanteDAO {
             ps.setInt(1, ide_srcom);
             res = ps.executeQuery();
             if (res.next()) {
-                comprobante = new Comprobante(res);
+                comprobante = new Comprobante(res, con);
             }
         } catch (SQLException e) {
             e.printStackTrace();
@@ -213,7 +210,7 @@ public class ComprobanteDAOImp implements ComprobanteDAO {
             ps.setInt(1, EstadoComprobanteEnum.AUTORIZADO.getCodigo());
             res = ps.executeQuery();
             while (res.next()) {
-                listaComprobantes.add(new Comprobante(res));
+                listaComprobantes.add(new Comprobante(res, con));
             }
         } catch (SQLException e) {
             throw new GenericException(e);
