@@ -81,6 +81,7 @@ public class DocumentoCxP extends Dialogo {
     private Tabla tab_dto_prove;
     private Tabla tab_cb_rete;
     private Tabla tab_dt_rete;
+    private Tabla tab_electronica;
 
     //PAGOS
     private Tabla tab_dt_pago;
@@ -110,7 +111,8 @@ public class DocumentoCxP extends Dialogo {
                 "p_con_tipo_documento_nota_venta",
                 "p_con_tipo_documento_liquidacion_compra",
                 "p_gen_tipo_iden_ruc",
-                "p_con_tipo_contribuyente_rise");
+                "p_con_tipo_contribuyente_rise",
+                "p_sri_activa_comp_elect");
 
         this.setWidth("95%");
         this.setHeight("90%");
@@ -385,6 +387,7 @@ public class DocumentoCxP extends Dialogo {
         tab_dt_rete.getColumna("ide_cndre").setVisible(false);
         tab_dt_rete.getColumna("ide_cncre").setVisible(false);
         tab_dt_rete.setScrollable(true);
+        
         tab_dt_rete.setScrollHeight(getAltoPanel() - 240);
         tab_dt_rete.setRows(100);
         tab_dt_rete.setLectura(true);
@@ -392,8 +395,46 @@ public class DocumentoCxP extends Dialogo {
         PanelTabla pat_panel = new PanelTabla();
         pat_panel.setPanelTabla(tab_dt_rete);
 
+        if (isFacturaElectronica()) {
+            tab_electronica = new Tabla();
+            tab_electronica.setId("tab_electronica");
+            tab_electronica.setIdCompleto("tab_documenoCxP:tab_electronica");
+            tab_electronica.setRuta("pre_index.clase." + getId());
+            tab_electronica.setTabla("sri_comprobante", "ide_srcom", 990);
+            tab_electronica.getGrid().setColumns(8);
+            tab_electronica.setTipoFormulario(true);
+
+            if (tab_cb_rete.getValor("ide_srcom") != null) {
+                tab_electronica.setCondicion("ide_srcom=" + tab_cab_documento.getValor("ide_srcom"));
+            } else {
+                tab_electronica.setCondicion("ide_srcom=-1");
+            }
+
+            //OCULTA TODAS LAS COLUMNAS
+            for (int i = 0; i < tab_electronica.getTotalColumnas(); i++) {
+                tab_electronica.getColumnas()[i].setVisible(false);
+                tab_electronica.getColumnas()[i].setLectura(true);
+            }
+            tab_electronica.getColumna("ide_sresc").setVisible(true);
+            tab_electronica.getColumna("ide_sresc").setCombo("sri_estado_comprobante", "ide_sresc", "nombre_sresc", "");
+            tab_electronica.getColumna("ide_sresc").setNombreVisual("ESTADO");
+            tab_electronica.getColumna("ide_sresc").setOrden(1);
+            tab_electronica.getColumna("claveacceso_srcom").setVisible(true);
+            tab_electronica.getColumna("claveacceso_srcom").setNombreVisual("NUM. AUTORIZACIÓN");
+            tab_electronica.getColumna("claveacceso_srcom").setOrden(2);
+            tab_electronica.getColumna("claveacceso_srcom").setEtiqueta();
+            tab_electronica.getColumna("fechaautoriza_srcom").setVisible(true);
+            tab_electronica.getColumna("fechaautoriza_srcom").setNombreVisual("FECHA AUTORIZACIÓN");
+            tab_electronica.getColumna("fechaautoriza_srcom").setOrden(3);
+            tab_electronica.getColumna("autorizacion_srcomn").setVisible(false);
+            tab_electronica.setMostrarNumeroRegistros(false);
+            tab_electronica.dibujar();
+
+        }
+
         grupo.getChildren().add(tab_cb_rete);
         grupo.getChildren().add(tab_dto_prove);
+        grupo.getChildren().add(tab_electronica);
         grupo.getChildren().add(new Separator());
 
         Grid gri_td = new Grid();
@@ -1757,4 +1798,21 @@ public class DocumentoCxP extends Dialogo {
         this.tab_com_reembolso = tab_com_reembolso;
     }
 
+    public boolean isFacturaElectronica() {
+        String p_sri_activa_comp_elect = parametros.get("p_sri_activa_comp_elect");
+        if (p_sri_activa_comp_elect == null) {
+            return false;
+        }
+        return p_sri_activa_comp_elect.equalsIgnoreCase("true");
+    }
+
+    public Tabla getTab_electronica() {
+        return tab_electronica;
+    }
+
+    public void setTab_electronica(Tabla tab_electronica) {
+        this.tab_electronica = tab_electronica;
+    }
+    
+    
 }

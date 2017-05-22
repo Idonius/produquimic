@@ -14,11 +14,14 @@ import framework.componentes.Grupo;
 import framework.componentes.PanelTabla;
 import framework.componentes.Tabla;
 import framework.componentes.Texto;
+import framework.componentes.VisualizarPDF;
 import java.util.List;
+import java.util.Map;
 import javax.ejb.EJB;
 import javax.faces.event.AjaxBehaviorEvent;
 import org.primefaces.component.separator.Separator;
 import org.primefaces.event.SelectEvent;
+import servicios.ceo.ServicioComprobanteElectronico;
 import servicios.contabilidad.ServicioRetenciones;
 import servicios.cuentas_x_cobrar.ServicioCuentasCxC;
 import servicios.cuentas_x_pagar.ServicioCuentasCxP;
@@ -43,18 +46,36 @@ public class Retencion extends Dialogo {
     private final ServicioRetenciones ser_retencion = (ServicioRetenciones) utilitario.instanciarEJB(ServicioRetenciones.class);
     @EJB
     private final ServicioCuentasCxC ser_cuentas_cxc = (ServicioCuentasCxC) utilitario.instanciarEJB(ServicioCuentasCxC.class);
+    @EJB
+    private final ServicioComprobanteElectronico ser_comprobante_electronico = (ServicioComprobanteElectronico) utilitario.instanciarEJB(ServicioComprobanteElectronico.class);
 
     private final AreaTexto ate_observacion = new AreaTexto();
     private final Texto tex_total = new Texto();
     double douBaseImponibleRentaTotal = 0;
     double douBaseImponibleIvaTotal = 0;
 
+    private final Map<String, String> parametros;
+    private final VisualizarPDF vpd_retElec = new VisualizarPDF();
+
     public Retencion() {
+        parametros = utilitario.getVariables(
+                "p_sri_activa_comp_elect",
+                "p_con_estado_comprobante_rete_normal",
+                "p_con_impuesto_iva30",
+                "p_con_impuesto_iva70",
+                "p_con_impuesto_iva100",
+                "p_con_porcentaje_imp_iva");
+
         this.setWidth("95%");
         this.setHeight("90%");
         this.setTitle("COMPROBANTE DE RETENCIÓN");
         this.setResizable(false);
         this.setDynamic(false);
+
+        vpd_retElec.setId("vpd_retElec");
+        vpd_retElec.setTitle("RIDE");
+        utilitario.getPantalla().getChildren().add(vpd_retElec);
+
     }
 
     public void nuevaRetencionCompra(String ide_cpcfa) {
@@ -137,7 +158,7 @@ public class Retencion extends Dialogo {
         tab_cb_retencion.getColumna("ide_cncre").setVisible(false);
         tab_cb_retencion.getColumna("ide_cnccc").setVisible(false);
         tab_cb_retencion.getColumna("ide_cnere").setVisible(false);
-        tab_cb_retencion.getColumna("ide_cnere").setValorDefecto(utilitario.getVariable("p_con_estado_comprobante_rete_normal"));
+        tab_cb_retencion.getColumna("ide_cnere").setValorDefecto(parametros.get("p_con_estado_comprobante_rete_normal"));
         tab_cb_retencion.getColumna("es_venta_cncre").setValorDefecto("true");
         tab_cb_retencion.getColumna("es_venta_cncre").setVisible(false);
         tab_cb_retencion.getColumna("numero_cncre").setOrden(1);
@@ -217,10 +238,10 @@ public class Retencion extends Dialogo {
         tex_total.setDisabled(true);
         gri_valores.getChildren().add(tex_total);
 
-////        String p_iva30 = utilitario.getVariable("p_con_impuesto_iva30");
-////        String p_iva70 = utilitario.getVariable("p_con_impuesto_iva70");
-////        String p_iva100 = utilitario.getVariable("p_con_impuesto_iva100");
-////        List porcen_iva_sql = utilitario.getConexion().consultar("select porcentaje_cnpim from con_porcen_impues where ide_cnpim=" + utilitario.getVariable("p_con_porcentaje_imp_iva"));
+////        String p_iva30 = parametros.get("p_con_impuesto_iva30");
+////        String p_iva70 = parametros.get("p_con_impuesto_iva70");
+////        String p_iva100 = parametros.get("p_con_impuesto_iva100");
+////        List porcen_iva_sql = utilitario.getConexion().consultar("select porcentaje_cnpim from con_porcen_impues where ide_cnpim=" + parametros.get("p_con_porcentaje_imp_iva"));
 ////        double p_porcentaje_iva = Double.parseDouble(porcen_iva_sql.get(0).toString());
 //////        cls_retenciones retenciones = new cls_retenciones();
 //////
@@ -409,7 +430,7 @@ public class Retencion extends Dialogo {
         tab_cb_retencion.getColumna("ide_cncre").setVisible(false);
         tab_cb_retencion.getColumna("ide_cnccc").setVisible(false);
         tab_cb_retencion.getColumna("ide_cnere").setVisible(false);
-        tab_cb_retencion.getColumna("ide_cnere").setValorDefecto(utilitario.getVariable("p_con_estado_comprobante_rete_normal"));
+        tab_cb_retencion.getColumna("ide_cnere").setValorDefecto(parametros.get("p_con_estado_comprobante_rete_normal"));
         tab_cb_retencion.getColumna("es_venta_cncre").setValorDefecto("false");
         tab_cb_retencion.getColumna("es_venta_cncre").setVisible(false);
         tab_cb_retencion.getColumna("numero_cncre").setOrden(1);
@@ -422,6 +443,14 @@ public class Retencion extends Dialogo {
         tab_cb_retencion.getColumna("autorizacion_cncre").setNombreVisual("NUM. AUTORIZACIÓN");
         tab_cb_retencion.getColumna("autorizacion_cncre").setQuitarCaracteresEspeciales(true);
         tab_cb_retencion.getColumna("autorizacion_cncre").setEstilo("font-size: 12px;font-weight: bold");
+        tab_cb_retencion.getColumna("autorizacion_cncre").setRequerida(true);
+        tab_cb_retencion.getColumna("numero_cncre").setRequerida(true);
+        if (isFacturaElectronica()) {
+            tab_cb_retencion.getColumna("autorizacion_cncre").setLectura(true);
+            tab_cb_retencion.getColumna("numero_cncre").setLectura(true);
+            tab_cb_retencion.getColumna("autorizacion_cncre").setRequerida(false);
+            tab_cb_retencion.getColumna("numero_cncre").setRequerida(false);
+        }
         tab_cb_retencion.getColumna("numero_cncre").setQuitarCaracteresEspeciales(true);
         tab_cb_retencion.getColumna("OBSERVACION_CNCRE").setVisible(false);
         tab_cb_retencion.getColumna("FECHA_EMISI_CNCRE").setNombreVisual("FECHA EMISIÓN");
@@ -489,10 +518,10 @@ public class Retencion extends Dialogo {
         tex_total.setDisabled(true);
         gri_valores.getChildren().add(tex_total);
 
-        String p_iva30 = utilitario.getVariable("p_con_impuesto_iva30");
-        String p_iva70 = utilitario.getVariable("p_con_impuesto_iva70");
-        String p_iva100 = utilitario.getVariable("p_con_impuesto_iva100");
-        List porcen_iva_sql = utilitario.getConexion().consultar("select porcentaje_cnpim from con_porcen_impues where ide_cnpim=" + utilitario.getVariable("p_con_porcentaje_imp_iva"));
+        String p_iva30 = parametros.get("p_con_impuesto_iva30");
+        String p_iva70 = parametros.get("p_con_impuesto_iva70");
+        String p_iva100 = parametros.get("p_con_impuesto_iva100");
+        List porcen_iva_sql = utilitario.getConexion().consultar("select porcentaje_cnpim from con_porcen_impues where ide_cnpim=" + parametros.get("p_con_porcentaje_imp_iva"));
         double p_porcentaje_iva = Double.parseDouble(porcen_iva_sql.get(0).toString());
 
         cls_retenciones retenciones = new cls_retenciones();
@@ -666,10 +695,28 @@ public class Retencion extends Dialogo {
                         utilitario.getConexion().agregarSqlPantalla("UPDATE cxc_cabece_factura SET ide_cncre=" + ide_cncre + " WHERE ide_cccfa=" + ide_cccfa);
                     }
                     if (utilitario.getConexion().guardarPantalla().isEmpty()) {
+                        if (ide_cpcfa != null) {
+                            if (isFacturaElectronica()) {
+                                //GENERA COMPROBANTE DE RETENCION ELECTRONICO
+                                String ide_srcom = ser_comprobante_electronico.generarRetencionElectronica(ide_cncre);
+                                //Abre pdf RIDE
+                                visualizarRide(ide_srcom);
+                            }
+                        }
                         this.cerrar();
                     }
                 }
             }
+        }
+    }
+
+    public void visualizarRide(String ide_srcom) {
+        try {
+            ser_comprobante_electronico.getRIDE(ide_srcom);
+            vpd_retElec.setVisualizarPDFUsuario();
+            vpd_retElec.dibujar();
+        } catch (Exception e) {
+            e.printStackTrace();
         }
     }
 
@@ -680,14 +727,15 @@ public class Retencion extends Dialogo {
      */
     public boolean validarComprobanteRetencion() {
 
-        if (tab_cb_retencion.getValor("numero_cncre") == null || tab_cb_retencion.getValor("numero_cncre").isEmpty()) {
-            utilitario.agregarMensajeError("Error al guardar el Comprobante", "Debe ingresar el número de retención");
-            return false;
-        }
-
-        if (tab_cb_retencion.getValor("autorizacion_cncre") == null || tab_cb_retencion.getValor("autorizacion_cncre").isEmpty()) {
-            utilitario.agregarMensajeError("Error al guardar el Comprobante", "Debe ingresar el número de autorización");
-            return false;
+        if (isFacturaElectronica() == false || ide_cpcfa == null) {
+            if (tab_cb_retencion.getValor("numero_cncre") == null || tab_cb_retencion.getValor("numero_cncre").isEmpty()) {
+                utilitario.agregarMensajeError("Error al guardar el Comprobante", "Debe ingresar el número de retención");
+                return false;
+            }
+            if (tab_cb_retencion.getValor("autorizacion_cncre") == null || tab_cb_retencion.getValor("autorizacion_cncre").isEmpty()) {
+                utilitario.agregarMensajeError("Error al guardar el Comprobante", "Debe ingresar el número de autorización");
+                return false;
+            }
         }
 
         try {
@@ -784,6 +832,18 @@ public class Retencion extends Dialogo {
         }
         tex_total.setValue(utilitario.getFormatoNumero(tot_ret));
         utilitario.addUpdate("gri_valoresrt");
+    }
+
+    public boolean isFacturaElectronica() {
+        String p_sri_activa_comp_elect = parametros.get("p_sri_activa_comp_elect");
+        if (p_sri_activa_comp_elect == null) {
+            return false;
+        }
+        if (p_sri_activa_comp_elect.equalsIgnoreCase("true")) {
+            return true;
+        } else {
+            return false;
+        }
     }
 
     public Tabla getTab_cb_retencion() {
