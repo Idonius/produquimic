@@ -29,7 +29,6 @@ import framework.componentes.Reporte;
 import framework.componentes.SeleccionFormatoReporte;
 import framework.componentes.Tabla;
 import framework.componentes.VisualizarPDF;
-import framework.componentes.bootstrap.CajaBootstrap;
 import framework.componentes.graficos.GraficoCartesiano;
 import framework.componentes.graficos.GraficoPastel;
 import java.util.HashMap;
@@ -185,7 +184,10 @@ public class pre_facturasCxC extends Pantalla {
         g1.setWidth("100%");
         g1.setColumns(2);
         g1.setHeader(new Etiqueta("<span style='font-size:11px;' class='text-navy'>PENDIENTES </span>"));
-        g1.getChildren().add(new Etiqueta("<i class='fa fa-clock-o fa-4x text-navy'></i>"));
+        Link l1 = new Link();
+        l1.setMetodo("filtrarPendientes");
+        l1.getChildren().add(new Etiqueta("<i class='fa fa-clock-o fa-4x text-navy'></i>"));
+        g1.getChildren().add(l1);
         g1.getChildren().add(new Etiqueta("<span style='font-size:20px; text-align: left;'>67884</span>"));
         p1.getChildren().add(g1);
         gri_dashboard.getChildren().add(p1);
@@ -196,7 +198,10 @@ public class pre_facturasCxC extends Pantalla {
         g2.setColumns(2);
         g2.setWidth("100%");
         g2.setHeader(new Etiqueta("<span style='font-size:11px;' class='text-blue'>RECIBIDAS </span>"));
-        g2.getChildren().add(new Etiqueta("<i class='fa fa-cloud-upload fa-4x text-blue'></i>"));
+        Link l2 = new Link();
+        l2.setMetodo("filtrarRecibidas");
+        l2.getChildren().add(new Etiqueta("<i class='fa fa-cloud-upload fa-4x text-blue'></i>"));
+        g2.getChildren().add(l2);
         g2.getChildren().add(new Etiqueta("<span style='font-size:20px; text-align: left;'>6 </span>"));
         p2.getChildren().add(g2);
         gri_dashboard.getChildren().add(p2);
@@ -207,7 +212,10 @@ public class pre_facturasCxC extends Pantalla {
         g3.setWidth("100%");
         g3.setColumns(2);
         g3.setHeader(new Etiqueta("<span style='font-size:11px;' class='text-orange'>DEVUELTAS </span>"));
-        g3.getChildren().add(new Etiqueta("<i class='fa fa-arrow-circle-left fa-4x text-orange'></i>"));
+        Link l3 = new Link();
+        l3.setMetodo("filtrarDevueltas");
+        l3.getChildren().add(new Etiqueta("<i class='fa fa-arrow-circle-left fa-4x text-orange'></i>"));
+        g3.getChildren().add(l3);
         g3.getChildren().add(new Etiqueta("<span style='font-size:20px; text-align: left;'>4 </span>"));
         p3.getChildren().add(g3);
 
@@ -218,7 +226,10 @@ public class pre_facturasCxC extends Pantalla {
         g4.setColumns(2);
         g4.setWidth("100%");
         g4.setHeader(new Etiqueta("<span style='font-size:11px;' class='text-red'>RECHAZADAS </span>"));
-        g4.getChildren().add(new Etiqueta("<i class='fa fa-times-circle fa-4x text-red'></i>"));
+        Link l4 = new Link();
+        l4.setMetodo("filtrarRechazadas");
+        l4.getChildren().add(new Etiqueta("<i class='fa fa-times-circle fa-4x text-red'></i>"));
+        g4.getChildren().add(l4);
         g4.getChildren().add(new Etiqueta("<span style='font-size:20px; text-align: left;'>4 </span>"));
         p4.getChildren().add(g4);
         gri_dashboard.getChildren().add(p4);
@@ -229,7 +240,10 @@ public class pre_facturasCxC extends Pantalla {
         g5.setColumns(2);
         g5.setWidth("100%");
         g5.setHeader(new Etiqueta("<span style='font-size:11px;' class='text-green'>AUTORIZADAS </span>"));
-        g5.getChildren().add(new Etiqueta("<i class='fa fa-check-circle fa-4x text-green'></i>"));
+        Link l5 = new Link();
+        l5.setMetodo("filtrarAutorizadas");
+        l5.getChildren().add(new Etiqueta("<i class='fa fa-check-circle fa-4x text-green'></i>"));
+        g5.getChildren().add(l5);
         g5.getChildren().add(new Etiqueta("<span style='font-size:20px; text-align: left;'>24 </span>"));
         p5.getChildren().add(g5);
         gri_dashboard.getChildren().add(p5);
@@ -239,10 +253,44 @@ public class pre_facturasCxC extends Pantalla {
         g6.setWidth("100%");
         g6.setColumns(2);
         g6.setHeader(new Etiqueta("<span style='font-size:11px;' class='text-red'> NO AUTORIZADAS </span>"));
-        g6.getChildren().add(new Etiqueta("<i class='fa fa-minus-circle fa-4x text-red'></i>"));
+        Link l6 = new Link();
+        l6.setMetodo("filtrarNoAutorizadas");
+        l6.getChildren().add(new Etiqueta("<i class='fa fa-minus-circle fa-4x text-red'></i>"));
+        g6.getChildren().add(l6);
+
         g6.getChildren().add(new Etiqueta("<span style='font-size:20px; text-align: left;'>24 </span>"));
         p6.getChildren().add(g6);
         gri_dashboard.getChildren().add(p6);
+    }
+
+    public void filtrarPendientes() {
+        tab_tabla.setSql(ser_factura.getSqlFacturasElectronicasPorEstado(com_pto_emision.getValue() + "", cal_fecha_inicio.getFecha(), cal_fecha_fin.getFecha(), EstadoComprobanteEnum.PENDIENTE));
+        tab_tabla.ejecutarSql();
+    }
+
+    public void filtrarRecibidas() {
+        tab_tabla.setSql(ser_factura.getSqlFacturasElectronicasPorEstado(com_pto_emision.getValue() + "", cal_fecha_inicio.getFecha(), cal_fecha_fin.getFecha(), EstadoComprobanteEnum.RECIBIDA));
+        tab_tabla.ejecutarSql();
+    }
+
+    public void filtrarDevueltas() {
+        tab_tabla.setSql(ser_factura.getSqlFacturasElectronicasPorEstado(com_pto_emision.getValue() + "", cal_fecha_inicio.getFecha(), cal_fecha_fin.getFecha(), EstadoComprobanteEnum.DEVUELTA));
+        tab_tabla.ejecutarSql();
+    }
+
+    public void filtrarRechazadas() {
+        tab_tabla.setSql(ser_factura.getSqlFacturasElectronicasPorEstado(com_pto_emision.getValue() + "", cal_fecha_inicio.getFecha(), cal_fecha_fin.getFecha(), EstadoComprobanteEnum.RECHAZADO));
+        tab_tabla.ejecutarSql();
+    }
+
+    public void filtrarAutorizadas() {
+        tab_tabla.setSql(ser_factura.getSqlFacturasElectronicasPorEstado(com_pto_emision.getValue() + "", cal_fecha_inicio.getFecha(), cal_fecha_fin.getFecha(), EstadoComprobanteEnum.AUTORIZADO));
+        tab_tabla.ejecutarSql();
+    }
+
+    public void filtrarNoAutorizadas() {
+        tab_tabla.setSql(ser_factura.getSqlFacturasElectronicasPorEstado(com_pto_emision.getValue() + "", cal_fecha_inicio.getFecha(), cal_fecha_fin.getFecha(), EstadoComprobanteEnum.NOAUTORIZADO));
+        tab_tabla.ejecutarSql();
     }
 
     public void dibujarFacturas() {
