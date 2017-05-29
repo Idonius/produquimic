@@ -169,7 +169,7 @@ public class ServicioComprobanteElectronico extends ServicioBase {
                 //Si esta en estado PENDIENTE genero nueva clave de acceso por si se modifico la fecha
                 if (tab_cabecara.getValor("ide_sresc").equals(String.valueOf(EstadoComprobanteEnum.PENDIENTE.getCodigo()))) {
                     try {
-                        Comprobante comprobanteFactura = comprobanteService.getComprobantePorId(Integer.parseInt(ide_srcom));
+                        Comprobante comprobanteFactura = comprobanteService.getComprobantePorId(Long.parseLong(ide_srcom));
                         String strClaveAcceso = comprobanteService.getClaveAcceso(comprobanteFactura);
                         utilitario.getConexion().ejecutarSql("UPDATE sri_comprobante SET claveacceso_srcom='" + strClaveAcceso + "' where ide_srcom=" + ide_srcom);
                     } catch (NumberFormatException | GenericException e) {
@@ -319,7 +319,7 @@ public class ServicioComprobanteElectronico extends ServicioBase {
                 //Si esta en estado PENDIENTE genero nueva clave de acceso por si se modifico la fecha
                 if (tab_cabecara.getValor("ide_sresc").equals(String.valueOf(EstadoComprobanteEnum.PENDIENTE.getCodigo()))) {
                     try {
-                        Comprobante comprobanteNotaC = comprobanteService.getComprobantePorId(Integer.parseInt(ide_srcom));
+                        Comprobante comprobanteNotaC = comprobanteService.getComprobantePorId(Long.parseLong(ide_srcom));
                         String strClaveAcceso = comprobanteService.getClaveAcceso(comprobanteNotaC);
                         utilitario.getConexion().ejecutarSql("UPDATE sri_comprobante SET claveacceso_srcom='" + strClaveAcceso + "' where ide_srcom=" + ide_srcom);
                     } catch (NumberFormatException | GenericException e) {
@@ -341,15 +341,18 @@ public class ServicioComprobanteElectronico extends ServicioBase {
     public String generarGuiaRemisionElectronica(String ide_ccgui) {
         String ide_srcom = "-1";
 
-        TablaGenerica tab_factura = utilitario.consultar("select serie_ccdaf,fecha_emisi_cpcno,identificac_geper"
-                + ",a.ide_geper,ide_cntdo,alterno_ats  from cxc_guia a"
-                + "inner join gen_persona b on a.ide_geper = b.ide_geper  \n"
-                + "inner join cxc_datos_fac d on a.ide_ccdaf=d.ide_ccdaf\n"
-                + "where a.ide_cpcno=" + ide_ccgui);
+        TablaGenerica tab_guia = utilitario.consultar("select serie_ccdaf,fecha_emision_ccgui,identificac_geper,\n"
+                + "g.ide_geper,ide_cntdo,a.ide_srcom, e.ide_srcom as ide_srcom_factura,g.placa_gecam,fecha_ini_trasla_ccgui,fecha_fin_trasla_ccgui,punto_partida_ccgui \n"
+                + "from cxc_guia a\n"
+                + "inner join gen_camion g on g.placa_gecam=a.placa_gecam \n"
+                + "inner join gen_persona b on g.ide_geper = b.ide_geper  \n"
+                + "left join cxc_datos_fac d on a.ide_ccdaf=d.ide_ccdaf\n"
+                + "inner join cxc_cabece_factura e on a.ide_cccfa=e.ide_cccfa "
+                + "where a.ide_ccgui=" + ide_ccgui);
 
-        if (tab_factura.isEmpty() == false) {
-            if (tab_factura.getValor("ide_srcom") != null) {
-                ide_srcom = tab_factura.getValor("ide_srcom");
+        if (tab_guia.isEmpty() == false) {
+            if (tab_guia.getValor("ide_srcom") != null) {
+                ide_srcom = tab_guia.getValor("ide_srcom");
             }
             TablaGenerica tab_cabecara = new TablaGenerica();
             tab_cabecara.setTabla("sri_comprobante", "ide_srcom");
@@ -361,43 +364,49 @@ public class ServicioComprobanteElectronico extends ServicioBase {
             } else {
                 tab_cabecara.modificar(tab_cabecara.getFilaActual());
             }
+
+            tab_cabecara.setValor("sri_ide_srcom", tab_guia.getValor("ide_srcom_factura"));
+            tab_cabecara.setValor("placa_srcom", tab_guia.getValor("placa_gecam"));
+            tab_cabecara.setValor("fecha_fin_trans_srcom", tab_guia.getValor("fecha_fin_trasla_ccgui"));
+            tab_cabecara.setValor("fecha_ini_trans_srcom", tab_guia.getValor("fecha_ini_trasla_ccgui"));
+            tab_cabecara.setValor("direcion_partida_srcom", tab_guia.getValor("punto_partida_ccgui"));
+
             tab_cabecara.setValor("ide_sresc", String.valueOf(EstadoComprobanteEnum.PENDIENTE.getCodigo()));
             tab_cabecara.setValor("coddoc_srcom", TipoComprobanteEnum.GUIA_DE_REMISION.getCodigo());
             tab_cabecara.setValor("tipoemision_srcom", TipoEmisionEnum.NORMAL.getCodigo());
-            tab_cabecara.setValor("estab_srcom", tab_factura.getValor("serie_ccdaf").substring(0, 3));
-            tab_cabecara.setValor("ptoemi_srcom", tab_factura.getValor("serie_ccdaf").substring(3, 6));
-            tab_cabecara.setValor("fechaemision_srcom", tab_factura.getValor("fecha_emisi_cpcno"));
+            tab_cabecara.setValor("estab_srcom", tab_guia.getValor("serie_ccdaf").substring(0, 3));
+            tab_cabecara.setValor("ptoemi_srcom", tab_guia.getValor("serie_ccdaf").substring(3, 6));
+            tab_cabecara.setValor("fechaemision_srcom", tab_guia.getValor("fecha_emision_ccgui"));
             tab_cabecara.setValor("reutiliza_srcom", "false");//no reutiliza por defecto
             tab_cabecara.setValor("fecha_sistema_srcom", utilitario.getFechaActual());
             tab_cabecara.setValor("ip_genera_srcom", utilitario.getIp());
-            tab_cabecara.setValor("identificacion_srcom", tab_factura.getValor("identificac_geper"));
+            tab_cabecara.setValor("identificacion_srcom", tab_guia.getValor("identificac_geper"));
             tab_cabecara.setValor("en_nube_srcom", "false");
-            tab_cabecara.setValor("ide_geper", tab_factura.getValor("ide_geper"));
-            tab_cabecara.setValor("ide_cntdo", tab_factura.getValor("ide_cntdo"));
-            tab_cabecara.setValor("forma_cobro_srcom", tab_factura.getValor("alterno_ats"));
+            tab_cabecara.setValor("ide_geper", tab_guia.getValor("ide_geper"));
+            tab_cabecara.setValor("ide_cntdo", "7"); //Guia de Remisión
             tab_cabecara.setValor("ide_empr", utilitario.getVariable("ide_empr"));
             tab_cabecara.setValor("ide_sucu", utilitario.getVariable("ide_sucu"));
 
-            tab_cabecara.guardar();
-            ide_srcom = tab_cabecara.getValor("ide_srcom");
-
-            if (utilitario.getConexion().ejecutarListaSql().isEmpty()) {
-                //Si la Nota de Credito es nueva Asigna nuevo secuencial
-                if (tab_cabecara.getValor("secuencial_srcom") == null) {
-                    String strSecuencialF = getSecuencialComprobante(TipoComprobanteEnum.GUIA_DE_REMISION);
-                    utilitario.getConexion().ejecutarSql("UPDATE sri_comprobante SET secuencial_srcom='" + strSecuencialF + "' where ide_srcom=" + ide_srcom);
-                    utilitario.getConexion().ejecutarSql("UPDATE sri_comprobante SET reutiliza_srcom= false where secuencial_srcom='" + strSecuencialF + "' and reutiliza_srcom=true and coddoc_srcom='" + TipoComprobanteEnum.GUIA_DE_REMISION.getCodigo() + "'");
-                    utilitario.getConexion().ejecutarSql("UPDATE cxc_guia SET  ide_srcom=" + ide_srcom + ", numero_ccgui='" + strSecuencialF + "' where ide_ccgui=" + ide_ccgui);
-                    //UPDATE secuecial ghuia en la factura
-                }
-                //Si esta en estado PENDIENTE genero nueva clave de acceso por si se modifico la fecha
-                if (tab_cabecara.getValor("ide_sresc").equals(String.valueOf(EstadoComprobanteEnum.PENDIENTE.getCodigo()))) {
-                    try {
-                        Comprobante comprobanteNotaC = comprobanteService.getComprobantePorId(Integer.parseInt(ide_srcom));
-                        String strClaveAcceso = comprobanteService.getClaveAcceso(comprobanteNotaC);
-                        utilitario.getConexion().ejecutarSql("UPDATE sri_comprobante SET claveacceso_srcom='" + strClaveAcceso + "' where ide_srcom=" + ide_srcom);
-                    } catch (NumberFormatException | GenericException e) {
-                        e.printStackTrace();
+            if (tab_cabecara.guardar()) {
+                ide_srcom = tab_cabecara.getValor("ide_srcom");
+                if (utilitario.getConexion().ejecutarListaSql().isEmpty()) {
+                    //Si la Nota de Credito es nueva Asigna nuevo secuencial
+                    if (tab_cabecara.getValor("secuencial_srcom") == null) {
+                        String strSecuencialF = getSecuencialComprobante(TipoComprobanteEnum.GUIA_DE_REMISION);
+                        utilitario.getConexion().ejecutarSql("UPDATE sri_comprobante SET secuencial_srcom='" + strSecuencialF + "' where ide_srcom=" + ide_srcom);
+                        utilitario.getConexion().ejecutarSql("UPDATE sri_comprobante SET num_guia_srcom='" + tab_cabecara.getValor("estab_srcom") + "-" + tab_cabecara.getValor("ptoemi_srcom") + "-" + strSecuencialF + "' where ide_srcom=" + tab_cabecara.getValor("sri_ide_srcom"));
+                        utilitario.getConexion().ejecutarSql("UPDATE sri_comprobante SET reutiliza_srcom= false where secuencial_srcom='" + strSecuencialF + "' and reutiliza_srcom=true and coddoc_srcom='" + TipoComprobanteEnum.GUIA_DE_REMISION.getCodigo() + "'");
+                        utilitario.getConexion().ejecutarSql("UPDATE cxc_guia SET  ide_srcom=" + ide_srcom + ", numero_ccgui='" + strSecuencialF + "' where ide_ccgui=" + ide_ccgui);
+                    }
+                    //Si esta en estado PENDIENTE genero nueva clave de acceso por si se modifico la fecha
+                    if (tab_cabecara.getValor("ide_sresc").equals(String.valueOf(EstadoComprobanteEnum.PENDIENTE.getCodigo()))) {
+                        try {
+                            Comprobante comprobanteNotaC = comprobanteService.getComprobantePorId(Long.parseLong(ide_srcom));
+                            String strClaveAcceso = comprobanteService.getClaveAcceso(comprobanteNotaC);
+                            utilitario.getConexion().ejecutarSql("UPDATE sri_comprobante SET claveacceso_srcom='" + strClaveAcceso + "' where ide_srcom=" + ide_srcom);
+                        } catch (NumberFormatException | GenericException e) {
+                            e.printStackTrace();
+                        }
                     }
                 }
             }
@@ -468,7 +477,7 @@ public class ServicioComprobanteElectronico extends ServicioBase {
                 //Si esta en estado PENDIENTE genero nueva clave de acceso por si se modifico la fecha
                 if (tab_cabecara.getValor("ide_sresc").equals(String.valueOf(EstadoComprobanteEnum.PENDIENTE.getCodigo()))) {
                     try {
-                        Comprobante comprobanteNotaC = comprobanteService.getComprobantePorId(Integer.parseInt(ide_srcom));
+                        Comprobante comprobanteNotaC = comprobanteService.getComprobantePorId(Long.parseLong(ide_srcom));
                         String strClaveAcceso = comprobanteService.getClaveAcceso(comprobanteNotaC);
                         utilitario.getConexion().ejecutarSql("UPDATE sri_comprobante SET claveacceso_srcom='" + strClaveAcceso + "' where ide_srcom=" + ide_srcom);
                         utilitario.getConexion().ejecutarSql("UPDATE con_cabece_retenc SET  autorizacion_cncre='" + strClaveAcceso + "' where ide_cncre=" + ide_cncre);
@@ -524,8 +533,8 @@ public class ServicioComprobanteElectronico extends ServicioBase {
 
     public void getRIDE(String ide_srcom) throws GenericException {
         try {
-            byte[] ar = archivoService.getPdf(comprobanteService.getComprobantePorId(new Integer(ide_srcom)));
-            //crea el archivo
+            byte[] ar = archivoService.getPdf(comprobanteService.getComprobantePorId(new Long(ide_srcom)));
+            //crea el archivo 
             FacesContext fc = FacesContext.getCurrentInstance();
             ExternalContext ec = fc.getExternalContext();
             String realPath = (String) ec.getRealPath("/reportes");
@@ -542,7 +551,7 @@ public class ServicioComprobanteElectronico extends ServicioBase {
     }
 
     public int getNumeroComprobantesporEstado(TipoComprobanteEnum tipo, EstadoComprobanteEnum estado) {
-        String sql = "SELECT coddoc_srcom,count(coddoc_srcom) as num FROM sri_comprobante WHERE coddoc_srcom =" + tipo.getCodigo() + "  AND ide_sresc=" + estado.getCodigo() +" group by coddoc_srcom,ide_sresc" ;
+        String sql = "SELECT coddoc_srcom,count(coddoc_srcom) as num FROM sri_comprobante WHERE coddoc_srcom =" + tipo.getCodigo() + "  AND ide_sresc=" + estado.getCodigo() + " group by coddoc_srcom,ide_sresc";
         TablaGenerica tab = utilitario.consultar(sql);
         return tab.getTotalFilas();
     }

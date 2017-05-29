@@ -801,4 +801,19 @@ public class ServicioCuentasCxC extends ServicioBase {
         return max;
     }
 
+    /**
+     * Retorna el ide_srcom de la guia electrónica asociada a una factura
+     *
+     * @param factura
+     * @return
+     */
+    public String getCodigoGuiaElectronica(String factura) {
+        TablaGenerica tab_secuencia = utilitario.consultar("select a.ide_cccfa,b.ide_srcom\n"
+                + "from cxc_cabece_factura a\n"
+                + "inner join cxc_guia b on a.ide_cccfa=b.ide_cccfa\n"
+                + "where a.ide_srcom=" + factura);
+        return tab_secuencia.getValor("ide_srcom");
+
+    }
+
 }

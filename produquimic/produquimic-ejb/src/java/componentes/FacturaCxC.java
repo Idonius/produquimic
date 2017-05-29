@@ -74,6 +74,10 @@ public class FacturaCxC extends Dialogo {
     private boolean haceKardex = false;
     private String ide_ccctr;
 
+    String ide_srcom;
+    String ide_srcom_guia;
+    private Combo com_tipo_documento_rep = new Combo();
+
     //FORMA DE PAGO
     private Tabla tab_deta_pago;
 
@@ -126,7 +130,21 @@ public class FacturaCxC extends Dialogo {
         this.setResizable(false);
         this.setDynamic(false);
         vpd_factcxc.setId("vpd_factcxc");
+
+        List lista = new ArrayList();
+        Object fila1[] = {
+            "FACTURA", "FACTURA"
+        };
+        Object fila2[] = {
+            "GUIA DE REMISIÓN", "GUIA DE REMISIÓN"
+        };
+        lista.add(fila1);
+        lista.add(fila2);
+        com_tipo_documento_rep.setCombo(lista);
+        com_tipo_documento_rep.eliminarVacio();
+        vpd_factcxc.getGru_botones().getChildren().add(com_tipo_documento_rep);
         vpd_factcxc.setTitle("RIDE");
+
         utilitario.getPantalla().getChildren().add(vpd_factcxc);
         tab_factura.setStyle("width:" + (getAnchoPanel() - 5) + "px;height:" + (getAltoPanel() - 10) + "px;overflow: auto;display: block;");
         tab_factura.setId("tab_factura");
@@ -239,9 +257,7 @@ public class FacturaCxC extends Dialogo {
                 tab_factura.getTab(3).getChildren().add(dibujarRetencion());
             }
 
-            if (tab_cab_factura.getValor("ide_ccgui") != null) {
-                tab_factura.getTab(4).getChildren().add(dibujarGuiaRemision());
-            }
+            tab_factura.getTab(4).getChildren().add(dibujarGuiaRemision());
 
             com_pto_emision.setValue(tab_cab_factura.getValor("ide_ccdaf"));
             tab_deta_factura.setCondicion("ide_cccfa=" + tab_cab_factura.getValorSeleccionado());
@@ -327,9 +343,9 @@ public class FacturaCxC extends Dialogo {
         tab_guia.setRuta("pre_index.clase." + getId());
         tab_guia.setIdCompleto("tab_factura:tab_guia");
         tab_guia.setTabla("cxc_guia", "ide_ccgui", 992);
-        if (tab_cab_factura.getValor("ide_ccgui") != null) {
-            tab_cab_retencion.setCondicion("ide_ccgui=" + tab_cab_factura.getValor("ide_ccgui"));
-            tab_cab_retencion.setRecuperarLectura(true);
+        if (tab_cab_factura.getValor("ide_cccfa") != null) {
+            tab_guia.setCondicion("ide_cccfa=" + tab_cab_factura.getValor("ide_cccfa"));
+            tab_guia.setRecuperarLectura(true);
         } else {
             tab_guia.setCondicion("ide_ccgui=-1");
         }
@@ -349,13 +365,15 @@ public class FacturaCxC extends Dialogo {
         tab_guia.getColumna("ide_cctgi").setRequerida(true);
         tab_guia.getColumna("ide_cctgi").setValorDefecto("4");//Venta;
         tab_guia.getColumna("ide_cccfa").setUnico(true);
+        tab_guia.getColumna("ide_ccdaf").setVisible(false);
+        tab_guia.getColumna("ide_srcom").setVisible(false);
         tab_guia.getColumna("ide_geper").setCombo(lisClientes);
         tab_guia.getColumna("ide_geper").setAutoCompletar();
         tab_guia.getColumna("ide_geper").setLectura(true);
         tab_guia.getColumna("ide_geper").setNombreVisual("CLIENTE");
         tab_guia.getColumna("ide_geper").setOrden(2);
         tab_guia.getColumna("ide_geper").setLectura(true);
-        tab_guia.getColumna("placa_gecam").setCombo("gen_camion", "placa_gecam", "placa_gecam,identificacion_gecam,razon_social_gecam", "");
+        tab_guia.getColumna("placa_gecam").setCombo("select placa_gecam,placa_gecam,nom_geper from gen_camion a inner join gen_persona b on a.ide_geper=b.ide_geper order by nom_geper");
         tab_guia.getColumna("placa_gecam").setEstilo("width:350px");
         tab_guia.getColumna("placa_gecam").setNombreVisual("PLACA - TRANSPORTE");
         tab_guia.getColumna("placa_gecam").setRequerida(true);
@@ -576,11 +594,10 @@ public class FacturaCxC extends Dialogo {
         tab_cab_factura.getColumna("ide_geper").setMetodoChangeRuta(tab_cab_factura.getRuta() + ".seleccionarCliente");
         tab_cab_factura.getColumna("ide_geper").setNombreVisual("CLIENTE");
 
-        tab_cab_factura.getColumna("ide_ccgui").setVisible(false);
         tab_cab_factura.getColumna("orden_compra_cccfa").setNombreVisual("N. ORDEN COMPRA");
         tab_cab_factura.getColumna("dias_credito_cccfa").setNombreVisual("DIAS CREDITO");
-        tab_cab_factura.getColumna("num_guia_cccfa").setNombreVisual("N. GUIA REMISIÓN");
-        tab_cab_factura.getColumna("num_guia_cccfa").setLectura(true);
+        tab_cab_factura.getColumna("correo_cccfa").setNombreVisual("E-MAIL");
+        tab_cab_factura.getColumna("correo_cccfa").setLectura(false);
 
         tab_cab_factura.getColumna("dias_credito_cccfa").setCombo(getListaDiasCredito());
         tab_cab_factura.getColumna("dias_credito_cccfa").setRequerida(true);
@@ -1047,7 +1064,8 @@ public class FacturaCxC extends Dialogo {
                 tab_cab_factura.setValor("ide_geper", ide_geper);
                 tab_cab_factura.setValor("direccion_cccfa", tag_cliente.getValor("direccion_geper"));
                 tab_cab_factura.setValor("telefono_cccfa", tag_cliente.getValor("telefono_geper"));
-                utilitario.addUpdateTabla(tab_cab_factura, "direccion_cccfa,telefono_cccfa", "");
+                tab_cab_factura.setValor("correo_cccfa", tag_cliente.getValor("correo_geper"));
+                utilitario.addUpdateTabla(tab_cab_factura, "direccion_cccfa,telefono_cccfa,correo_cccfa", "");
             }
         }
     }
@@ -1213,7 +1231,8 @@ public class FacturaCxC extends Dialogo {
                 //Asigna punto de emision seleccionado y si solo guarda la factura
                 tab_cab_factura.setValor("ide_ccdaf", String.valueOf(com_pto_emision.getValue()));
                 tab_cab_factura.setValor("OBSERVACION_CCCFA", String.valueOf(ate_observacion.getValue()));
-                tab_cab_factura.setValor("tarifa_iva_cccfa", utilitario.getFormatoNumero(tarifaIVA));
+                tab_cab_factura.setValor("tarifa_iva_cccfa", utilitario.getFormatoNumero((tarifaIVA * 100)));
+                tab_guia.setValor("ide_ccdaf", String.valueOf(com_pto_emision.getValue()));
                 //valida la factura
                 if (validarFactura()) {
                     generarFactura();
@@ -1246,8 +1265,6 @@ public class FacturaCxC extends Dialogo {
             tab_guia.setValor("fecha_emision_ccgui", tab_cab_factura.getValor("fecha_emisi_cccfa"));
             tab_guia.setValor("ide_cccfa", ide_cccfa);
             if (tab_guia.guardar()) {
-                String ide_ccgui = tab_guia.getValor("ide_ccgui");
-                utilitario.getConexion().agregarSql("UPDATE cxc_cabece_factura SET ide_ccgui= " + ide_ccgui + " where ide_cccfa=" + ide_cccfa);
                 if (tab_deta_factura.guardar()) {
                     //Guarda la cuenta por cobrar
                     ser_factura.generarTransaccionFactura(tab_cab_factura);
@@ -1259,9 +1276,9 @@ public class FacturaCxC extends Dialogo {
                     if (utilitario.getConexion().guardarPantalla().isEmpty()) {
                         ////FACTURA ELECTRONICA
                         if (isFacturaElectronica()) {
-                            String ide_srcom = ser_comprobante_electronico.generarFacturaElectronica(ide_cccfa);
+                            ide_srcom = ser_comprobante_electronico.generarFacturaElectronica(ide_cccfa);
                             //Genera guia de remision electronica
-                            String ide_srcom_guia = ser_comprobante_electronico.generarGuiaRemisionElectronica(ide_ccgui);
+                            ide_srcom_guia = ser_comprobante_electronico.generarGuiaRemisionElectronica(tab_guia.getValor("ide_ccgui"));
                             //Abre pdf RIDE
                             visualizarRide(ide_srcom);
                         }
@@ -1276,11 +1293,33 @@ public class FacturaCxC extends Dialogo {
 
     public void visualizarRide(String ide_srcom) {
         try {
+            com_tipo_documento_rep.setMetodoRuta("pre_index.clase." + getId() + ".cambioTipoDocumetoReporte");
             ser_comprobante_electronico.getRIDE(ide_srcom);
+            this.ide_srcom = ide_srcom;
+            this.ide_srcom_guia = ser_factura.getCodigoGuiaElectronica(ide_srcom);
             vpd_factcxc.setVisualizarPDFUsuario();
             vpd_factcxc.dibujar();
         } catch (Exception e) {
             e.printStackTrace();
+        }
+    }
+
+    public void cambioTipoDocumetoReporte() {
+        try {
+            if (com_tipo_documento_rep.getValue().equals("FACTURA")) {
+                if (ide_srcom != null) {
+                    ser_comprobante_electronico.getRIDE(ide_srcom);
+                    vpd_factcxc.setVisualizarPDFUsuario();
+                    utilitario.addUpdate("vpd_factcxc");
+                }
+            } else {
+                if (ide_srcom_guia != null) {
+                    ser_comprobante_electronico.getRIDE(ide_srcom_guia);
+                    vpd_factcxc.setVisualizarPDFUsuario();
+                    utilitario.addUpdate("vpd_factcxc");
+                }
+            }
+        } catch (Exception e) {
         }
     }
 
@@ -1385,6 +1424,14 @@ public class FacturaCxC extends Dialogo {
         if (tab_cab_factura.getValor("observacion_cccfa") == null || tab_cab_factura.getValor("observacion_cccfa").isEmpty()) {
             utilitario.agregarMensajeError("No se puede guardar la Factura", "Debe ingresar una Observacion");
             return false;
+        }
+
+        if (tab_cab_factura.getValor("correo_cccfa") != null || tab_cab_factura.getValor("correo_cccfa").isEmpty() == false) {
+            if (utilitario.isCorreoValido(tab_cab_factura.getValor("correo_cccfa")) == false) {
+                utilitario.agregarMensajeError("No se puede guardar la Factura", "Debe ingresar una Observacion");
+                return false;
+            }
+
         }
 
         if (tab_deta_factura.getTotalFilas() == 0) {
