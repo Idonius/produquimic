@@ -65,6 +65,8 @@ public class ArchivoServiceImp implements ArchivoService {
     private NotaCreditoService notaCreditoService;
     @EJB
     private RetencionService retencionService;
+    @EJB
+    private GuiaRemisionService guiaRemisionService;
     private final UtilitarioCeo utilitario = new UtilitarioCeo();
 
     @Override
@@ -110,6 +112,8 @@ public class ArchivoServiceImp implements ArchivoService {
                 cadenaXML = notaCreditoService.getXmlNotaCredito(comprobante);
             } else if (comprobante.getCoddoc().equals(TipoComprobanteEnum.COMPROBANTE_DE_RETENCION.getCodigo())) {
                 cadenaXML = retencionService.getXmlRetencion(comprobante);
+            } else if (comprobante.getCoddoc().equals(TipoComprobanteEnum.GUIA_DE_REMISION.getCodigo())) {
+                cadenaXML = guiaRemisionService.getXmlGuiaRemision(comprobante);
             }
         } else {
             cadenaXML = sriComprobante.getXmlcomprobante();
@@ -153,6 +157,45 @@ public class ArchivoServiceImp implements ArchivoService {
                     utilitario.getValorEtiqueta(strDetalleActual, "precioTotalSinImpuesto")};
                 lisDetalle.add(new DetalleReporte(columnas, valores));
             }
+        } else if (comprobante.getCoddoc().equals(TipoComprobanteEnum.GUIA_DE_REMISION.getCodigo())) {
+            //Destinatario
+            String cadenaDestinatario = utilitario.getValorEtiqueta(cadenaXML, "destinatario");
+            String nombreComprobante = TipoComprobanteEnum.getDescripcion(utilitario.getValorEtiqueta(cadenaXML, "codDocSustento"));
+            String numDocSustento = utilitario.getValorEtiqueta(cadenaDestinatario, "numDocSustento");
+            String fechaEmisionSustento = utilitario.getValorEtiqueta(cadenaDestinatario, "fechaEmisionDocSustento");
+            String numeroAutorizacion = utilitario.getValorEtiqueta(cadenaDestinatario, "numAutDocSustento");
+            String motivoTraslado = utilitario.getValorEtiqueta(cadenaDestinatario, "motivoTraslado");
+            String destino = utilitario.getValorEtiqueta(cadenaDestinatario, "dirDestinatario");
+            String rucDestinatario = utilitario.getValorEtiqueta(cadenaDestinatario, "identificacionDestinatario");
+            String razonSocial = utilitario.getValorEtiqueta(cadenaDestinatario, "razonSocialDestinatario");
+            String docAduanero = utilitario.getValorEtiqueta(cadenaDestinatario, "impuestos");
+            String codigoEstab = utilitario.getValorEtiqueta(cadenaDestinatario, "impuestos");
+            String ruta = "RUTA TRANSPORTE";
+            // Detalles Guia
+            String cadenaDetalles = utilitario.getValorEtiqueta(cadenaXML, "detalles");
+            // //Forma un arreglo de todos los impuestos
+            String strDetalles[] = cadenaDetalles.split("</detalle>");
+            String columnas[] = {"nombreComprobante", "numDocSustento", "fechaEmisionSustento", "numeroAutorizacion", "motivoTraslado", "destino", "rucDestinatario", "razonSocial", "docAduanero", "codigoEstab", "ruta", "cantidad", "descripcion", "codigoPrincipal", "codigoAuxiliar"};
+            for (String strDetalleActual : strDetalles) {
+                Object valores[] = {
+                    nombreComprobante,
+                    numDocSustento,
+                    fechaEmisionSustento,
+                    numeroAutorizacion,
+                    motivoTraslado,
+                    destino,
+                    rucDestinatario,
+                    razonSocial,
+                    docAduanero,
+                    codigoEstab,
+                    ruta,
+                    utilitario.getValorEtiqueta(strDetalleActual, "cantidad"),
+                    utilitario.getValorEtiqueta(strDetalleActual, "descripcion"),
+                    utilitario.getValorEtiqueta(strDetalleActual, "codigoInterno"),
+                    utilitario.getValorEtiqueta(strDetalleActual, "codigoAdicional")
+                };
+                lisDetalle.add(new DetalleReporte(columnas, valores));
+            }
         } else if (comprobante.getCoddoc().equals(TipoComprobanteEnum.COMPROBANTE_DE_RETENCION.getCodigo())) {
             // Detalles impuestos
             String cadenaDetalles = utilitario.getValorEtiqueta(cadenaXML, "impuestos");
@@ -181,6 +224,8 @@ public class ArchivoServiceImp implements ArchivoService {
 
         } else if (comprobante.getCoddoc().equals(TipoComprobanteEnum.NOTA_DE_CREDITO.getCodigo())) {
             reporte = generarReporte.crearPDF(parametros, "notaCredito.jasper", parametros.get("CLAVE_ACC") + "");
+        } else if (comprobante.getCoddoc().equals(TipoComprobanteEnum.GUIA_DE_REMISION.getCodigo())) {
+            reporte = generarReporte.crearPDF(parametros, "guiaRemisionFinal.jasper", parametros.get("CLAVE_ACC") + "");
         }
 
         try {
@@ -221,6 +266,7 @@ public class ArchivoServiceImp implements ArchivoService {
             parametros.put("LLEVA_CONTABILIDAD", utilitario.getValorEtiqueta(cadenaXML, "obligadoContabilidad"));
             parametros.put("RS_COMPRADOR", utilitario.getValorEtiqueta(cadenaXML, "razonSocialComprador"));
             parametros.put("RUC_COMPRADOR", utilitario.getValorEtiqueta(cadenaXML, "identificacionComprador"));
+            parametros.put("GUIA", utilitario.getValorEtiqueta(cadenaXML, "guiaRemision"));
 
             parametros.put("NUM_DOC_MODIFICADO", utilitario.getValorEtiqueta(cadenaXML, "numDocModificado"));
             parametros.put("DOC_MODIFICADO", TipoComprobanteEnum.getDescripcion(utilitario.getValorEtiqueta(cadenaXML, "codDocModificado")));
@@ -250,6 +296,15 @@ public class ArchivoServiceImp implements ArchivoService {
                 parametros.put("EJERCICIO_FISCAL", utilitario.getValorEtiqueta(cadenaXML, "periodoFiscal"));
                 parametros.put("RS_COMPRADOR", utilitario.getValorEtiqueta(cadenaXML, "razonSocialSujetoRetenido"));
                 parametros.put("RUC_COMPRADOR", utilitario.getValorEtiqueta(cadenaXML, "identificacionSujetoRetenido"));
+            }
+
+            if (comprobante.getCoddoc().equals(TipoComprobanteEnum.GUIA_DE_REMISION.getCodigo())) {
+                parametros.put("PLACA", utilitario.getValorEtiqueta(cadenaXML, "placa"));
+                parametros.put("RS_COMPRADOR", utilitario.getValorEtiqueta(cadenaXML, "razonSocialTransportista"));
+                parametros.put("RUC_COMPRADOR", utilitario.getValorEtiqueta(cadenaXML, "rucTransportista"));
+                parametros.put("PUNTO_PARTIDA", utilitario.getValorEtiqueta(cadenaXML, "dirPartida"));
+                parametros.put("FECHA_INI_TRANSPORTE", utilitario.getValorEtiqueta(cadenaXML, "fechaIniTransporte"));
+                parametros.put("FECHA_FIN_TRANSPORTE", utilitario.getValorEtiqueta(cadenaXML, "fechaFinTransporte"));
             }
 
             // Porcentaje iva

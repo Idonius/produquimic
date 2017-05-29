@@ -205,14 +205,20 @@ public class ComprobanteServiceImp implements ComprobanteService {
     }
 
     @Override
-    public Comprobante getComprobantePorId(Integer ide_srcom) throws GenericException {
+    public Comprobante getComprobantePorId(Long ide_srcom) throws GenericException {
         return comprobanteDAO.getComprobantePorId(ide_srcom);
+    }
+
+    @Override
+    public Comprobante getComprobanteGuia(Comprobante comprobante) throws GenericException {
+        return comprobanteDAO.getComprobanteGuia(comprobante.getCodigocomprobante());
     }
 
     @Override
     public void enviarComprobante(String claveAcceso) throws GenericException {
 
         Comprobante comprobanteActual = getComprobantePorClaveAcceso(claveAcceso);
+        Comprobante comprobanteGuia = null;
         if (comprobanteActual == null) {
             throw new GenericException("ERROR. No existe el comprobante " + claveAcceso);
         }
@@ -225,25 +231,49 @@ public class ComprobanteServiceImp implements ComprobanteService {
                 xml = notaCreditoService.getXmlNotaCredito(comprobanteActual);
             } else if (comprobanteActual.getCoddoc().equals(TipoComprobanteEnum.COMPROBANTE_DE_RETENCION.getCodigo())) {
                 xml = retencionService.getXmlRetencion(comprobanteActual);
+            } else if (comprobanteActual.getCoddoc().equals(TipoComprobanteEnum.GUIA_DE_REMISION.getCodigo())) {
+                xml = guiaRemisionService.getXmlGuiaRemision(comprobanteActual);
             }
             xml = utilitario.reemplazarCaracteresEspeciales(xml);
             recepcionService.enviarRecepcionOfflineSRI(comprobanteActual, xml);
             //verifica que se encuentre en estado RECIBIDA
-            comprobanteActual = getComprobantePorClaveAcceso(claveAcceso);
+            comprobanteActual = getComprobantePorId(comprobanteActual.getCodigocomprobante());
+
+            //Si es factura envia la guia de remision
+            if (comprobanteActual.getCoddoc().equals(TipoComprobanteEnum.FACTURA.getCodigo())) {
+                comprobanteGuia = getComprobanteGuia(comprobanteActual);
+            }
+
             if (comprobanteActual.getCodigoestado() != EstadoComprobanteEnum.RECIBIDA.getCodigo()) {
                 throw new GenericException("ERROR. El Comprobante " + claveAcceso + " no pudo ser enviado al SRI");
             } else {
-                try {
-                    //Esperamos 6 segundos por recomendacion del SRI
-                    Thread.sleep(6 * 1000);
-                } catch (Exception e) {
+
+                if (comprobanteGuia != null && comprobanteGuia.getCodigoestado() == EstadoComprobanteEnum.PENDIENTE.getCodigo()) {
+                    //Envia la guia
+                    String xmlGuia = guiaRemisionService.getXmlGuiaRemision(comprobanteGuia);
+                    xmlGuia = utilitario.reemplazarCaracteresEspeciales(xmlGuia);
+                    recepcionService.enviarRecepcionOfflineSRI(comprobanteGuia, xmlGuia);
+                    comprobanteGuia = getComprobantePorId(comprobanteGuia.getCodigocomprobante());
+                } else {
+                    try {
+                        //Esperamos 6 segundos por recomendacion del SRI
+                        Thread.sleep(6 * 1000);
+                    } catch (Exception e) {
+                    }
                 }
+
             }
         }
         if (comprobanteActual.getCodigoestado() == EstadoComprobanteEnum.RECIBIDA.getCodigo()) {
             autorizacionService.enviarRecibidosOfflineSRI(comprobanteActual);
+            if (comprobanteGuia != null) {
+                //Envia Guia
+                if (comprobanteGuia.getCodigoestado() == EstadoComprobanteEnum.RECIBIDA.getCodigo()) {
+                    autorizacionService.enviarRecibidosOfflineSRI(comprobanteGuia);
+                }
+            }
             //verifica si se autorizo
-            comprobanteActual = getComprobantePorClaveAcceso(claveAcceso);
+            comprobanteActual = getComprobantePorId(comprobanteActual.getCodigocomprobante());
             if (comprobanteActual.getCodigoestado() != EstadoComprobanteEnum.AUTORIZADO.getCodigo()) {
                 throw new GenericException("ERROR. El Comprobante " + claveAcceso + " no pudo ser Autorizado por el SRI.");
             }

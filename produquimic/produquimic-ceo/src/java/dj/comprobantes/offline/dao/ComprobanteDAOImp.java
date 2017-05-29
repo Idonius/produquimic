@@ -167,7 +167,7 @@ public class ComprobanteDAOImp implements ComprobanteDAO {
     }
 
     @Override
-    public Comprobante getComprobantePorId(Integer ide_srcom) throws GenericException {
+    public Comprobante getComprobantePorId(Long ide_srcom) throws GenericException {
         Comprobante comprobante = null;
         ConexionCEO con = new ConexionCEO();
         PreparedStatement ps = null;
@@ -175,7 +175,7 @@ public class ComprobanteDAOImp implements ComprobanteDAO {
         try {
             String sql = "SELECT * FROM sri_comprobante  WHERE ide_srcom = ?";
             ps = con.getPreparedStatement(sql);
-            ps.setInt(1, ide_srcom);
+            ps.setLong(1, ide_srcom);
             res = ps.executeQuery();
             if (res.next()) {
                 comprobante = new Comprobante(res, con);
@@ -227,6 +227,38 @@ public class ComprobanteDAOImp implements ComprobanteDAO {
             con.desconectar();
         }
         return listaComprobantes;
+    }
+
+    @Override
+    public Comprobante getComprobanteGuia(Long ide_srcom) throws GenericException {
+        Comprobante comprobante = null;
+        ConexionCEO con = new ConexionCEO();
+        PreparedStatement ps = null;
+        ResultSet res = null;
+        try {
+            String sql = "SELECT * FROM sri_comprobante  WHERE sri_ide_srcom = ?";
+            ps = con.getPreparedStatement(sql);
+            ps.setLong(1, ide_srcom);
+            res = ps.executeQuery();
+            if (res.next()) {
+                comprobante = new Comprobante(res, con);
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+            throw new GenericException(e);
+        } finally {
+            try {
+                if (ps != null) {
+                    ps.close();
+                }
+                if (res != null) {
+                    res.close();
+                }
+            } catch (Exception e) {
+            }
+            con.desconectar();
+        }
+        return comprobante;
     }
 
 }

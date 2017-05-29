@@ -32,14 +32,18 @@ public class DetalleComprobante implements Serializable {
 
     public DetalleComprobante(ResultSet resultado) {
         try {
-            this.codigoprincipal = resultado.getString("codigo_principal_srdec");
-            this.codigoauxiliar = resultado.getString("codigo_auxiliar_srdec");
-            this.cantidad = resultado.getBigDecimal("cantidad_srdec");
-            this.descripciondet = resultado.getString("descripcion_srdec");
-            this.preciounitario = resultado.getBigDecimal("precio_srdec");
-            this.descuento = resultado.getBigDecimal("descuento_detalle_srdec");
-            this.preciototalsinimpuesto = resultado.getBigDecimal("total_detalle_srdec");
-            this.porcentajeiva = resultado.getBigDecimal("porcentaje_iva_srdec");
+            this.codigoprincipal = resultado.getString("codigo_inarti");
+            this.codigoauxiliar = resultado.getString("ide_inarti");
+            this.cantidad = resultado.getBigDecimal("cantidad_ccdfa");
+            this.descripciondet = resultado.getString("nombre_inarti");
+            this.preciounitario = resultado.getBigDecimal("precio_ccdfa");
+            this.descuento = new BigDecimal("0.00");
+            this.preciototalsinimpuesto = resultado.getBigDecimal("total_ccdfa");
+            if (resultado.getString("iva_inarti_ccdfa").equals("1")) {
+                this.porcentajeiva = resultado.getBigDecimal("tarifa_iva_cccfa");
+            } else {
+                this.porcentajeiva = new BigDecimal("0.00");
+            }
         } catch (SQLException e) {
             e.printStackTrace();
         }

@@ -79,7 +79,7 @@ public interface ComprobanteService {
      * @return
      * @throws GenericException
      */
-    public Comprobante getComprobantePorId(Integer ide_srcom) throws GenericException;
+    public Comprobante getComprobantePorId(Long ide_srcom) throws GenericException;
 
     /**
      * envia un comprobante al SRI
@@ -89,4 +89,12 @@ public interface ComprobanteService {
      */
     public void enviarComprobante(String claveAcceso) throws GenericException;
 
+    /**
+     * Retorna una guia de remision a partir de una factura
+     *
+     * @param comprobante
+     * @return
+     * @throws GenericException
+     */
+    public Comprobante getComprobanteGuia(Comprobante comprobante) throws GenericException;
 }

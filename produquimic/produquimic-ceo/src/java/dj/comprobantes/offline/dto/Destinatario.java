@@ -18,7 +18,7 @@ public class Destinatario {
     private String razonSocialDestinatario;
     private String dirDestinatario;
     private String motivoTraslado;
-    private String docAduaneroUnico;
+    private String docAduaneroUnico = "000";
     private String codEstabDestino;
     private String ruta = "RUTA";
     private String codDocSustento;
@@ -29,16 +29,16 @@ public class Destinatario {
     public Destinatario(ResultSet resultado) {
 
         try {
-            this.identificacionDestinatario = resultado.getString("").trim();
-            this.razonSocialDestinatario = resultado.getString("").trim();
-            this.dirDestinatario = resultado.getString("").trim();
-            this.motivoTraslado = resultado.getString("");
-            this.docAduaneroUnico = resultado.getString("");
-            this.codEstabDestino = resultado.getString("");
-            this.codDocSustento = resultado.getString("");
-            this.numDocSustento = resultado.getString("");            
-            this.numAutDocSustento = resultado.getString("");
-            this.fechaEmisionDocSustento = resultado.getDate("");
+            this.identificacionDestinatario = resultado.getString("identificac_geper").trim();
+            this.razonSocialDestinatario = resultado.getString("nom_geper").trim();
+            this.dirDestinatario = resultado.getString("direccion_geper").trim();
+            this.motivoTraslado = resultado.getString("nombre_cctgi");
+            //this.docAduaneroUnico = resultado.getString("");
+            this.codEstabDestino = resultado.getString("estab_srcom");
+            this.codDocSustento = resultado.getString("coddoc_srcom");
+            this.numDocSustento = resultado.getString("estab_srcom") + "-" + resultado.getString("ptoemi_srcom") + "-" + resultado.getString("secuencial_srcom");
+            this.numAutDocSustento = resultado.getString("claveacceso_srcom");
+            this.fechaEmisionDocSustento = resultado.getDate("fechaemision_srcom");
         } catch (Exception e) {
             e.printStackTrace();
         }

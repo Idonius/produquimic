@@ -79,6 +79,7 @@ public class FacturaServiceImp implements FacturaService {
                     .append("			<contribuyenteEspecial>").append(emisorService.getEmisor().getContribuyenteespecial()).append("</contribuyenteEspecial> \n")
                     .append("			<obligadoContabilidad>").append(emisorService.getEmisor().getObligadocontabilidad()).append("</obligadoContabilidad> \n")
                     .append("			<tipoIdentificacionComprador>").append(comprobante.getCliente().getTipoIdentificacion()).append("</tipoIdentificacionComprador> \n")
+                    .append("			<guiaRemision>").append(comprobante.getGuiaremision()).append("</guiaRemision> \n")
                     .append("			<razonSocialComprador>").append(comprobante.getCliente().getNombreCliente()).append("</razonSocialComprador> \n")
                     .append("			<identificacionComprador>").append(comprobante.getCliente().getIdentificacion().trim()).append("</identificacionComprador> \n")
                     .append("			<direccionComprador>").append(comprobante.getCliente().getDireccion()).append("</direccionComprador> \n")

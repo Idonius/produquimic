@@ -11,7 +11,6 @@ package dj.comprobantes.offline.dto;
 
 import dj.comprobantes.offline.conexion.ConexionCEO;
 import dj.comprobantes.offline.enums.TipoComprobanteEnum;
-import dj.comprobantes.offline.exception.GenericException;
 import java.io.Serializable;
 import java.math.BigDecimal;
 import java.sql.ResultSet;
@@ -62,7 +61,6 @@ public final class Comprobante implements Serializable {
     private List<DetalleImpuesto> impuesto;
     private String formaCobro = "01"; //por defecto efectivo
     private String motivo;
-    private String numGuiaRemision;
     private int diasCredito;
     private String numOrdenCompra;
 
@@ -80,6 +78,7 @@ public final class Comprobante implements Serializable {
     public Comprobante(ResultSet resultado, ConexionCEO con) {
         try {
             this.codigocomprobante = resultado.getLong("ide_srcom");
+            this.codigoComprobanteFactura = resultado.getLong("sri_ide_srcom");
             this.tipoemision = resultado.getString("tipoemision_srcom");
             this.claveacceso = resultado.getString("claveacceso_srcom");
             this.coddoc = resultado.getString("coddoc_srcom");
@@ -88,9 +87,9 @@ public final class Comprobante implements Serializable {
             this.secuencial = resultado.getString("secuencial_srcom");
             this.fechaemision = resultado.getDate("fechaemision_srcom");
             //this.direstablecimiento =   Direccion donde se factura
-            //this.guiaremision = resultado.getString("va_guia_remision");
+            this.guiaremision = resultado.getString("num_guia_srcom");
             this.totalsinimpuestos = resultado.getBigDecimal("subtotal_srcom");
-
+            this.placa = resultado.getString("placa_srcom");
             this.totaldescuento = resultado.getBigDecimal("descuento_srcom");
             this.propina = new BigDecimal(0.00);
             this.importetotal = resultado.getBigDecimal("total_srcom");
@@ -104,7 +103,6 @@ public final class Comprobante implements Serializable {
             this.numAutorizacion = resultado.getString("autorizacion_srcomn");
 
             this.diasCredito = resultado.getInt("dias_credito_srcom");
-            this.numGuiaRemision = resultado.getString("num_guia_srcom");
             this.numOrdenCompra = resultado.getString("orden_compra_srcom");
 
             if (resultado.getString("en_nube_srcom") != null) {
@@ -135,6 +133,10 @@ public final class Comprobante implements Serializable {
 
             this.fechaautoriza = resultado.getDate("fechaautoriza_srcom");
 
+            this.fechaIniTransporte = resultado.getDate("fecha_ini_trans_srcom");
+            this.fechaFinTransporte = resultado.getDate("fecha_fin_trans_srcom");
+            this.dirPartida = resultado.getString("direcion_partida_srcom");
+
             //Busca el cliente 
             try {
                 Statement sentensia = con.getConnection().createStatement();
@@ -153,10 +155,15 @@ public final class Comprobante implements Serializable {
 
             if (this.coddoc.equals(TipoComprobanteEnum.FACTURA.getCodigo()) || this.coddoc.equals(TipoComprobanteEnum.NOTA_DE_CREDITO.getCodigo())) {
                 //Busca los detalles del Comprobante
-                try {
-                    //!!!!!!!!!!CAMBIAR AL DETALLE DE LA FACTURA CXC Y AL DETALLE DE LA NOTA DE CREDITO CXP
+                try {                    
                     detalle = new ArrayList<>();
-                    String sql = "SELECT * FROM sri_detalle_comprobante where ide_srcom=" + this.codigocomprobante;
+                    String sql = "select f.ide_inarti,codigo_inarti,observacion_ccdfa,nombre_inarti,cantidad_ccdfa\n"
+                            + ",precio_ccdfa,iva_inarti_ccdfa,total_ccdfa,nombre_inuni, tarifa_iva_cccfa,iva_inarti_ccdfa \n"
+                            + "from cxc_cabece_factura  a\n"
+                            + "inner join cxc_deta_factura c on a.ide_cccfa=c.ide_cccfa\n"
+                            + "inner join  inv_articulo f on c.ide_inarti =f.ide_inarti\n"
+                            + "left join  inv_unidad g on c.ide_inuni =g.ide_inuni\n"
+                            + "where a.ide_srcom=" + this.codigocomprobante;
                     Statement sentensia = con.getConnection().createStatement();
                     ResultSet res = sentensia.executeQuery(sql);
                     while (res.next()) {
@@ -170,12 +177,39 @@ public final class Comprobante implements Serializable {
                     e.printStackTrace();
                 }
             } else if (this.coddoc.equals(TipoComprobanteEnum.GUIA_DE_REMISION.getCodigo())) {
+                //Busca datos de la guia de remision
+                try {
 
-                destinatario = new Destinatario(resultado);
+                    String sql = "select c.identificac_geper,c.nom_geper,c.direccion_geper,nombre_cctgi,\n"
+                            + "h.coddoc_srcom,h.estab_srcom,h.ptoemi_srcom,h.secuencial_srcom,h.claveacceso_srcom,h.fechaemision_srcom\n"
+                            + "from cxc_guia a\n"
+                            + "inner join gen_persona b on a.ide_geper = b.ide_geper  \n"
+                            + "inner join gen_persona c on a.ide_geper = c.ide_geper  \n"
+                            + "inner join cxc_tipo_guia e on a.ide_cctgi=e.ide_cctgi\n"
+                            + "inner join sri_comprobante f on a.ide_srcom=f.ide_srcom\n"
+                            + "inner join sri_comprobante h on f.sri_ide_srcom=h.ide_srcom\n"
+                            + "where a.ide_srcom=" + this.codigocomprobante;
+                    Statement sentensia = con.getConnection().createStatement();
+                    ResultSet res = sentensia.executeQuery(sql);
+                    if (res.next()) {
+                        destinatario = new Destinatario(res);
+                    }
+                    sentensia.close();
+                    res.close();
+                } catch (Exception e) {
+                    e.printStackTrace();
+                }
+
                 //Busca los detalles del Comprobante Factura asociado a la guia
                 try {
                     detalle = new ArrayList<>();
-                    String sql = "SELECT * FROM sri_detalle_comprobante where ide_srcom=" + this.codigoComprobanteFactura;
+                    String sql = "select f.ide_inarti,codigo_inarti,observacion_ccdfa,nombre_inarti,cantidad_ccdfa\n"
+                            + ",precio_ccdfa,iva_inarti_ccdfa,total_ccdfa,nombre_inuni,(tarifa_iva_cccfa*100)as tarifa_iva_cccfa \n"
+                            + "from cxc_cabece_factura  a\n"
+                            + "inner join cxc_deta_factura c on a.ide_cccfa=c.ide_cccfa\n"
+                            + "inner join  inv_articulo f on c.ide_inarti =f.ide_inarti\n"
+                            + "left join  inv_unidad g on c.ide_inuni =g.ide_inuni\n"
+                            + "where a.ide_srcom=" + this.codigoComprobanteFactura;                    
                     Statement sentensia = con.getConnection().createStatement();
                     ResultSet res = sentensia.executeQuery(sql);
                     while (res.next()) {
@@ -491,14 +525,6 @@ public final class Comprobante implements Serializable {
 
     public void setMotivo(String motivo) {
         this.motivo = motivo;
-    }
-
-    public String getNumGuiaRemision() {
-        return numGuiaRemision;
-    }
-
-    public void setNumGuiaRemision(String numGuiaRemision) {
-        this.numGuiaRemision = numGuiaRemision;
     }
 
     public int getDiasCredito() {

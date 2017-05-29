@@ -29,7 +29,7 @@ public class GuiaRemisionServiceImp implements GuiaRemisionService {
         StringBuilder str_xml = new StringBuilder();
         if (comprobante != null) {
             str_xml.append("<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n")
-                    .append("     <guiaRemision id=\"comprobante\" version=\"2.1.0\"> \n")
+                    .append("     <guiaRemision id=\"comprobante\" version=\"1.0.0\"> \n")
                     .append("		<infoTributaria> \n")
                     .append("			<ambiente>").append(emisorService.getEmisor().getAmbiente()).append("</ambiente> \n")
                     .append("			<tipoEmision>").append(comprobante.getTipoemision()).append("</tipoEmision> \n")
@@ -70,14 +70,14 @@ public class GuiaRemisionServiceImp implements GuiaRemisionService {
                     .append("                           <fechaEmisionDocSustento>").append(utilitario.getFormatoFecha(comprobante.getDestinatario().getFechaEmisionDocSustento(), "dd/MM/yyyy")).append("</fechaEmisionDocSustento> \n")
                     .append("                           <detalles> \n");
             for (DetalleComprobante detalle : comprobante.getDetalle()) {
-                str_xml.append("                            <detalle> \n")
-                        .append("				<codigoInterno>").append(detalle.getCodigoprincipal()).append("</codigoInterno> \n")
-                        .append("				<codigoAdicional>").append((detalle.getCodigoauxiliar() == null ? detalle.getCodigoprincipal() : detalle.getCodigoauxiliar())).append("</codigoAdicional> \n")
-                        .append("				<descripcion>").append(detalle.getDescripciondet()).append("</descripcion> \n")
-                        .append("				<cantidad>").append(utilitario.getFormatoNumero(detalle.getCantidad())).append("</cantidad> \n")
-                        .append("                           </detalle> \n");
+                str_xml.append("                                <detalle> \n")
+                        .append("                                       <codigoInterno>").append(detalle.getCodigoprincipal()).append("</codigoInterno> \n")
+                        .append("                                       <codigoAdicional>").append((detalle.getCodigoauxiliar() == null ? detalle.getCodigoprincipal() : detalle.getCodigoauxiliar())).append("</codigoAdicional> \n")
+                        .append("                                       <descripcion>").append(detalle.getDescripciondet()).append("</descripcion> \n")
+                        .append("                                       <cantidad>").append(utilitario.getFormatoNumero(detalle.getCantidad())).append("</cantidad> \n")
+                        .append("                               </detalle> \n");
             }
-            str_xml.append("                            <detalles> \n");
+            str_xml.append("                            </detalles> \n");
             str_xml.append("                    </destinatario> \n")
                     .append("		</destinatarios> \n")
                     .append("		<infoAdicional> \n");
