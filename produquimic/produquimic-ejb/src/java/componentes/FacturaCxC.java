@@ -1272,7 +1272,13 @@ public class FacturaCxC extends Dialogo {
                     if (haceKardex) {
                         ser_inventario.generarComprobnateTransaccionVenta(tab_cab_factura, tab_deta_factura);
                     }
-
+                    //Actualiza informacion del cliente
+                    tab_creacion_cliente.setCondicion("ide_geper=" + tab_cab_factura.getValor("ide_geper"));
+                    tab_creacion_cliente.modificar(tab_creacion_cliente.getFilaActual());
+                    tab_creacion_cliente.setValor("direccion_geper", tab_cab_factura.getValor("direccion_cccfa"));
+                    tab_creacion_cliente.setValor("telefono_geper", tab_cab_factura.getValor("telefono_cccfa"));
+                    tab_creacion_cliente.setValor("correo_geper", tab_cab_factura.getValor("correo_cccfa"));
+                    tab_creacion_cliente.guardar();
                     if (utilitario.getConexion().guardarPantalla().isEmpty()) {
                         ////FACTURA ELECTRONICA
                         if (isFacturaElectronica()) {
@@ -1347,7 +1353,9 @@ public class FacturaCxC extends Dialogo {
                     tab_cab_factura.setValor("ide_geper", tab_creacion_cliente.getValor("ide_geper"));
                     tab_cab_factura.setValor("direccion_cccfa", tab_creacion_cliente.getValor("direccion_geper"));
                     tab_cab_factura.setValor("telefono_cccfa", tab_creacion_cliente.getValor("telefono_geper"));
-                    utilitario.addUpdateTabla(tab_cab_factura, "direccion_cccfa,telefono_cccfa,ide_geper", "");
+                    tab_cab_factura.setValor("correo_cccfa", tab_creacion_cliente.getValor("correo_geper"));
+
+                    utilitario.addUpdateTabla(tab_cab_factura, "direccion_cccfa,telefono_cccfa,ide_geper,correo_cccfa", "");
                     tab_creacion_cliente.limpiar();
 
                     dia_creacion_cliente.cerrar();
@@ -1428,10 +1436,9 @@ public class FacturaCxC extends Dialogo {
 
         if (tab_cab_factura.getValor("correo_cccfa") != null || tab_cab_factura.getValor("correo_cccfa").isEmpty() == false) {
             if (utilitario.isCorreoValido(tab_cab_factura.getValor("correo_cccfa")) == false) {
-                utilitario.agregarMensajeError("No se puede guardar la Factura", "Debe ingresar una Observacion");
+                utilitario.agregarMensajeError("No se puede guardar la Factura", "El correo electrónico ingresado no es válido");
                 return false;
             }
-
         }
 
         if (tab_deta_factura.getTotalFilas() == 0) {

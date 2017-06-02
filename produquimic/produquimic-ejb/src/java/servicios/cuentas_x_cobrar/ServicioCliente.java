@@ -114,7 +114,7 @@ public class ServicioCliente extends ServicioBase {
     public void configurarTablaCliente(Tabla tabla) {
 
         tabla.setTabla("gen_persona", "ide_geper", -1);
-        tabla.setCondicion("es_cliente_geper=true");
+        tabla.setCondicion("es_cliente_geper=true and ide_geper=-1");
         tabla.getColumna("es_cliente_geper").setValorDefecto("true");
         tabla.getColumna("es_cliente_geper").setVisible(false);
         tabla.getColumna("codigo_geper").setLectura(true);
