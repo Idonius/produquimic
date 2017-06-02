@@ -22,6 +22,7 @@ public enum ParametrosSistemaEnum {
     MAIL_SMTP_PORT("465"),//25  //465
     MAIL_PASSWORD("password"),
     MAIL_GENERIC("comprobantes@produquimic.com.ec"),
+    CPANEL_WEB("http://127.0.0.1:8000/framework/servicios/ServicioNube.php/subirComprobante"),
     CODIGO_EMPR("1"); //CEO PRODUQUIMIC MG
 
     private final String codigo;

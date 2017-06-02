@@ -278,9 +278,9 @@ public class ComprobanteServiceImp implements ComprobanteService {
                 throw new GenericException("ERROR. El Comprobante " + claveAcceso + " no pudo ser Autorizado por el SRI.");
             }
             try {
-                cPanelService.subirComprobante(comprobanteActual);
+                cPanelService.guardarComprobanteNube(comprobanteActual);
             } catch (Exception e) {
-                System.out.println("ERROR. al subir a la nube " + e.getMessage());
+                System.out.println("ERROR. al subir comprobante a la Nube :" + e.getMessage());
             }
 
         }

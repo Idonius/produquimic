@@ -31,12 +31,4 @@ public interface CPanelService {
      * @throws GenericException
      */
     public void subirComprobantesPendientes() throws GenericException;
-
-    /**
-     * Sube un comprobante Autorizado a la nube
-     *
-     * @param comprobanteActual
-     * @throws GenericException
-     */
-    public void subirComprobante(Comprobante comprobanteActual) throws GenericException;
 }
