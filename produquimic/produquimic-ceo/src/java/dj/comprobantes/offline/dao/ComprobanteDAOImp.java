@@ -146,7 +146,7 @@ public class ComprobanteDAOImp implements ComprobanteDAO {
             preparedStatement.setString(4, comprobante.getNumAutorizacion());
             preparedStatement.setString(5, comprobante.getTipoemision());
             if (comprobante.getFechaautoriza() != null) {
-                preparedStatement.setDate(6, new java.sql.Date(comprobante.getFechaautoriza().getTime()));
+                preparedStatement.setTimestamp(6, new java.sql.Timestamp(comprobante.getFechaautoriza().getTime()));
             } else {
                 preparedStatement.setDate(6, null);
             }

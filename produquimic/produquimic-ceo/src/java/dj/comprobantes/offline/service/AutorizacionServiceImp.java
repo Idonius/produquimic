@@ -23,6 +23,7 @@ import ec.gob.sri.comprobantes.ws.aut.Mensaje;
 import ec.gob.sri.comprobantes.ws.aut.RespuestaComprobante;
 import java.net.MalformedURLException;
 import java.net.URL;
+import java.util.Date;
 import java.util.List;
 import java.util.Map;
 import javax.ejb.EJB;
@@ -75,7 +76,7 @@ public class AutorizacionServiceImp implements AutorizacionService {
                     System.out.println("... " + autorizacion.getEstado() + "  " + mensajesAutorizacion.toString());
                     comprobateActual.setCodigoestado(EstadoComprobanteEnum.getCodigo(autorizacion.getEstado()));
                     if (autorizacion.getEstado().equals(EstadoComprobanteEnum.AUTORIZADO.getDescripcion())) {
-                        comprobateActual.setFechaautoriza(autorizacion.getFechaAutorizacion().toGregorianCalendar().getTime());
+                        comprobateActual.setFechaautoriza(autorizacion.getFechaAutorizacion().toGregorianCalendar().getTime());                        
                         comprobateActual.setNumAutorizacion(autorizacion.getNumeroAutorizacion());
                         StringBuilder stb_xml = new StringBuilder();
                         stb_xml.append("<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n")

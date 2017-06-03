@@ -5,7 +5,6 @@
  */
 package dj.comprobantes.offline.service;
 
-import com.lowagie.text.pdf.codec.Base64;
 import dj.comprobantes.offline.dao.ComprobanteDAO;
 import dj.comprobantes.offline.dto.Comprobante;
 import dj.comprobantes.offline.enums.EstadoComprobanteEnum;
@@ -28,6 +27,7 @@ import java.util.List;
 import java.util.Map;
 import javax.ejb.EJB;
 import javax.ejb.Stateless;
+import org.apache.commons.codec.binary.Base64;
 
 /**
  *
@@ -51,8 +51,7 @@ public class CPanelServiceImp implements CPanelService {
         params.put("IDENTIFICACION_USUARIO", comprobante.getCliente().getIdentificacion());
         params.put("CORREO_USUARIO", comprobante.getCliente().getCorreo());
         params.put("CODIGO_ESTADO", EstadoUsuarioEnum.NUEVO.getCodigo());
-        params.put("DIRECCION_USUARIO", comprobante.getCliente().getDireccion());
-        params.put("TELEFONO_USUARIO", comprobante.getCliente().getTelefono());
+        params.put("DIRECCION_USUARIO", comprobante.getCliente().getDireccion());        
         params.put("PK_CODIGO_COMP", comprobante.getCodigocomprobante());
         params.put("CODIGO_DOCUMENTO", comprobante.getCoddoc());
         params.put("ESTADO", EstadoComprobanteEnum.AUTORIZADO.getDescripcion());
@@ -76,7 +75,7 @@ public class CPanelServiceImp implements CPanelService {
             postData.append(":\"");
             postData.append(String.valueOf(param.getValue())).append("\"");
         }
-        String encodedfileXML = Base64.encodeBytes(bxml);
+        String encodedfileXML = new String(Base64.encodeBase64(bxml));
         params.put("ARCHIVO_XML", encodedfileXML);
 
         //guarda en la nuebe el comprobante AUTORIZADO
