@@ -443,11 +443,10 @@ public class pre_facturasCxC extends Pantalla {
                 String mensaje = ser_facElect.enviarComprobante(tab_tabla.getValor("clave_acceso"));
 
                 String aux = tab_tabla.getValorSeleccionado();
-                tab_tabla.actualizar();
+                dibujarFacturas();
                 tab_tabla.setFilaActual(aux);
                 tab_tabla.calcularPaginaActual();
-                dibujarDashboard();
-                utilitario.addUpdate("gri_dashboard");
+
                 if (mensaje.isEmpty()) {
                     String mensje = "<p> FACTURA NRO. " + tab_tabla.getValor("secuencial_cccfa") + " ";
                     mensje += "</br>AMBIENTE : <strong>" + (utilitario.getVariable("p_sri_ambiente_comp_elect").equals("1") ? "PRUEBAS" : "PRODUCCIÓN") + "</strong></p>";  //********variable ambiente facturacion electronica                    
