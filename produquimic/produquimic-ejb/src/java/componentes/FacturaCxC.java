@@ -383,7 +383,7 @@ public class FacturaCxC extends Dialogo {
         tab_guia.getColumna("FECHA_FIN_TRASLA_CCGUI").setNombreVisual("FECHA FIN TRASLADO");
         tab_guia.getColumna("FECHA_INI_TRASLA_CCGUI").setValorDefecto(utilitario.getFechaActual());
         tab_guia.getColumna("FECHA_INI_TRASLA_CCGUI").setNombreVisual("FECHA INICIO TRASLADO");
-        tab_guia.getColumna("DESTINATARIO_CCGUI ").setNombreVisual("DESTINATARIO");
+        tab_guia.getColumna("DESTINATARIO_CCGUI ").setVisible(false);
 
         if (ser_factura.isFacturaElectronica()) {
             tab_guia.getColumna("numero_ccgui").setLectura(true);
@@ -643,7 +643,7 @@ public class FacturaCxC extends Dialogo {
         tab_cab_factura.getColumna("DIRECCION_CCCFA").setOrden(6);
         tab_cab_factura.getColumna("DIRECCION_CCCFA").setNombreVisual("DIRECCIÓN");
         tab_cab_factura.getColumna("DIRECCION_CCCFA").setRequerida(true);
-        tab_cab_factura.getColumna("DIRECCION_CCCFA").setMetodoChangeRuta(tab_cab_factura.getRuta() + ".cambiaDireccion");
+        //tab_cab_factura.getColumna("DIRECCION_CCCFA").setMetodoChangeRuta(tab_cab_factura.getRuta() + ".cambiaDireccion");
         tab_cab_factura.getColumna("OBSERVACION_CCCFA").setVisible(false);
         //tab_cab_factura.getColumna("ide_cndfp").setValorDefecto(`parametros.get("p_con_deta_pago_efectivo"));
         tab_cab_factura.getColumna("solo_guardar_cccfa").setVisible(false);
@@ -1274,6 +1274,7 @@ public class FacturaCxC extends Dialogo {
                     }
                     //Actualiza informacion del cliente
                     tab_creacion_cliente.setCondicion("ide_geper=" + tab_cab_factura.getValor("ide_geper"));
+                    tab_creacion_cliente.ejecutarSql();
                     tab_creacion_cliente.modificar(tab_creacion_cliente.getFilaActual());
                     tab_creacion_cliente.setValor("direccion_geper", tab_cab_factura.getValor("direccion_cccfa"));
                     tab_creacion_cliente.setValor("telefono_geper", tab_cab_factura.getValor("telefono_cccfa"));

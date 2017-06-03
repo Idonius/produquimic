@@ -556,4 +556,20 @@ public class ServicioComprobanteElectronico extends ServicioBase {
         return tab.getTotalFilas();
     }
 
+    /**
+     * Retorna el número de comprobantes por estado
+     *
+     * @param fecha_inicio
+     * @param fecha_fin
+     * @param tipoComprobante
+     * @return
+     */
+    public String getSqlTotalComprobantesPorEstado(String fecha_inicio, String fecha_fin, TipoComprobanteEnum tipoComprobante) {
+        return "select count(1) as contador,nombre_sresc,a.ide_sresc from sri_comprobante a\n"
+                + "inner join sri_estado_comprobante b on a.ide_sresc=b.ide_sresc\n"
+                + "where coddoc_srcom='" + tipoComprobante.getCodigo() + "'\n"
+                + "and fechaemision_srcom BETWEEN '" + fecha_inicio + "' and '" + fecha_fin + "'\n"
+                + "GROUP BY nombre_sresc,a.ide_sresc";
+    }
+
 }
