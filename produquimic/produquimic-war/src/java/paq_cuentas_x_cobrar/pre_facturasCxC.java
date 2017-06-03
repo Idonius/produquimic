@@ -9,6 +9,8 @@ import componentes.AsientoContable;
 import componentes.FacturaCxC;
 import componentes.Retencion;
 import dj.comprobantes.offline.enums.EstadoComprobanteEnum;
+import dj.comprobantes.offline.enums.TipoComprobanteEnum;
+import framework.aplicacion.TablaGenerica;
 import framework.componentes.Barra;
 import framework.componentes.Boton;
 import framework.componentes.Calendario;
@@ -176,6 +178,30 @@ public class pre_facturasCxC extends Pantalla {
     }
 
     private void dibujarDashboard() {
+        int num_pendientes = 0;
+        int num_recibidas = 0;
+        int num_rechazadas = 0;
+        int num_devueltas = 0;
+        int num_autorizadas = 0;
+        int num_no_autorizadas = 0;
+        TablaGenerica tg = utilitario.consultar(ser_facElect.getSqlTotalComprobantesPorEstado(cal_fecha_inicio.getFecha(), cal_fecha_fin.getFecha(), TipoComprobanteEnum.FACTURA));
+        if (tg.isEmpty() == false) {
+            for (int i = 0; i < tg.getTotalFilas(); i++) {
+                if (tg.getValor(i, "ide_sresc").equals(String.valueOf(EstadoComprobanteEnum.PENDIENTE.getCodigo()))) {
+                    num_pendientes = Integer.parseInt(tg.getValor(i, "contador"));
+                } else if (tg.getValor(i, "ide_sresc").equals(String.valueOf(EstadoComprobanteEnum.RECIBIDA.getCodigo()))) {
+                    num_recibidas = Integer.parseInt(tg.getValor(i, "contador"));
+                } else if (tg.getValor(i, "ide_sresc").equals(String.valueOf(EstadoComprobanteEnum.DEVUELTA.getCodigo()))) {
+                    num_devueltas = Integer.parseInt(tg.getValor(i, "contador"));
+                } else if (tg.getValor(i, "ide_sresc").equals(String.valueOf(EstadoComprobanteEnum.RECHAZADO.getCodigo()))) {
+                    num_rechazadas = Integer.parseInt(tg.getValor(i, "contador"));
+                } else if (tg.getValor(i, "ide_sresc").equals(String.valueOf(EstadoComprobanteEnum.AUTORIZADO.getCodigo()))) {
+                    num_autorizadas = Integer.parseInt(tg.getValor(i, "contador"));
+                } else if (tg.getValor(i, "ide_sresc").equals(String.valueOf(EstadoComprobanteEnum.NOAUTORIZADO.getCodigo()))) {
+                    num_no_autorizadas = Integer.parseInt(tg.getValor(i, "contador"));
+                }
+            }
+        }
 
         gri_dashboard.getChildren().clear();
         Panel p1 = new Panel();
@@ -188,7 +214,7 @@ public class pre_facturasCxC extends Pantalla {
         l1.setMetodo("filtrarPendientes");
         l1.getChildren().add(new Etiqueta("<i class='fa fa-clock-o fa-4x text-navy'></i>"));
         g1.getChildren().add(l1);
-        g1.getChildren().add(new Etiqueta("<span style='font-size:20px; text-align: left;'>67884</span>"));
+        g1.getChildren().add(new Etiqueta("<span style='font-size:20px; text-align: left;'>" + num_pendientes + "</span>"));
         p1.getChildren().add(g1);
         gri_dashboard.getChildren().add(p1);
 
@@ -202,7 +228,7 @@ public class pre_facturasCxC extends Pantalla {
         l2.setMetodo("filtrarRecibidas");
         l2.getChildren().add(new Etiqueta("<i class='fa fa-cloud-upload fa-4x text-blue'></i>"));
         g2.getChildren().add(l2);
-        g2.getChildren().add(new Etiqueta("<span style='font-size:20px; text-align: left;'>6 </span>"));
+        g2.getChildren().add(new Etiqueta("<span style='font-size:20px; text-align: left;'>" + num_recibidas + "</span>"));
         p2.getChildren().add(g2);
         gri_dashboard.getChildren().add(p2);
 
@@ -216,7 +242,7 @@ public class pre_facturasCxC extends Pantalla {
         l3.setMetodo("filtrarDevueltas");
         l3.getChildren().add(new Etiqueta("<i class='fa fa-arrow-circle-left fa-4x text-orange'></i>"));
         g3.getChildren().add(l3);
-        g3.getChildren().add(new Etiqueta("<span style='font-size:20px; text-align: left;'>4 </span>"));
+        g3.getChildren().add(new Etiqueta("<span style='font-size:20px; text-align: left;'>" + num_devueltas + "</span>"));
         p3.getChildren().add(g3);
 
         gri_dashboard.getChildren().add(p3);
@@ -230,7 +256,7 @@ public class pre_facturasCxC extends Pantalla {
         l4.setMetodo("filtrarRechazadas");
         l4.getChildren().add(new Etiqueta("<i class='fa fa-times-circle fa-4x text-red'></i>"));
         g4.getChildren().add(l4);
-        g4.getChildren().add(new Etiqueta("<span style='font-size:20px; text-align: left;'>4 </span>"));
+        g4.getChildren().add(new Etiqueta("<span style='font-size:20px; text-align: left;'>" + num_rechazadas + "</span>"));
         p4.getChildren().add(g4);
         gri_dashboard.getChildren().add(p4);
 
@@ -244,7 +270,7 @@ public class pre_facturasCxC extends Pantalla {
         l5.setMetodo("filtrarAutorizadas");
         l5.getChildren().add(new Etiqueta("<i class='fa fa-check-circle fa-4x text-green'></i>"));
         g5.getChildren().add(l5);
-        g5.getChildren().add(new Etiqueta("<span style='font-size:20px; text-align: left;'>24 </span>"));
+        g5.getChildren().add(new Etiqueta("<span style='font-size:20px; text-align: left;'>" + num_autorizadas + "</span>"));
         p5.getChildren().add(g5);
         gri_dashboard.getChildren().add(p5);
         Panel p6 = new Panel();
@@ -258,7 +284,7 @@ public class pre_facturasCxC extends Pantalla {
         l6.getChildren().add(new Etiqueta("<i class='fa fa-minus-circle fa-4x text-red'></i>"));
         g6.getChildren().add(l6);
 
-        g6.getChildren().add(new Etiqueta("<span style='font-size:20px; text-align: left;'>24 </span>"));
+        g6.getChildren().add(new Etiqueta("<span style='font-size:20px; text-align: left;'>" + num_no_autorizadas + "</span>"));
         p6.getChildren().add(g6);
         gri_dashboard.getChildren().add(p6);
     }
@@ -385,7 +411,7 @@ public class pre_facturasCxC extends Pantalla {
         dibujarDashboard();
         Grupo gr = new Grupo();
         gr.getChildren().add(new Etiqueta("<div align='center'>"));
-
+        gri_dashboard.setId("gri_dashboard");
         gri_dashboard.setWidth("100%");
         gri_dashboard.setColumns(6);
         gr.getChildren().add(gri_dashboard);
@@ -420,6 +446,8 @@ public class pre_facturasCxC extends Pantalla {
                 tab_tabla.actualizar();
                 tab_tabla.setFilaActual(aux);
                 tab_tabla.calcularPaginaActual();
+                dibujarDashboard();
+                utilitario.addUpdate("gri_dashboard");
                 if (mensaje.isEmpty()) {
                     String mensje = "<p> FACTURA NRO. " + tab_tabla.getValor("secuencial_cccfa") + " ";
                     mensje += "</br>AMBIENTE : <strong>" + (utilitario.getVariable("p_sri_ambiente_comp_elect").equals("1") ? "PRUEBAS" : "PRODUCCIÓN") + "</strong></p>";  //********variable ambiente facturacion electronica                    
@@ -451,15 +479,6 @@ public class pre_facturasCxC extends Pantalla {
         } else {
             utilitario.agregarMensajeInfo("Seleccione una factura", "");
 
-        }
-    }
-
-    public void generarFacturaElectronica() {
-        if (tab_tabla.getValor("ide_cccfa") != null) {
-            ser_facElect.generarFacturaElectronica(tab_tabla.getValor("ide_cccfa"));
-            tab_tabla.actualizar();
-        } else {
-            utilitario.agregarMensajeError("Debe seleccionar una Factura", "");
         }
     }
 
@@ -883,6 +902,8 @@ public class pre_facturasCxC extends Pantalla {
         if (mep_menu.getOpcion() == 1) {
             tab_tabla.setSql(ser_factura.getSqlFacturas(com_pto_emision.getValue() + "", cal_fecha_inicio.getFecha(), cal_fecha_fin.getFecha()));
             tab_tabla.ejecutarSql();
+            dibujarDashboard();
+            utilitario.addUpdate("gri_dashboard");
         } else if (mep_menu.getOpcion() == 2) {
             tab_tabla.setSql(ser_factura.getSqlFacturasNoContabilizadas(com_pto_emision.getValue() + "", cal_fecha_inicio.getFecha(), cal_fecha_fin.getFecha()));
             tab_tabla.ejecutarSql();
