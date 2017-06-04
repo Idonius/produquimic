@@ -153,14 +153,37 @@ public final class Comprobante implements Serializable {
                 e.printStackTrace();
             }
 
-            if (this.coddoc.equals(TipoComprobanteEnum.FACTURA.getCodigo()) || this.coddoc.equals(TipoComprobanteEnum.NOTA_DE_CREDITO.getCodigo())) {
+            if (this.coddoc.equals(TipoComprobanteEnum.FACTURA.getCodigo())) {
                 //Busca los detalles del Comprobante
-                try {                    
+                try {
                     detalle = new ArrayList<>();
                     String sql = "select f.ide_inarti,codigo_inarti,observacion_ccdfa,nombre_inarti,cantidad_ccdfa\n"
-                            + ",precio_ccdfa,iva_inarti_ccdfa,total_ccdfa,nombre_inuni, tarifa_iva_cccfa,iva_inarti_ccdfa \n"
+                            + ",precio_ccdfa,iva_inarti_ccdfa,total_ccdfa,nombre_inuni, tarifa_iva_cccfa \n"
                             + "from cxc_cabece_factura  a\n"
                             + "inner join cxc_deta_factura c on a.ide_cccfa=c.ide_cccfa\n"
+                            + "inner join  inv_articulo f on c.ide_inarti =f.ide_inarti\n"
+                            + "left join  inv_unidad g on c.ide_inuni =g.ide_inuni\n"
+                            + "where a.ide_srcom=" + this.codigocomprobante;
+                    Statement sentensia = con.getConnection().createStatement();
+                    ResultSet res = sentensia.executeQuery(sql);
+                    while (res.next()) {
+                        DetalleComprobante dt = new DetalleComprobante(res);
+                        dt.setComprobante(this);
+                        detalle.add(dt);
+                    }
+                    sentensia.close();
+                    res.close();
+                } catch (Exception e) {
+                    e.printStackTrace();
+                }
+            } else if (this.coddoc.equals(TipoComprobanteEnum.NOTA_DE_CREDITO.getCodigo())) {
+                //Busca los detalles del Comprobante
+                try {
+                    detalle = new ArrayList<>();
+                    String sql = "select f.ide_inarti,codigo_inarti,observacion_cpdno as observacion_ccdfa,nombre_inarti,cantidad_cpdno as cantidad_ccdfa\n"
+                            + ",precio_cpdno as precio_ccdfa,iva_inarti_cpdno as iva_inarti_ccdfa,valor_cpdno as total_ccdfa,nombre_inuni, tarifa_iva_cpcno as tarifa_iva_cccfa \n"
+                            + "from cxp_cabecera_nota  a\n"
+                            + "inner join cxp_detalle_nota c on a.ide_cpcno=c.ide_cpcno\n"
                             + "inner join  inv_articulo f on c.ide_inarti =f.ide_inarti\n"
                             + "left join  inv_unidad g on c.ide_inuni =g.ide_inuni\n"
                             + "where a.ide_srcom=" + this.codigocomprobante;
@@ -209,7 +232,7 @@ public final class Comprobante implements Serializable {
                             + "inner join cxc_deta_factura c on a.ide_cccfa=c.ide_cccfa\n"
                             + "inner join  inv_articulo f on c.ide_inarti =f.ide_inarti\n"
                             + "left join  inv_unidad g on c.ide_inuni =g.ide_inuni\n"
-                            + "where a.ide_srcom=" + this.codigoComprobanteFactura;                    
+                            + "where a.ide_srcom=" + this.codigoComprobanteFactura;
                     Statement sentensia = con.getConnection().createStatement();
                     ResultSet res = sentensia.executeQuery(sql);
                     while (res.next()) {

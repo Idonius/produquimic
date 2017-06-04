@@ -62,9 +62,9 @@ public enum TipoImpuestoIvaEnum {
     }
 
     public static String getCodigo(Double valor) {
-        String codigo = IVA_VENTA_14.getCodigo(); //por defecto
-        if (String.valueOf(valor).equals(IVA_VENTA_12.getPorcentaje())) {
-            codigo = IVA_VENTA_12.getCodigo();
+        String codigo = IVA_VENTA_12.getCodigo(); //por defecto
+        if (String.valueOf(valor).equals(IVA_VENTA_14.getPorcentaje())) {
+            codigo = IVA_VENTA_14.getCodigo();
         } else if (String.valueOf(valor).equals(IVA_VENTA_0.getPorcentaje())) {
             codigo = IVA_VENTA_0.getCodigo();
         }
@@ -78,9 +78,9 @@ public enum TipoImpuestoIvaEnum {
      * @return
      */
     public static String getPorcentaje(Double valor) {
-        String codigo = IVA_VENTA_14.getPorcentaje(); //por defecto
-        if (String.valueOf(valor).equals(IVA_VENTA_12.getPorcentaje())) {
-            codigo = IVA_VENTA_12.getPorcentaje();
+        String codigo = IVA_VENTA_12.getPorcentaje(); //por defecto
+        if (String.valueOf(valor).equals(IVA_VENTA_14.getPorcentaje())) {
+            codigo = IVA_VENTA_14.getPorcentaje();
         } else if (String.valueOf(valor).equals(IVA_VENTA_0.getPorcentaje())) {
             codigo = IVA_VENTA_0.getPorcentaje();
         }
