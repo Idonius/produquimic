@@ -95,6 +95,8 @@ public class DocumentoCxP extends Dialogo {
 
     //REEMBOLSOS
     private Tabla tab_com_reembolso;
+    private Etiqueta eti_subtotal = new Etiqueta();
+    private Etiqueta eti_iva = new Etiqueta();
 
     public DocumentoCxP() {
         //utilitario.getConexion().setImprimirSqlConsola(true);
@@ -129,7 +131,7 @@ public class DocumentoCxP extends Dialogo {
         this.setDialogo(tab_documenoCxP);
 
         //Recupera porcentaje iva
-        tarifaIVA = ser_configuracion.getPorcentajeIva();
+        tarifaIVA = ser_configuracion.getPorcentajeIva(utilitario.getFechaActual());
         dia_creacion_cliente = new Dialogo();
         dia_creacion_cliente.setId("dia_creacion_cliente");
         dia_creacion_cliente.setTitle("CREAR PROVEEDOR");
@@ -178,6 +180,13 @@ public class DocumentoCxP extends Dialogo {
         }
     }
 
+    public void cambioFecha() {
+        tarifaIVA = ser_configuracion.getPorcentajeIva(tab_cab_documento.getValor("fecha_emisi_cpcfa"));
+        eti_subtotal.setValue("<strong>SUBTOTAL TARIFA " + (utilitario.getFormatoNumero(tarifaIVA * 100)) + "% :<s/trong>");
+        eti_iva.setValue("<strong>IVA " + (utilitario.getFormatoNumero(tarifaIVA * 100)) + "% :<s/trong>");
+        calcularTotalDocumento();
+    }
+
     public void verDocumento(String ide_cpcfa) {
         opcion = 2;  // GENERA FACTURA
         tab_documenoCxP.getTab(0).getChildren().clear();
@@ -204,7 +213,7 @@ public class DocumentoCxP extends Dialogo {
             tab_documenoCxP.getTab(2).getChildren().add(dibujarAsiento());
         }
         tab_documenoCxP.getTab(3).getChildren().add(dibujarDetallePago());
-
+        cambioFecha();
         tex_iva.setValue(utilitario.getFormatoNumero(tab_cab_documento.getValor("valor_iva_cpcfa")));
         //Carga totales y observacion
         double dou_subt0 = 0;
@@ -387,7 +396,7 @@ public class DocumentoCxP extends Dialogo {
         tab_dt_rete.getColumna("ide_cndre").setVisible(false);
         tab_dt_rete.getColumna("ide_cncre").setVisible(false);
         tab_dt_rete.setScrollable(true);
-        
+
         tab_dt_rete.setScrollHeight(getAltoPanel() - 240);
         tab_dt_rete.setRows(100);
         tab_dt_rete.setLectura(true);
@@ -625,6 +634,7 @@ public class DocumentoCxP extends Dialogo {
         tab_cab_documento.getColumna("fecha_emisi_cpcfa").setValorDefecto(utilitario.getFechaActual());
         tab_cab_documento.getColumna("fecha_emisi_cpcfa").setNombreVisual("FECHA EMISIÓN");
         tab_cab_documento.getColumna("fecha_emisi_cpcfa").setOrden(1);
+        tab_cab_documento.getColumna("fecha_emisi_cpcfa").setMetodoChangeRuta(tab_cab_documento.getRuta() + ".cambioFecha");
         tab_cab_documento.getColumna("ide_geper").setCombo("gen_persona", "ide_geper", "nom_geper,identificac_geper", "ide_geper=-1"); //por defecto no carga los clientes
         tab_cab_documento.getColumna("ide_geper").setAutoCompletar();
         tab_cab_documento.getColumna("ide_geper").setRequerida(true);
@@ -907,7 +917,8 @@ public class DocumentoCxP extends Dialogo {
         tex_valor_descuento.setMetodoChangeRuta(tab_det_documento.getRuta() + ".calcularTotalDocumento");
         gri_valores.getChildren().add(tex_valor_descuento);
 
-        gri_valores.getChildren().add(new Etiqueta("<strong>SUBTOTAL TARIFA " + (utilitario.getFormatoNumero(tarifaIVA * 100)) + "% :<s/trong>"));
+        eti_subtotal.setValue("<strong>SUBTOTAL TARIFA " + (utilitario.getFormatoNumero(tarifaIVA * 100)) + "% :<s/trong>");
+        gri_valores.getChildren().add(eti_subtotal);
         tex_subtotal12.setDisabled(true);
         tex_subtotal12.setStyle("font-size: 14px;text-align: right;width:110px");
         tex_subtotal12.setValue(utilitario.getFormatoNumero("0"));
@@ -917,7 +928,8 @@ public class DocumentoCxP extends Dialogo {
         tex_subtotal0.setStyle("font-size: 14px;text-align: right;width:110px");
         tex_subtotal0.setValue(utilitario.getFormatoNumero("0"));
         gri_valores.getChildren().add(tex_subtotal0);
-        gri_valores.getChildren().add(new Etiqueta("<strong>IVA " + (utilitario.getFormatoNumero(tarifaIVA * 100)) + "% :<s/trong>"));
+        eti_iva.setValue("<strong>IVA " + (utilitario.getFormatoNumero(tarifaIVA * 100)) + "% :<s/trong>");
+        gri_valores.getChildren().add(eti_iva);
         tex_iva.setDisabled(true);
         tex_iva.setStyle("font-size: 14px;text-align: right;width:110px");
         tex_iva.setValue(utilitario.getFormatoNumero("0"));
@@ -1813,6 +1825,5 @@ public class DocumentoCxP extends Dialogo {
     public void setTab_electronica(Tabla tab_electronica) {
         this.tab_electronica = tab_electronica;
     }
-    
-    
+
 }

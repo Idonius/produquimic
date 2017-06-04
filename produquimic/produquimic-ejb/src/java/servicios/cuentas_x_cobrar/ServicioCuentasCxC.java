@@ -740,6 +740,22 @@ public class ServicioCuentasCxC extends ServicioBase {
 
     }
 
+    public String getSqlNotasElectronicasPorEstado(String ide_ccdaf, String fechaInicio, String fechaFin, EstadoComprobanteEnum estado) {
+
+        return "select a.ide_cpcno, numero_cpcno,ide_cnccc,a.ide_cpeno,nombre_sresc as nombre_cpeno, fecha_emisi_cpcno,motivo_srcom as MOTIVO,nom_geper,identificac_geper,base_grabada_cpcno as ventas12,"
+                + "base_tarifa0_cpcno+base_no_objeto_iva_cpcno as ventas0,valor_iva_cpcno,total_cpcno, "
+                + "claveacceso_srcom as CLAVE_ACCESO, fecha_trans_cpcno,d.ide_srcom  "
+                + "from cxp_cabecera_nota a "
+                + "inner join gen_persona b on a.ide_geper=b.ide_geper "
+                + "left join sri_comprobante d on a.ide_srcom=d.ide_srcom "
+                + "left join sri_estado_comprobante f on d.ide_sresc=f.ide_sresc "
+                + "where fecha_emisi_cpcno BETWEEN  '" + fechaInicio + "' and '" + fechaFin + "' "
+                + "and ide_ccdaf=" + ide_ccdaf + " "
+                + " and d.ide_sresc =" + estado.getCodigo() + " "
+                + "ORDER BY numero_cpcno desc,ide_cpcno desc";
+
+    }
+
     public String getSqlNotasAnuladas(String ide_ccdaf, String fechaInicio, String fechaFin) {
 
         return "select a.ide_cpcno, numero_cpcno,nombre_cpeno ,fecha_emisi_cpcno,nom_geper,identificac_geper,base_grabada_cpcno as ventas12,"
