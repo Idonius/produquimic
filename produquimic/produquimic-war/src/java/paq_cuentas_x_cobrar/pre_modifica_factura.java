@@ -58,7 +58,7 @@ public class pre_modifica_factura extends Pantalla {
 
     public pre_modifica_factura() {
 
-        tarifaIVA = ser_configuracion.getPorcentajeIva();
+        tarifaIVA = ser_configuracion.getPorcentajeIva(utilitario.getFechaActual());
         bar_botones.quitarBotonsNavegacion();
         bar_botones.quitarBotonInsertar();
         bar_botones.quitarBotonEliminar();
@@ -243,6 +243,7 @@ public class pre_modifica_factura extends Pantalla {
                 utilitario.agregarMensajeInfo("No existe la Factura N. " + mas_num_factua.getValue(), "");
 
             }
+            tarifaIVA = ser_configuracion.getPorcentajeIva(tab_cab_factura.getValor("fecha_emisi_cccfa"));
             calcularTotalFactura();
         } else {
             utilitario.agregarMensajeInfo("Debe ingresar el número secuencial de la Factura", "");

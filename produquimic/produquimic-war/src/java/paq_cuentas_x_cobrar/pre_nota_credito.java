@@ -6,6 +6,7 @@
 package paq_cuentas_x_cobrar;
 
 import dj.comprobantes.offline.enums.EstadoComprobanteEnum;
+import dj.comprobantes.offline.enums.TipoComprobanteEnum;
 import framework.aplicacion.TablaGenerica;
 import framework.componentes.Barra;
 import framework.componentes.Boton;
@@ -13,7 +14,9 @@ import framework.componentes.Calendario;
 import framework.componentes.Combo;
 import framework.componentes.Confirmar;
 import framework.componentes.Etiqueta;
+import framework.componentes.Grid;
 import framework.componentes.Grupo;
+import framework.componentes.Link;
 import framework.componentes.Mensaje;
 import framework.componentes.MenuPanel;
 import framework.componentes.PanelTabla;
@@ -21,6 +24,7 @@ import framework.componentes.Tabla;
 import framework.componentes.VisualizarPDF;
 import javax.ejb.EJB;
 import javax.faces.event.AjaxBehaviorEvent;
+import org.primefaces.component.panel.Panel;
 import servicios.ceo.ServicioComprobanteElectronico;
 import servicios.contabilidad.ServicioConfiguracion;
 import servicios.cuentas_x_cobrar.ServicioCuentasCxC;
@@ -57,8 +61,10 @@ public class pre_nota_credito extends Pantalla {
 
     private String ide_cpcno = null;
 
+    private final Grid gri_dashboard = new Grid();
+
     public pre_nota_credito() {
-        tarifaIVA = ser_configuracion.getPorcentajeIva();
+        tarifaIVA = ser_configuracion.getPorcentajeIva(utilitario.getFechaActual());
         bar_botones.quitarBotonsNavegacion();
 
         com_pto_emision.setId("com_pto_emision");
@@ -83,7 +89,7 @@ public class pre_nota_credito extends Pantalla {
         bar_botones.agregarComponente(bot_consultar);
 
         mep_menu.setMenuPanel("OPCIONES NOTAS DE CRÉDITO", "20%");
-        mep_menu.agregarItem("Crear Nota de Crédito", "dibujarInsertar", "ui-icon-contact"); // 1
+
         mep_menu.agregarItem("Listado de Notas de Crédito", "dibujarNotaCredito", "ui-icon-note");  //2
         //  mep_menu.agregarItem("Generar Asiento Contable", "dibujarNotaCreditoNoContabilizadas", "ui-icon-notice"); //3
         //mep_menu.agregarItem("Notas de Crédito Anuladas", "dibujarNotaCreditoAnuladas", "ui-icon-cancel"); //4
@@ -107,15 +113,153 @@ public class pre_nota_credito extends Pantalla {
         dibujarNotaCredito();
     }
 
-    public void dibujarInsertar() {
-        ide_cpcno = null;
-        dibujarNuevaNotaCredito();
+    private void dibujarDashboard() {
+        int num_pendientes = 0;
+        int num_recibidas = 0;
+        int num_rechazadas = 0;
+        int num_devueltas = 0;
+        int num_autorizadas = 0;
+        int num_no_autorizadas = 0;
+        TablaGenerica tg = utilitario.consultar(ser_comprobante_electronico.getSqlTotalComprobantesPorEstado(cal_fecha_inicio.getFecha(), cal_fecha_fin.getFecha(), TipoComprobanteEnum.NOTA_DE_CREDITO));
+        if (tg.isEmpty() == false) {
+            for (int i = 0; i < tg.getTotalFilas(); i++) {
+                if (tg.getValor(i, "ide_sresc").equals(String.valueOf(EstadoComprobanteEnum.PENDIENTE.getCodigo()))) {
+                    num_pendientes = Integer.parseInt(tg.getValor(i, "contador"));
+                } else if (tg.getValor(i, "ide_sresc").equals(String.valueOf(EstadoComprobanteEnum.RECIBIDA.getCodigo()))) {
+                    num_recibidas = Integer.parseInt(tg.getValor(i, "contador"));
+                } else if (tg.getValor(i, "ide_sresc").equals(String.valueOf(EstadoComprobanteEnum.DEVUELTA.getCodigo()))) {
+                    num_devueltas = Integer.parseInt(tg.getValor(i, "contador"));
+                } else if (tg.getValor(i, "ide_sresc").equals(String.valueOf(EstadoComprobanteEnum.RECHAZADO.getCodigo()))) {
+                    num_rechazadas = Integer.parseInt(tg.getValor(i, "contador"));
+                } else if (tg.getValor(i, "ide_sresc").equals(String.valueOf(EstadoComprobanteEnum.AUTORIZADO.getCodigo()))) {
+                    num_autorizadas = Integer.parseInt(tg.getValor(i, "contador"));
+                } else if (tg.getValor(i, "ide_sresc").equals(String.valueOf(EstadoComprobanteEnum.NOAUTORIZADO.getCodigo()))) {
+                    num_no_autorizadas = Integer.parseInt(tg.getValor(i, "contador"));
+                }
+            }
+        }
+
+        gri_dashboard.getChildren().clear();
+        Panel p1 = new Panel();
+        p1.setStyle("margin-left: 2px;");
+        Grid g1 = new Grid();
+        g1.setWidth("100%");
+        g1.setColumns(2);
+        g1.setHeader(new Etiqueta("<span style='font-size:11px;' class='text-navy'>PENDIENTES </span>"));
+        Link l1 = new Link();
+        l1.setMetodo("filtrarPendientes");
+        l1.getChildren().add(new Etiqueta("<i class='fa fa-clock-o fa-4x text-navy'></i>"));
+        g1.getChildren().add(l1);
+        g1.getChildren().add(new Etiqueta("<span style='font-size:20px; text-align: left;'>" + num_pendientes + "</span>"));
+        p1.getChildren().add(g1);
+        gri_dashboard.getChildren().add(p1);
+
+        Panel p2 = new Panel();
+        p2.setStyle("margin-left: 2px;");
+        Grid g2 = new Grid();
+        g2.setColumns(2);
+        g2.setWidth("100%");
+        g2.setHeader(new Etiqueta("<span style='font-size:11px;' class='text-blue'>RECIBIDAS </span>"));
+        Link l2 = new Link();
+        l2.setMetodo("filtrarRecibidas");
+        l2.getChildren().add(new Etiqueta("<i class='fa fa-cloud-upload fa-4x text-blue'></i>"));
+        g2.getChildren().add(l2);
+        g2.getChildren().add(new Etiqueta("<span style='font-size:20px; text-align: left;'>" + num_recibidas + "</span>"));
+        p2.getChildren().add(g2);
+        gri_dashboard.getChildren().add(p2);
+
+        Panel p3 = new Panel();
+        p3.setStyle("margin-left: 2px;");
+        Grid g3 = new Grid();
+        g3.setWidth("100%");
+        g3.setColumns(2);
+        g3.setHeader(new Etiqueta("<span style='font-size:11px;' class='text-orange'>DEVUELTAS </span>"));
+        Link l3 = new Link();
+        l3.setMetodo("filtrarDevueltas");
+        l3.getChildren().add(new Etiqueta("<i class='fa fa-arrow-circle-left fa-4x text-orange'></i>"));
+        g3.getChildren().add(l3);
+        g3.getChildren().add(new Etiqueta("<span style='font-size:20px; text-align: left;'>" + num_devueltas + "</span>"));
+        p3.getChildren().add(g3);
+
+        gri_dashboard.getChildren().add(p3);
+        Panel p4 = new Panel();
+        p4.setStyle("margin-left: 2px;");
+        Grid g4 = new Grid();
+        g4.setColumns(2);
+        g4.setWidth("100%");
+        g4.setHeader(new Etiqueta("<span style='font-size:11px;' class='text-red'>RECHAZADAS </span>"));
+        Link l4 = new Link();
+        l4.setMetodo("filtrarRechazadas");
+        l4.getChildren().add(new Etiqueta("<i class='fa fa-times-circle fa-4x text-red'></i>"));
+        g4.getChildren().add(l4);
+        g4.getChildren().add(new Etiqueta("<span style='font-size:20px; text-align: left;'>" + num_rechazadas + "</span>"));
+        p4.getChildren().add(g4);
+        gri_dashboard.getChildren().add(p4);
+
+        Panel p5 = new Panel();
+        p5.setStyle("margin-left: 2px;");
+        Grid g5 = new Grid();
+        g5.setColumns(2);
+        g5.setWidth("100%");
+        g5.setHeader(new Etiqueta("<span style='font-size:11px;' class='text-green'>AUTORIZADAS </span>"));
+        Link l5 = new Link();
+        l5.setMetodo("filtrarAutorizadas");
+        l5.getChildren().add(new Etiqueta("<i class='fa fa-check-circle fa-4x text-green'></i>"));
+        g5.getChildren().add(l5);
+        g5.getChildren().add(new Etiqueta("<span style='font-size:20px; text-align: left;'>" + num_autorizadas + "</span>"));
+        p5.getChildren().add(g5);
+        gri_dashboard.getChildren().add(p5);
+        Panel p6 = new Panel();
+        p6.setStyle("margin-left: 2px;");
+        Grid g6 = new Grid();
+        g6.setWidth("100%");
+        g6.setColumns(2);
+        g6.setHeader(new Etiqueta("<span style='font-size:11px;' class='text-red'> NO AUTORIZADAS </span>"));
+        Link l6 = new Link();
+        l6.setMetodo("filtrarNoAutorizadas");
+        l6.getChildren().add(new Etiqueta("<i class='fa fa-minus-circle fa-4x text-red'></i>"));
+        g6.getChildren().add(l6);
+
+        g6.getChildren().add(new Etiqueta("<span style='font-size:20px; text-align: left;'>" + num_no_autorizadas + "</span>"));
+        p6.getChildren().add(g6);
+        gri_dashboard.getChildren().add(p6);
     }
 
     public void actualizarNotas() {
         if (mep_menu.getOpcion() == 1) {
             tab_tabla1.setValor("ide_ccdaf", String.valueOf(com_pto_emision.getValue()));
+            dibujarDashboard();
         }
+    }
+
+    public void filtrarPendientes() {
+        tab_tabla1.setSql(ser_factura.getSqlNotasElectronicasPorEstado(com_pto_emision.getValue() + "", cal_fecha_inicio.getFecha(), cal_fecha_fin.getFecha(), EstadoComprobanteEnum.PENDIENTE));
+        tab_tabla1.ejecutarSql();
+    }
+
+    public void filtrarRecibidas() {
+        tab_tabla1.setSql(ser_factura.getSqlNotasElectronicasPorEstado(com_pto_emision.getValue() + "", cal_fecha_inicio.getFecha(), cal_fecha_fin.getFecha(), EstadoComprobanteEnum.RECIBIDA));
+        tab_tabla1.ejecutarSql();
+    }
+
+    public void filtrarDevueltas() {
+        tab_tabla1.setSql(ser_factura.getSqlNotasElectronicasPorEstado(com_pto_emision.getValue() + "", cal_fecha_inicio.getFecha(), cal_fecha_fin.getFecha(), EstadoComprobanteEnum.DEVUELTA));
+        tab_tabla1.ejecutarSql();
+    }
+
+    public void filtrarRechazadas() {
+        tab_tabla1.setSql(ser_factura.getSqlNotasElectronicasPorEstado(com_pto_emision.getValue() + "", cal_fecha_inicio.getFecha(), cal_fecha_fin.getFecha(), EstadoComprobanteEnum.RECHAZADO));
+        tab_tabla1.ejecutarSql();
+    }
+
+    public void filtrarAutorizadas() {
+        tab_tabla1.setSql(ser_factura.getSqlNotasElectronicasPorEstado(com_pto_emision.getValue() + "", cal_fecha_inicio.getFecha(), cal_fecha_fin.getFecha(), EstadoComprobanteEnum.AUTORIZADO));
+        tab_tabla1.ejecutarSql();
+    }
+
+    public void filtrarNoAutorizadas() {
+        tab_tabla1.setSql(ser_factura.getSqlNotasElectronicasPorEstado(com_pto_emision.getValue() + "", cal_fecha_inicio.getFecha(), cal_fecha_fin.getFecha(), EstadoComprobanteEnum.NOAUTORIZADO));
+        tab_tabla1.ejecutarSql();
     }
 
     public void dibujarNuevaNotaCredito() {
@@ -136,6 +280,8 @@ public class pre_nota_credito extends Pantalla {
         tab_tabla1.getColumna("ide_cpeno").setVisible(false);
         tab_tabla1.getColumna("ide_cpcno").setVisible(false);
         tab_tabla1.getColumna("ide_srcom").setVisible(false);
+        tab_tabla1.getColumna("TARIFA_IVA_CPCNO").setVisible(false);
+
         if (ser_factura.isFacturaElectronica()) {
             tab_tabla1.getColumna("NUMERO_CPCNO").setLectura(true);
         }
@@ -384,11 +530,23 @@ public class pre_nota_credito extends Pantalla {
         tab_tabla1.setLectura(true);
         //COLOR VERDE FACTURAS NO CONTABILIZADAS
         //COLOR ROJO FACTURAS ANULADAS
-        tab_tabla1.setValueExpression("rowStyleClass", "fila.campos[3] eq '0' ? 'text-red' : fila.campos[2] eq null  ? 'text-green' : null");
+        // ok tab_tabla1.setValueExpression("rowStyleClass", "fila.campos[3] eq '0' ? 'text-red' : fila.campos[2] eq null  ? 'text-green' : null");
+        tab_tabla1.setValueExpression("rowStyleClass", "fila.campos[3] eq '0' ? 'text-red' : null");
         tab_tabla1.dibujar();
         PanelTabla pat_panel = new PanelTabla();
         pat_panel.setPanelTabla(tab_tabla1);
         Grupo gru = new Grupo();
+
+        dibujarDashboard();
+        Grupo gr = new Grupo();
+        gr.getChildren().add(new Etiqueta("<div align='center'>"));
+        gri_dashboard.setId("gri_dashboard");
+        gri_dashboard.setWidth("100%");
+        gri_dashboard.setColumns(6);
+        gr.getChildren().add(gri_dashboard);
+        gr.getChildren().add(new Etiqueta("</div>"));
+        gru.getChildren().add(gr);
+
         gru.getChildren().add(bar_menu);
         gru.getChildren().add(pat_panel);
         mep_menu.dibujar(2, "LISTADO DE NOTAS DE CRÉDITO", gru);
@@ -438,12 +596,16 @@ public class pre_nota_credito extends Pantalla {
     public void abrirRIDE() {
         if (tab_tabla1.getValor("ide_cpcno") != null) {
             if (tab_tabla1.getValor("ide_srcom") != null) {
-                try {
-                    ser_comprobante_electronico.getRIDE(tab_tabla1.getValor("ide_srcom"));
-                    vpd_nota_ride.setVisualizarPDFUsuario();
-                    vpd_nota_ride.dibujar();
-                } catch (Exception e) {
-                    e.printStackTrace();
+                if (tab_tabla1.getValor("nombre_cpeno") != null && !tab_tabla1.getValor("nombre_cpeno").equals(EstadoComprobanteEnum.ANULADO.getDescripcion())) {
+                    try {
+                        ser_comprobante_electronico.getRIDE(tab_tabla1.getValor("ide_srcom"));
+                        vpd_nota_ride.setVisualizarPDFUsuario();
+                        vpd_nota_ride.dibujar();
+                    } catch (Exception e) {
+                        e.printStackTrace();
+                    }
+                } else {
+                    utilitario.agregarMensajeError("No se puede Visualizar el Comprobate", "La Nota de Crédito seleccionada se encuentara ANULADA");
                 }
 
             } else {
@@ -461,7 +623,7 @@ public class pre_nota_credito extends Pantalla {
                 String mensaje = ser_comprobante_electronico.enviarComprobante(tab_tabla1.getValor("clave_acceso"));
 
                 String aux = tab_tabla1.getValorSeleccionado();
-                tab_tabla1.actualizar();
+                dibujarNotaCredito();
                 tab_tabla1.setFilaActual(aux);
                 tab_tabla1.calcularPaginaActual();
                 if (mensaje.isEmpty()) {
@@ -504,6 +666,7 @@ public class pre_nota_credito extends Pantalla {
     @Override
     public void guardar() {
         if (mep_menu.getOpcion() == 1) {
+            tab_tabla1.setValor("TARIFA_IVA_CPCNO", utilitario.getFormatoNumero((tarifaIVA * 100)));
             if (tab_tabla1.guardar()) {
                 if (tab_tabla2.guardar()) {
                     if (guardarPantalla().isEmpty()) {

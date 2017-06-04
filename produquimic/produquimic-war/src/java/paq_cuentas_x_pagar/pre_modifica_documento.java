@@ -98,7 +98,7 @@ public class pre_modifica_documento extends Pantalla {
         bar_botones.agregarBoton(bot_clean);
 
         //Recupera porcentaje iva
-        tarifaIVA = ser_configuracion.getPorcentajeIva();
+        tarifaIVA = ser_configuracion.getPorcentajeIva(utilitario.getFechaActual());
         div_division.setId("div_division");
         agregarComponente(div_division);
 
@@ -125,6 +125,7 @@ public class pre_modifica_documento extends Pantalla {
             div_division.getChildren().clear();
             div_division.getChildren().add(dibujarDocumento(sel_factura.getValorSeleccionado()));
             utilitario.addUpdate("div_division");
+            tarifaIVA = ser_configuracion.getPorcentajeIva(tab_cab_documento.getValor("fecha_emisi_cpcfa"));
         } else {
             utilitario.agregarMensajeInfo("Seleccione un Documento por pagar", "");
         }

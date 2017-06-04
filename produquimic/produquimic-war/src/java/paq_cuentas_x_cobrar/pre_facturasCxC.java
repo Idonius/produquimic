@@ -402,7 +402,8 @@ public class pre_facturasCxC extends Pantalla {
         tab_tabla.setLectura(true);
         //COLOR VERDE FACTURAS NO CONTABILIZADAS
         //COLOR ROJO FACTURAS ANULADAS
-        tab_tabla.setValueExpression("rowStyleClass", "fila.campos[3] eq '" + utilitario.getVariable("p_cxc_estado_factura_anulada") + "' ? 'text-red' : fila.campos[2] eq null  ? 'text-green' : null");
+        /// ok tab_tabla.setValueExpression("rowStyleClass", "fila.campos[3] eq '" + utilitario.getVariable("p_cxc_estado_factura_anulada") + "' ? 'text-red' : fila.campos[2] eq null  ? 'text-green' : null");
+        tab_tabla.setValueExpression("rowStyleClass", "fila.campos[3] eq '" + utilitario.getVariable("p_cxc_estado_factura_anulada") + "' ? 'text-red' : null");
         tab_tabla.dibujar();
         PanelTabla pat_panel = new PanelTabla();
         pat_panel.setPanelTabla(tab_tabla);
@@ -427,7 +428,11 @@ public class pre_facturasCxC extends Pantalla {
     public void abrirRIDE() {
         if (tab_tabla.getValor("ide_cccfa") != null) {
             if (tab_tabla.getValor("ide_srcom") != null) {
-                fcc_factura.visualizarRide(tab_tabla.getValor("ide_srcom"));
+                if (tab_tabla.getValor("nombre_ccefa") != null && !tab_tabla.getValor("nombre_ccefa").equals(EstadoComprobanteEnum.ANULADO.getDescripcion())) {
+                    fcc_factura.visualizarRide(tab_tabla.getValor("ide_srcom"));
+                } else {
+                    utilitario.agregarMensajeError("No se puede Visualizar el Comprobate", "La Factura seleccionada se encuentara ANULADA");
+                }
             } else {
                 utilitario.agregarMensajeInfo("La factura seleccionada no es electrónica", "");
             }
