@@ -1059,10 +1059,13 @@ public class FacturaCxC extends Dialogo {
 
     private void asignarDatosGuia() {
         if (tab_guia.isFilaInsertada()) {
-            tab_guia.setValor("ide_geper", tab_cab_factura.getValor("ide_geper"));
-            tab_guia.setValor("PUNTO_LLEGADA_CCGUI", tab_cab_factura.getValor("direccion_cccfa"));
-            tab_guia.setValor("fecha_emision_ccgui", tab_cab_factura.getValor("fecha_emisi_cccfa"));
-            utilitario.addUpdateTabla(tab_guia, "ide_geper,fecha_emision_ccgui,PUNTO_LLEGADA_CCGUI", "");
+            if (tab_cab_factura.getValor("ide_geper") != null) {
+                tab_guia.setValor("ide_geper", tab_cab_factura.getValor("ide_geper"));
+                tab_guia.setValor("PUNTO_LLEGADA_CCGUI", tab_cab_factura.getValor("direccion_cccfa"));
+                tab_guia.setValor("fecha_emision_ccgui", tab_cab_factura.getValor("fecha_emisi_cccfa"));
+                utilitario.addUpdateTabla(tab_guia, "ide_geper,fecha_emision_ccgui,PUNTO_LLEGADA_CCGUI", "");
+            }
+
         }
     }
 
@@ -1075,6 +1078,26 @@ public class FacturaCxC extends Dialogo {
         if (ide_geper != null) {
             TablaGenerica tag_cliente = ser_cliente.getCliente(ide_geper);
             if (tag_cliente.isEmpty() == false) {
+                if (tag_cliente.getValor("ide_getid") == null) {
+                    utilitario.agregarMensajeError("Error Datos del Cliente", "El cliete seleccionado no tiene Tipo de Identificación");
+                    return;
+                }
+
+                //valida que la idetificacion  cedula
+                if (tag_cliente.getValor("ide_getid").equals("0")) {
+                    if (utilitario.validarCedula(tag_cliente.getValor("identificac_geper")) == false) {
+                        utilitario.agregarMensajeError("Error ", "Número de cédula no válido");
+                        return;
+                    }
+                }
+                //valida que la idetificacion  RUC
+                if (tag_cliente.getValor("ide_getid").equals("1")) {
+                    if (utilitario.validarRUC(tag_cliente.getValor("identificac_geper")) == false) {
+                        utilitario.agregarMensajeError("Error ", "Número R.U.C. no válido");
+                        return;
+                    }
+                }
+
                 tab_cab_factura.setValor("ide_geper", ide_geper);
                 tab_cab_factura.setValor("direccion_cccfa", tag_cliente.getValor("direccion_geper"));
                 tab_cab_factura.setValor("telefono_cccfa", tag_cliente.getValor("telefono_geper"));
