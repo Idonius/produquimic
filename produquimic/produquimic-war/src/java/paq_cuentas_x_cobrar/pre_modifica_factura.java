@@ -348,12 +348,16 @@ public class pre_modifica_factura extends Pantalla {
                     if (haceKardex) {
                         ser_inventario.generarModificarComprobnateTransaccionVenta(tab_cab_factura, tab_deta_factura);
                     }
-                    if (cambioFecha) {
+                    if (cambioFecha && ser_factura.isFacturaElectronica()) {
                         //Se debe generar nueva clave de acceso
                         ser_factura.generarNuevaClaveAcceso(tab_cab_factura.getValor("ide_srcom"));
                     }
 
                     if (utilitario.getConexion().guardarPantalla().isEmpty()) {
+                        if (ser_factura.isFacturaElectronica()) {
+                            String ide_cccfa = tab_cab_factura.getValor("ide_cccfa");
+                            ser_comp_electronico.generarFacturaElectronica(ide_cccfa);
+                        }
                         fecha_emision_original = null;
                         cambioFecha = false;
                     }
