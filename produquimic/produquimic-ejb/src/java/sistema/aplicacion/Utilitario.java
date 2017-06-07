@@ -1068,7 +1068,6 @@ public class Utilitario extends Framework {
         return 1000;
     }
 
-
     /**
      * Retorna una fecha en formato especificado
      *
@@ -1125,8 +1124,9 @@ public class Utilitario extends Framework {
      * @param email
      * @return
      */
-    public  boolean isCorreoValido(String email) {
-        Pattern pat = Pattern.compile("^([0-9a-zA-Z]([_.w]*[0-9a-zA-Z])*@([0-9a-zA-Z][-w]*[0-9a-zA-Z].)+([a-zA-Z]{2,9}.)+[a-zA-Z]{2,3})$");
+    public boolean isCorreoValido(String email) {
+        Pattern pat = Pattern.compile("^[_A-Za-z0-9-\\+]+(\\.[_A-Za-z0-9-]+)*@"
+                + "[A-Za-z0-9-]+(\\.[A-Za-z0-9]+)*(\\.[A-Za-z]{2,})$");
         Matcher mat = pat.matcher(email);
         if (mat.find()) {
             return true;
@@ -1140,7 +1140,7 @@ public class Utilitario extends Framework {
      *
      * @return
      */
-    public  String instalarCertificados() {
+    public String instalarCertificados() {
         TrustManager[] trustAllCerts = new TrustManager[]{new X509TrustManager() {
             @Override
             public X509Certificate[] getAcceptedIssuers() {
@@ -1167,7 +1167,4 @@ public class Utilitario extends Framework {
         return null;
     }
 
-  
-  
-    
 }

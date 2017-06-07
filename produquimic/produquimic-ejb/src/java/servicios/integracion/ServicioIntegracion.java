@@ -479,7 +479,6 @@ public class ServicioIntegracion extends ServicioBase {
 //////                tab_inventario.setValor("valor_indci", utilitario.getFormatoNumero(Double.parseDouble(tab_quimi.getValor(i, "existencia")) * Double.parseDouble(tab_quimi.getValor(i, "precio_compra"))));
 //////            } catch (Exception e) {
 //////            }
-
             int_maximo_articulo++;
         }
         tab_cod.guardar();
@@ -517,9 +516,9 @@ public class ServicioIntegracion extends ServicioBase {
             String numFactura = tab_factura.getValor("numfactura");
             for (int i = 0; i < tab_factura.getTotalFilas(); i++) {
                 ///Kardex Productos
-                String codProd = tab_factura.getValor("codigo_inarti");
-                double vcant = Double.parseDouble(tab_factura.getValor("cantidad_ccdfa"));
-                double vpre = Double.parseDouble(tab_factura.getValor("precio_ccdfa"));
+                String codProd = tab_factura.getValor(i, "codigo_inarti");
+                double vcant = Double.parseDouble(tab_factura.getValor(i, "cantidad_ccdfa"));
+                double vpre = Double.parseDouble(tab_factura.getValor(i, "precio_ccdfa"));
                 double exan = getExisteciaProducto_Escritorio(codProd);
                 double exnue = exan - vcant;
                 String nombreCliente = tab_factura.getValor("nom_geper");
@@ -538,7 +537,10 @@ public class ServicioIntegracion extends ServicioBase {
             double tiva = Double.parseDouble(tab_factura.getValor("valor_iva_cccfa"));
             double total = Double.parseDouble(tab_factura.getValor("total_cccfa"));
 
-            ide_cntco = ide_cntco == null ? "2" : ide_cntco; //Persona natural si es null
+            if (ide_cntco == null) {
+                ide_cntco = "2";//Persona natural por defecto;    
+            }
+
             switch (ide_cntco) {
                 case "2": {
                     //PERSONA NATURAL

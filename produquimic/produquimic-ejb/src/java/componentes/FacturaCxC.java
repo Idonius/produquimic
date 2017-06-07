@@ -583,6 +583,7 @@ public class FacturaCxC extends Dialogo {
 
         tab_cab_factura.getColumna("telefono_cccfa").setNombreVisual("TELEFONO");
         tab_cab_factura.getColumna("telefono_cccfa").setOrden(5);
+        tab_cab_factura.getColumna("telefono_cccfa").setRequerida(true);
         tab_cab_factura.getColumna("ide_cntdo").setVisible(false);
         tab_cab_factura.getColumna("ide_cntdo").setValorDefecto(parametros.get("p_con_tipo_documento_factura"));
         tab_cab_factura.getColumna("ide_ccefa").setVisible(false);
@@ -1469,6 +1470,10 @@ public class FacturaCxC extends Dialogo {
         }
         if (tab_cab_factura.getValor("observacion_cccfa") == null || tab_cab_factura.getValor("observacion_cccfa").isEmpty()) {
             utilitario.agregarMensajeError("No se puede guardar la Factura", "Debe ingresar una Observacion");
+            return false;
+        }
+        if (tab_cab_factura.getValor("telefono_cccfa") == null || tab_cab_factura.getValor("telefono_cccfa").isEmpty()) {
+            utilitario.agregarMensajeError("No se puede guardar la Factura", "Debe ingresar una Número Telefónico");
             return false;
         }
 

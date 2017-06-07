@@ -572,4 +572,13 @@ public class ServicioComprobanteElectronico extends ServicioBase {
                 + "GROUP BY nombre_sresc,a.ide_sresc";
     }
 
+    /**
+     * Retorna un comprobante electronico
+     * @param ide_srcom
+     * @return 
+     */
+    public String getSqlComprobanteElectronico(String ide_srcom) {
+        return "SELECT * from sri_comprobante where ide_srcom=" + ide_srcom;
+    }
+   
 }

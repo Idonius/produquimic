@@ -517,6 +517,12 @@ public class ServicioCuentasCxC extends ServicioBase {
             //cambia de estado el compobante pendiente
             if (tab_cab.getValor("ide_srcom") != null) {
                 utilitario.getConexion().agregarSql("update sri_comprobante set ide_sresc=" + EstadoComprobanteEnum.ANULADO.getCodigo() + ",reutiliza_srcom=true  where ide_srcom=" + tab_cab.getValor("ide_srcom") + " and ide_sresc=" + EstadoComprobanteEnum.PENDIENTE.getCodigo());
+                //anula guia
+                String guia = getCodigoGuiaElectronica(tab_cab.getValor("ide_srcom"));
+                if (guia != null) {
+                    utilitario.getConexion().agregarSql("update sri_comprobante set ide_sresc=" + EstadoComprobanteEnum.ANULADO.getCodigo() + ",reutiliza_srcom=true  where ide_srcom=" + guia + " and ide_sresc=" + EstadoComprobanteEnum.PENDIENTE.getCodigo());
+                }
+
             }
         }
         //Produquimic elimina kardex
@@ -832,4 +838,7 @@ public class ServicioCuentasCxC extends ServicioBase {
 
     }
 
+    public void generarNuevaClaveAcceso(String factura) {
+        utilitario.getConexion().agregarSqlPantalla("UPDATE sri_comprobante set claveacceso_srcom=null where ide_srcom=" + factura);
+    }
 }
