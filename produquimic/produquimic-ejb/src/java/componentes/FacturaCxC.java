@@ -76,7 +76,7 @@ public class FacturaCxC extends Dialogo {
 
     String ide_srcom;
     String ide_srcom_guia;
-    private Combo com_tipo_documento_rep = new Combo();
+    private final Combo com_tipo_documento_rep = new Combo();
 
     //FORMA DE PAGO
     private Tabla tab_deta_pago;
@@ -157,6 +157,7 @@ public class FacturaCxC extends Dialogo {
         tab_factura.agregarTab("COMPROBANTE DE CONTABILIDAD", null);//2       
         tab_factura.agregarTab("COMPROBANTE DE RETENCIÓN", null);//3
         tab_factura.agregarTab("GUIA DE REMISIÓN", null);//4
+        tab_factura.agregarTab("SRI XML", null);//5
         this.setDialogo(tab_factura);
         //Recupera porcentaje iva
         tarifaIVA = ser_configuracion.getPorcentajeIva(utilitario.getFechaActual());
@@ -192,6 +193,7 @@ public class FacturaCxC extends Dialogo {
         tab_factura.getTab(2).getChildren().clear();
         tab_factura.getTab(3).getChildren().clear();
         tab_factura.getTab(4).getChildren().clear();
+        tab_factura.getTab(5).getChildren().clear();
         haceKardex = false;
         tab_factura.getTab(0).getChildren().add(dibujarFactura());
         tab_factura.getTab(4).getChildren().add(dibujarGuiaRemision());
@@ -244,6 +246,7 @@ public class FacturaCxC extends Dialogo {
             tab_factura.getTab(2).getChildren().clear();
             tab_factura.getTab(3).getChildren().clear();
             tab_factura.getTab(4).getChildren().clear();
+            tab_factura.getTab(5).getChildren().clear();
             tab_factura.getTab(0).getChildren().add(dibujarFactura());
 
             opcion = 2;
@@ -268,6 +271,8 @@ public class FacturaCxC extends Dialogo {
             }
 
             tab_factura.getTab(4).getChildren().add(dibujarGuiaRemision());
+            
+            tab_factura.getTab(5).getChildren().add(dibujarXmlFactura());
 
             com_pto_emision.setValue(tab_cab_factura.getValor("ide_ccdaf"));
             tab_deta_factura.setCondicion("ide_cccfa=" + tab_cab_factura.getValorSeleccionado());
@@ -419,6 +424,35 @@ public class FacturaCxC extends Dialogo {
         return grupo;
     }
 
+    private Grupo dibujarXmlFactura() {
+        Grupo grupo = new Grupo();
+        String ide_srcom = tab_cab_factura.getValor("ide_srcom");
+        if (ide_srcom != null) {
+            TablaGenerica tag = utilitario.consultar(ser_comprobante_electronico.getSqlXmlComprobante(ide_srcom));
+            Grid gri_m = new Grid();
+            gri_m.setWidth("100%");
+            gri_m.setColumns(2);
+            gri_m.getChildren().add(new Etiqueta("<strong>MENSAJE DE RECEPCIÓN</strong>"));
+            gri_m.getChildren().add(new Etiqueta("<strong>MENSAJE DE AUTORIZACIÓN</strong>"));
+            AreaTexto a1 = new AreaTexto();
+            a1.setValue(tag.getValor("msg_recepcion_srxmc"));
+            a1.setReadonly(true);
+            gri_m.getChildren().add(a1);
+            AreaTexto a2 = new AreaTexto();
+            a2.setValue(tag.getValor("msg_autoriza_srxmc"));
+            a2.setReadonly(true);
+            gri_m.getChildren().add(a2);
+            grupo.getChildren().add(gri_m);
+
+            AreaTexto ax = new AreaTexto();
+            ax.setValue(tag.getValor("xml_srxmc"));
+            ax.setReadonly(true);
+            grupo.getChildren().add(ax);
+
+        }
+        return grupo;
+    }
+
     /**
      * Configuraciones para Tab de Factura
      *
@@ -455,6 +489,14 @@ public class FacturaCxC extends Dialogo {
             botCrearProducto.setIcon("ui-icon-cart");
             botCrearProducto.setMetodoRuta("pre_index.clase." + getId() + ".abrirProducto");
             gri_pto.getChildren().add(botCrearProducto);
+
+            Boton botImportar = new Boton();
+            botImportar.setId("botImportar");
+            botImportar.setValue("Importar");
+            botImportar.setTitle("Importar Clientes y Productos del Sistema de Facturación");
+            botImportar.setIcon("ui-icon-circle-arrow-n");
+            botImportar.setMetodoRuta("pre_index.clase." + getId() + ".importarClientesProductos");
+            gri_pto.getChildren().add(botImportar);
 
             dia_creacion_cliente.getBot_aceptar().setMetodoRuta("pre_index.clase." + getId() + ".guardarCliente");
             dia_creacion_cliente.getBot_cancelar().setMetodoRuta("pre_index.clase." + getId() + ".cerrarDialogos");
@@ -574,7 +616,9 @@ public class FacturaCxC extends Dialogo {
         tab_cab_factura.getColumna("ide_cnccc").setVisible(false);
         tab_cab_factura.getColumna("ide_cccfa").setVisible(false);
         tab_cab_factura.getColumna("ide_cncre").setVisible(false);
-        tab_cab_factura.getColumna("ide_vgven").setVisible(false);
+        tab_cab_factura.getColumna("ide_vgven").setVisible(true);
+        tab_cab_factura.getColumna("ide_vgven").setNombreVisual("VENDEDOR");
+        tab_cab_factura.getColumna("ide_vgven").setCombo("ven_vendedor", "ide_vgven", "nombre_vgven", "");
 
         tab_cab_factura.getColumna("ide_srcom").setVisible(false);  //FE
 
@@ -904,6 +948,14 @@ public class FacturaCxC extends Dialogo {
         }
         grupo.getChildren().add(gri_observa);
         return grupo;
+    }
+
+    public void importarClientesProductos() {
+        ser_integracion.importarClientes();
+        ser_integracion.importarProductos();
+        actualizarClientesProductos();
+        utilitario.addUpdateTabla(tab_cab_factura, "ide_geper", "");
+        utilitario.addUpdateTabla(tab_deta_factura, "ide_inuni", "");
     }
 
     private Grupo dibujarRetencion() {
