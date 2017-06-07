@@ -82,7 +82,8 @@ public class UtilitarioCeo extends Framework {
      * @return
      */
     public boolean isCorreoValido(String email) {
-        Pattern pat = Pattern.compile("^([0-9a-zA-Z]([_.w]*[0-9a-zA-Z])*@([0-9a-zA-Z][-w]*[0-9a-zA-Z].)+([a-zA-Z]{2,9}.)+[a-zA-Z]{2,3})$");
+        Pattern pat = Pattern.compile("^[_A-Za-z0-9-\\+]+(\\.[_A-Za-z0-9-]+)*@"
+                + "[A-Za-z0-9-]+(\\.[A-Za-z0-9]+)*(\\.[A-Za-z]{2,})$");
         Matcher mat = pat.matcher(email);
         if (mat.find()) {
             return true;
@@ -148,7 +149,7 @@ public class UtilitarioCeo extends Framework {
      * @param numero
      * @return
      */
-    public  String getFormatoNumeroEntero(Object numero) {
+    public String getFormatoNumeroEntero(Object numero) {
         try {
             Double ldob_valor = Double.parseDouble(numero.toString());
             return String.valueOf(ldob_valor.intValue());
@@ -157,8 +158,8 @@ public class UtilitarioCeo extends Framework {
         }
     }
 
-    public  String reemplazarCaracteresEspeciales(String xml) {
-         //REMPLAZAR TILDES Y Ñ
+    public String reemplazarCaracteresEspeciales(String xml) {
+        //REMPLAZAR TILDES Y Ñ
         //remplaza ñ y tildes
         xml = xml.replaceAll("Ñ", "N");
         xml = xml.replaceAll("ñ", "n");
