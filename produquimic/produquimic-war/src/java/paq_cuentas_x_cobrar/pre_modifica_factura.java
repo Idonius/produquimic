@@ -5,6 +5,7 @@
  */
 package paq_cuentas_x_cobrar;
 
+import dj.comprobantes.offline.enums.EstadoComprobanteEnum;
 import framework.aplicacion.TablaGenerica;
 import framework.componentes.AreaTexto;
 import framework.componentes.Boton;
@@ -18,7 +19,9 @@ import framework.componentes.Tabla;
 import framework.componentes.Texto;
 import javax.ejb.EJB;
 import javax.faces.event.AjaxBehaviorEvent;
+import org.primefaces.event.DateSelectEvent;
 import org.primefaces.event.SelectEvent;
+import servicios.ceo.ServicioComprobanteElectronico;
 import servicios.contabilidad.ServicioConfiguracion;
 import servicios.cuentas_x_cobrar.ServicioCliente;
 import servicios.cuentas_x_cobrar.ServicioCuentasCxC;
@@ -54,7 +57,14 @@ public class pre_modifica_factura extends Pantalla {
     private final ServicioInventario ser_inventario = (ServicioInventario) utilitario.instanciarEJB(ServicioInventario.class);
     @EJB
     private final ServicioConfiguracion ser_configuracion = (ServicioConfiguracion) utilitario.instanciarEJB(ServicioConfiguracion.class);
+    @EJB
+    private final ServicioComprobanteElectronico ser_comp_electronico = (ServicioComprobanteElectronico) utilitario.instanciarEJB(ServicioComprobanteElectronico.class);
+
     private boolean haceKardex = false;
+
+    private String ide_sresc;
+    private String fecha_emision_original;
+    private boolean cambioFecha = false;
 
     public pre_modifica_factura() {
 
@@ -120,6 +130,7 @@ public class pre_modifica_factura extends Pantalla {
         tab_cab_factura.getColumna("base_tarifa0_cccfa").setValorDefecto("0");
         tab_cab_factura.getColumna("ide_cndfp").setCombo("con_deta_forma_pago", "ide_cndfp", "nombre_cndfp", "ide_cndfp!=" + utilitario.getVariable("p_con_for_pag_reembolso_caja"));
         tab_cab_factura.getColumna("ide_cndfp").setEstilo("width:140px");
+        tab_cab_factura.getColumna("fecha_emisi_cccfa").setMetodoChange("cambioFecha");
         tab_cab_factura.getColumna("ide_cndfp").setRequerida(true);
         tab_cab_factura.getColumna("TARIFA_IVA_CCCFA").setVisible(false);
         tab_cab_factura.getColumna("DIRECCION_CCCFA").setRequerida(true);
@@ -166,7 +177,7 @@ public class pre_modifica_factura extends Pantalla {
         tab_deta_factura.getColumna("ALTERNO_CCDFA").setValorDefecto("00");
         tab_deta_factura.getColumna("ALTERNO_CCDFA").setVisible(false);
         tab_deta_factura.setScrollable(true);
-        tab_deta_factura.setScrollHeight(utilitario.getAltoPantalla() - 300);
+        tab_deta_factura.setScrollHeight(utilitario.getAltoPantalla() - 350);
         tab_deta_factura.dibujar();
 
         PanelTabla pat_panel1 = new PanelTabla();
@@ -229,20 +240,67 @@ public class pre_modifica_factura extends Pantalla {
 
     }
 
+    public void cambioFecha(AjaxBehaviorEvent evt) {
+        cambioFecha();
+    }
+
+    public void cambioFecha(DateSelectEvent evt) {
+        cambioFecha();
+    }
+
+    public void cambioFecha() {
+        cambioFecha = false;
+        if (!ide_sresc.equals(String.valueOf(EstadoComprobanteEnum.PENDIENTE.getCodigo()))) {
+            utilitario.agregarMensajeError("No se puede Cambiar la fecha de emisión", "El comprobante debe setar en estado PENDIENTE");
+            tab_cab_factura.setValor("fecha_emisi_cccfa", fecha_emision_original);
+            utilitario.addUpdateTabla(tab_cab_factura, "fecha_emisi_cccfa", "");
+        } else {
+            cambioFecha = true;
+        }
+    }
+
     public void buscarFactura() {
 
         if (mas_num_factua.getValue() != null || mas_num_factua.getValue().toString().isEmpty() == false) {
             tab_cab_factura.setCondicion("ide_ccdaf=" + com_pto_emision.getValue() + " and secuencial_cccfa='" + mas_num_factua.getValue() + "'");
             tab_cab_factura.ejecutarSql();
-            setObservacion(tab_cab_factura.getValor("OBSERVACION_CCCFA"));
-            tab_deta_factura.ejecutarValorForanea(tab_cab_factura.getValorSeleccionado());
-            haceKardex = false;
+
             if (tab_cab_factura.isEmpty()) {
                 tab_cab_factura.insertar();
                 tab_cab_factura.getFilaSeleccionada().setLectura(true);
                 utilitario.agregarMensajeInfo("No existe la Factura N. " + mas_num_factua.getValue(), "");
-
+                return;
             }
+            setObservacion(tab_cab_factura.getValor("OBSERVACION_CCCFA"));
+            tab_deta_factura.ejecutarValorForanea(tab_cab_factura.getValorSeleccionado());
+            haceKardex = false;
+            if (ser_factura.isFacturaElectronica()) {
+                //si es factura electronica valida que este en pendiente
+                String ide_srcom = tab_cab_factura.getValor("ide_srcom");
+                if (ide_srcom != null) {
+                    TablaGenerica tag_e = utilitario.consultar(ser_comp_electronico.getSqlComprobanteElectronico(ide_srcom));
+                    tag_e.imprimirSql();
+                    if (tag_e.isEmpty() == false) {
+                        //solo puede modificar si no esta RECIBIDA O AUTORIZADA
+                        ide_sresc = tag_e.getValor("ide_sresc");
+                        fecha_emision_original = tag_e.getValor("fechaemision_srcom");
+
+                        if (ide_sresc == null) {
+                            tab_cab_factura.setValor("ide_sresc", String.valueOf(EstadoComprobanteEnum.PENDIENTE.getCodigo()));
+                            ide_sresc = String.valueOf(EstadoComprobanteEnum.PENDIENTE.getCodigo());
+                        }
+                        if (ide_sresc.equals(String.valueOf(EstadoComprobanteEnum.RECIBIDA.getCodigo())) || ide_sresc.equals(String.valueOf(EstadoComprobanteEnum.AUTORIZADO.getCodigo()))) {
+                            utilitario.agregarMensajeError("No se puede modificar la Factura", "La Factura N. " + mas_num_factua.getValue() + " ya se a enviado al SRI");
+                            //Hace de lectura
+                            tab_cab_factura.getFilaSeleccionada().setLectura(true);
+                            for (int i = 0; i < tab_deta_factura.getTotalFilas(); i++) {
+                                tab_deta_factura.getFila(i).setLectura(true);
+                            }
+                        }
+                    }
+                }
+            }
+
             tarifaIVA = ser_configuracion.getPorcentajeIva(tab_cab_factura.getValor("fecha_emisi_cccfa"));
             calcularTotalFactura();
         } else {
@@ -290,7 +348,15 @@ public class pre_modifica_factura extends Pantalla {
                     if (haceKardex) {
                         ser_inventario.generarModificarComprobnateTransaccionVenta(tab_cab_factura, tab_deta_factura);
                     }
-                    utilitario.getConexion().guardarPantalla();
+                    if (cambioFecha) {
+                        //Se debe generar nueva clave de acceso
+                        ser_factura.generarNuevaClaveAcceso(tab_cab_factura.getValor("ide_srcom"));
+                    }
+
+                    if (utilitario.getConexion().guardarPantalla().isEmpty()) {
+                        fecha_emision_original = null;
+                        cambioFecha = false;
+                    }
                 }
             }
         }
