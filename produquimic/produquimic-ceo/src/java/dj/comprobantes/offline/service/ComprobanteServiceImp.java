@@ -253,7 +253,7 @@ public class ComprobanteServiceImp implements ComprobanteService {
                     String xmlGuia = guiaRemisionService.getXmlGuiaRemision(comprobanteGuia);
                     xmlGuia = utilitario.reemplazarCaracteresEspeciales(xmlGuia);
                     recepcionService.enviarRecepcionOfflineSRI(comprobanteGuia, xmlGuia);
-                    comprobanteGuia = getComprobantePorId(comprobanteGuia.getCodigocomprobante());
+                    comprobanteGuia = getComprobantePorId(comprobanteGuia.getCodigocomprobante());                    
                 } else {
                     try {
                         //Esperamos 6 segundos por recomendacion del SRI
