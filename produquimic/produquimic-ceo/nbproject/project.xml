@@ -80,6 +80,7 @@
             <included-library dirs="200">file.reference.xmlsec-1.4.2-ADSI-1.0.jar-1</included-library>
             <included-library dirs="200">file.reference.xstream-1.4.1.jar</included-library>
             <included-library dirs="200">file.reference.jdfaces.jar</included-library>
+            <included-library dirs="200">file.reference.commons-codec-1.2.jar</included-library>
             <source-roots>
                 <root id="src.dir"/>
             </source-roots>
