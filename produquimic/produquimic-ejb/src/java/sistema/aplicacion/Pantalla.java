@@ -110,9 +110,12 @@ public abstract class Pantalla {
      * Cuando se presiona en el boton inicio de la barra de navegación
      */
     public void inicio() {
-        Tabla tabla_foco = utilitario.getTablaisFocus();
-        if (tabla_foco != null) {
-            tabla_foco.inicio();
+        try {
+            Tabla tabla_foco = utilitario.getTablaisFocus();
+            if (tabla_foco != null) {
+                tabla_foco.inicio();
+            }
+        } catch (Exception e) {
         }
     }
 
@@ -120,9 +123,12 @@ public abstract class Pantalla {
      * Cuando se presiona en el boton fin de la barra de navegación
      */
     public void fin() {
-        Tabla tabla_foco = utilitario.getTablaisFocus();
-        if (tabla_foco != null) {
-            tabla_foco.fin();
+        try {
+            Tabla tabla_foco = utilitario.getTablaisFocus();
+            if (tabla_foco != null) {
+                tabla_foco.fin();
+            }
+        } catch (Exception e) {
         }
     }
 
@@ -130,9 +136,12 @@ public abstract class Pantalla {
      * Cuando se presiona en el boton siguiente de la barra de navegación
      */
     public void siguiente() {
-        Tabla tabla_foco = utilitario.getTablaisFocus();
-        if (tabla_foco != null) {
-            tabla_foco.siguiente();
+        try {
+            Tabla tabla_foco = utilitario.getTablaisFocus();
+            if (tabla_foco != null) {
+                tabla_foco.siguiente();
+            }
+        } catch (Exception e) {
         }
     }
 
@@ -140,9 +149,12 @@ public abstract class Pantalla {
      * Cuando se presiona en el boton atras de la barra de navegación
      */
     public void atras() {
-        Tabla tabla_foco = utilitario.getTablaisFocus();
-        if (tabla_foco != null) {
-            tabla_foco.atras();
+        try {
+            Tabla tabla_foco = utilitario.getTablaisFocus();
+            if (tabla_foco != null) {
+                tabla_foco.atras();
+            }
+        } catch (Exception e) {
         }
     }
 
@@ -150,11 +162,14 @@ public abstract class Pantalla {
      * Cuando se presiona el item buscar del menu contextual
      */
     public void buscar() {
-        //Busca en la tabla que tiene el foco
-        Tabla tabla_foco = utilitario.getTablaisFocus();
-        BuscarTabla bus_buscar = utilitario.getBuscaTabla();
-        if (bus_buscar != null && tabla_foco != null) {
-            bus_buscar.setBuscar(tabla_foco);
+        try {
+            //Busca en la tabla que tiene el foco
+            Tabla tabla_foco = utilitario.getTablaisFocus();
+            BuscarTabla bus_buscar = utilitario.getBuscaTabla();
+            if (bus_buscar != null && tabla_foco != null) {
+                bus_buscar.setBuscar(tabla_foco);
+            }
+        } catch (Exception e) {
         }
     }
 
@@ -162,9 +177,12 @@ public abstract class Pantalla {
      * Cuando se presiona el item actualizar del menu contextual
      */
     public void actualizar() {
-        Tabla tabla_foco = utilitario.getTablaisFocus();
-        if (tabla_foco != null) {
-            tabla_foco.actualizar();
+        try {
+            Tabla tabla_foco = utilitario.getTablaisFocus();
+            if (tabla_foco != null) {
+                tabla_foco.actualizar();
+            }
+        } catch (Exception e) {
         }
     }
 

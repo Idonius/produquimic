@@ -271,7 +271,7 @@ public class FacturaCxC extends Dialogo {
             }
 
             tab_factura.getTab(4).getChildren().add(dibujarGuiaRemision());
-            
+
             tab_factura.getTab(5).getChildren().add(dibujarXmlFactura());
 
             com_pto_emision.setValue(tab_cab_factura.getValor("ide_ccdaf"));
@@ -432,19 +432,24 @@ public class FacturaCxC extends Dialogo {
             Grid gri_m = new Grid();
             gri_m.setWidth("100%");
             gri_m.setColumns(2);
-            gri_m.getChildren().add(new Etiqueta("<strong>MENSAJE DE RECEPCIÓN</strong>"));
-            gri_m.getChildren().add(new Etiqueta("<strong>MENSAJE DE AUTORIZACIÓN</strong>"));
+            gri_m.getChildren().add(new Etiqueta("<strong>MENSAJE DE RECEPCIÓN :</strong>"));
+            gri_m.getChildren().add(new Etiqueta("<strong>MENSAJE DE AUTORIZACIÓN :</strong>"));
             AreaTexto a1 = new AreaTexto();
+            a1.setStyle("width:99%;height:50px");
             a1.setValue(tag.getValor("msg_recepcion_srxmc"));
             a1.setReadonly(true);
             gri_m.getChildren().add(a1);
             AreaTexto a2 = new AreaTexto();
+            a2.setStyle("width:97%;height:50px");
             a2.setValue(tag.getValor("msg_autoriza_srxmc"));
             a2.setReadonly(true);
             gri_m.getChildren().add(a2);
             grupo.getChildren().add(gri_m);
 
+            grupo.getChildren().add(new Etiqueta("<strong>XML :</strong> </br>"));
+
             AreaTexto ax = new AreaTexto();
+            ax.setStyle("width:98%;overflow:auto;height:" + (utilitario.getAltoPantalla() - 210) + "px;");
             ax.setValue(tag.getValor("xml_srxmc"));
             ax.setReadonly(true);
             grupo.getChildren().add(ax);
@@ -619,7 +624,8 @@ public class FacturaCxC extends Dialogo {
         tab_cab_factura.getColumna("ide_vgven").setVisible(true);
         tab_cab_factura.getColumna("ide_vgven").setNombreVisual("VENDEDOR");
         tab_cab_factura.getColumna("ide_vgven").setCombo("ven_vendedor", "ide_vgven", "nombre_vgven", "");
-
+        tab_cab_factura.getColumna("ide_vgven").setOrden(1);
+        tab_cab_factura.getColumna("ide_vgven").setValorDefecto("0");
         tab_cab_factura.getColumna("ide_srcom").setVisible(false);  //FE
 
         tab_cab_factura.getColumna("ret_fuente_cccfa").setVisible(false); //produquimic
@@ -716,6 +722,7 @@ public class FacturaCxC extends Dialogo {
         tab_cab_factura.getColumna("base_tarifa0_cccfa").setVisible(false);
         tab_cab_factura.getColumna("total_cccfa").setVisible(false);
         tab_cab_factura.setRecuperarLectura(true);
+        tab_cab_factura.getColumna("secuencial_cccfa").setVisible(false);
         tab_cab_factura.dibujar();
 
         if (isFacturaElectronica()) {

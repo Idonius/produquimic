@@ -156,15 +156,13 @@ public class ServicioIntegracion extends ServicioBase {
             String ide_cntco = tab_clie.getValor(i, "tipo");
             if (ide_cntco != null) {
                 ide_cntco = ide_cntco.toUpperCase();
-                if (ide_cntco.indexOf("OBLIGADO A LLEVAR CONTABILIDAD") > 0) {
+                if (ide_cntco.startsWith("OBLIGADO A LLEVAR CONTABILIDAD")) {
                     ide_cntco = "3";
-                } else if (ide_cntco.indexOf("PERSONA NATURAL") > 0) {
+                } else if (ide_cntco.startsWith("PERSONA NATURAL")) {
                     ide_cntco = "2";
-                }
-                if (ide_cntco.indexOf("CONTRIBUYENTE ESPECIAL") > 0) {
+                } else if (ide_cntco.startsWith("CONTRIBUYENTE ESPECIAL")) {
                     ide_cntco = "1";
-                }
-                if (ide_cntco.indexOf("ESPECIALES-EXPORTADORES") > 0) {
+                } else if (ide_cntco.startsWith("ESPECIALES-EXPORTADORES")) {
                     ide_cntco = "6";
                 } else {
                     ide_cntco = "2";
@@ -510,6 +508,7 @@ public class ServicioIntegracion extends ServicioBase {
                 + "inner join inv_articulo e on a.ide_inarti= e.ide_inarti\n"
                 + "where a.ide_cccfa=" + ide_cccfa);
         //Guarda Kardex de productos de todos detalles de la factura
+
         if (tab_factura.isEmpty() == false) {
             Conexion con_conecta = getConexionEscritorio();
             String fechae = utilitario.getFormatoFecha(new Date(), "yyyy-MM-dd");
@@ -528,7 +527,7 @@ public class ServicioIntegracion extends ServicioBase {
                 con_conecta.agregarSql(sql_2);
             }
             //Guarda Kardex de clientes
-            String ide_cntco = tab_factura.getValor("ide_cntco");
+            // String ide_cntco = tab_factura.getValor("ide_cntco");
             double retFuente = 0, retIva = 0;
             String codClie = tab_factura.getValor("codigo_geper");
             double saldoInicialClie = getSaldoCliente_Escritorio(codClie);
@@ -537,10 +536,8 @@ public class ServicioIntegracion extends ServicioBase {
             double tiva = Double.parseDouble(tab_factura.getValor("valor_iva_cccfa"));
             double total = Double.parseDouble(tab_factura.getValor("total_cccfa"));
 
-            if (ide_cntco == null) {
-                ide_cntco = "2";//Persona natural por defecto;    
-            }
-
+            //Busca tipo de contribuyente del sistema de escritorio
+            String ide_cntco = getTipoCliente(tab_factura.getValor("codigo_geper"));
             switch (ide_cntco) {
                 case "2": {
                     //PERSONA NATURAL
@@ -593,14 +590,14 @@ public class ServicioIntegracion extends ServicioBase {
                     con_conecta.agregarSql(sql2);
                     break;
                 }
-                default: {
-                    //POR DEFECTO NO RETIENE NADA
-                    retFuente = 0;
-                    retIva = 0;
-                    saldoNuevoClie = saldoInicialClie + total;
-                    String sql = "INSERT INTO KARDEXCLIENTES VALUES((SELECT MAX(k.CODIGOKC )+1 FROM KARDEXCLIENTES k where  k.COD_CLIE='" + codClie + " '),'" + codClie + "','" + fechae + "','" + numFactura + "','F.E - COMPRA DE PRODUCTOS '," + total + ",0," + saldoNuevoClie + ")";
-                    con_conecta.agregarSql(sql);
-                }
+//                default: {
+//                    //POR DEFECTO NO RETIENE NADA
+//                    retFuente = 0;
+//                    retIva = 0;
+//                    saldoNuevoClie = saldoInicialClie + total;
+//                    String sql = "INSERT INTO KARDEXCLIENTES VALUES((SELECT MAX(k.CODIGOKC )+1 FROM KARDEXCLIENTES k where  k.COD_CLIE='" + codClie + " '),'" + codClie + "','" + fechae + "','" + numFactura + "','F.E - COMPRA DE PRODUCTOS '," + total + ",0," + saldoNuevoClie + ")";
+//                    con_conecta.agregarSql(sql);
+//                }
             }
             String sql = "UPDATE CLIENTES SET EXISTENCIA=" + saldoNuevoClie + " where COD_CLIE='" + codClie + "'";
             con_conecta.agregarSql(sql);
@@ -694,5 +691,31 @@ public class ServicioIntegracion extends ServicioBase {
             }
         }
         return dou_existencia;
+    }
+
+    public String getTipoCliente(String CODIGO_CLIE) {
+        TablaGenerica tab = new TablaGenerica();
+        String sql = "SELECT COD_CLIE,TIPO FROM clientes where COD_CLIE='" + CODIGO_CLIE + "'";
+        Conexion con_conecta = getConexionEscritorio();
+        tab.setConexion(con_conecta);
+        tab.setSql(sql);
+        tab.ejecutarSql();
+        String ide_cntco = tab.getValor("TIPO");
+
+        if (ide_cntco != null) {
+            ide_cntco = ide_cntco.toUpperCase();
+            if (ide_cntco.startsWith("OBLIGADO A LLEVAR CONTABILIDAD")) {
+                ide_cntco = "3";
+            } else if (ide_cntco.startsWith("PERSONA NATURAL")) {
+                ide_cntco = "2";
+            } else if (ide_cntco.startsWith("CONTRIBUYENTE ESPECIAL")) {
+                ide_cntco = "1";
+            } else if (ide_cntco.startsWith("ESPECIALES-EXPORTADORES")) {
+                ide_cntco = "6";
+            } else {
+                ide_cntco = "2";
+            }
+        }
+        return ide_cntco;
     }
 }
