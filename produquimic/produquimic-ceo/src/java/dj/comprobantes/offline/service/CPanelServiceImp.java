@@ -138,7 +138,7 @@ public class CPanelServiceImp implements CPanelService {
                 String value = String.valueOf(params.get(key));
                 outputStream.writeBytes(twoHyphens + boundary + lineEnd);
                 outputStream.writeBytes("Content-Disposition: form-data; name=\"" + key + "\"" + lineEnd);
-                outputStream.writeBytes("Content-Type: text/plain" + lineEnd);
+                outputStream.writeBytes("Content-Type: text/plain; charset=utf-8" + lineEnd);
                 outputStream.writeBytes(lineEnd);
                 outputStream.writeBytes(value);
                 outputStream.writeBytes(lineEnd);
