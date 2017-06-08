@@ -168,6 +168,11 @@ public class pre_modifica_factura extends Pantalla {
         tab_deta_factura.getColumna("iva_inarti_ccdfa").setPermitirNullCombo(false);
         tab_deta_factura.getColumna("iva_inarti_ccdfa").setMetodoChange("cambioPrecioCantidadIva");
         tab_deta_factura.getColumna("iva_inarti_ccdfa").setLongitud(-1);
+        tab_deta_factura.getColumna("ide_inarti").setRequerida(true);
+        tab_deta_factura.getColumna("ide_inuni").setCombo("inv_unidad", "ide_inuni", "nombre_inuni", "");
+        tab_deta_factura.getColumna("ide_inuni").setOrden(1);
+        tab_deta_factura.getColumna("ide_inuni").setNombreVisual("UNIDAD");
+        tab_deta_factura.getColumna("ide_inuni").setLongitud(-1);
         tab_deta_factura.getColumna("total_ccdfa").setNombreVisual("TOTAL");
         tab_deta_factura.getColumna("OBSERVACION_CCDFA").setNombreVisual("OBSERVACION");
         tab_deta_factura.getColumna("total_ccdfa").setEtiqueta();
