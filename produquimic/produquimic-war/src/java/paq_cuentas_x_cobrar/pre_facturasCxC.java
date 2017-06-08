@@ -83,10 +83,7 @@ public class pre_facturasCxC extends Pantalla {
     private Confirmar con_confirma = new Confirmar();
 
     private Retencion ret_retencion = new Retencion();
-
-    @EJB
-    private final ServicioIntegracion ser_integra = (ServicioIntegracion) utilitario.instanciarEJB(ServicioIntegracion.class);
-
+   
     @EJB
     private final ServicioComprobanteElectronico ser_facElect = (ServicioComprobanteElectronico) utilitario.instanciarEJB(ServicioComprobanteElectronico.class);
 

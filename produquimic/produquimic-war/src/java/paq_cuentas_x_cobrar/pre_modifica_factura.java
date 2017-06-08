@@ -25,6 +25,7 @@ import servicios.ceo.ServicioComprobanteElectronico;
 import servicios.contabilidad.ServicioConfiguracion;
 import servicios.cuentas_x_cobrar.ServicioCliente;
 import servicios.cuentas_x_cobrar.ServicioCuentasCxC;
+import servicios.integracion.ServicioIntegracion;
 import servicios.inventario.ServicioInventario;
 import servicios.inventario.ServicioProducto;
 import sistema.aplicacion.Pantalla;
@@ -59,6 +60,8 @@ public class pre_modifica_factura extends Pantalla {
     private final ServicioConfiguracion ser_configuracion = (ServicioConfiguracion) utilitario.instanciarEJB(ServicioConfiguracion.class);
     @EJB
     private final ServicioComprobanteElectronico ser_comp_electronico = (ServicioComprobanteElectronico) utilitario.instanciarEJB(ServicioComprobanteElectronico.class);
+ @EJB
+    private final ServicioIntegracion ser_integra = (ServicioIntegracion) utilitario.instanciarEJB(ServicioIntegracion.class);
 
     private boolean haceKardex = false;
 
@@ -363,6 +366,10 @@ public class pre_modifica_factura extends Pantalla {
                             String ide_cccfa = tab_cab_factura.getValor("ide_cccfa");
                             ser_comp_electronico.generarFacturaElectronica(ide_cccfa);
                         }
+                        //Produquimic sistema de Escritorio
+                        ser_integra.anularFactura_Escritorio(tab_cab_factura.getValor("ide_cccfa"));
+                        ser_integra.guardarKardexFactura(tab_cab_factura.getValor("ide_cccfa"));
+
                         fecha_emision_original = null;
                         cambioFecha = false;
                     }
