@@ -628,7 +628,7 @@ public class ServicioIntegracion extends ServicioBase {
             String numFactura = tab_factura.getValor("numfactura");
             for (int i = 0; i < tab_factura.getTotalFilas(); i++) {
                 ///Kardex Productos
-                String codProd = tab_factura.getValor("codigo_inarti");
+                String codProd = tab_factura.getValor(i,"codigo_inarti");
                 String sql_1 = "DELETE FROM KARDEXPRODUCTOS  WHERE  FACTURA ='" + numFactura + "' AND COD_PROD='" + codProd + "'";
                 String sql_2 = "call calcula('" + codProd + "');";
                 con_conecta.agregarSql(sql_1);
