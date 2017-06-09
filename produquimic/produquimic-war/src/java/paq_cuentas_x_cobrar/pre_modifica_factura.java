@@ -286,8 +286,7 @@ public class pre_modifica_factura extends Pantalla {
                 //si es factura electronica valida que este en pendiente
                 String ide_srcom = tab_cab_factura.getValor("ide_srcom");
                 if (ide_srcom != null) {
-                    TablaGenerica tag_e = utilitario.consultar(ser_comp_electronico.getSqlComprobanteElectronico(ide_srcom));
-                    tag_e.imprimirSql();
+                    TablaGenerica tag_e = utilitario.consultar(ser_comp_electronico.getSqlComprobanteElectronico(ide_srcom));                    
                     if (tag_e.isEmpty() == false) {
                         //solo puede modificar si no esta RECIBIDA O AUTORIZADA
                         ide_sresc = tag_e.getValor("ide_sresc");
