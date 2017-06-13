@@ -499,13 +499,19 @@ public class ServicioIntegracion extends ServicioBase {
      * @param ide_cccfa
      */
     public void guardarKardexFactura(String ide_cccfa) {
-        TablaGenerica tab_factura = utilitario.consultar("select codigo_inarti,cantidad_ccdfa,precio_ccdfa,"
+        TablaGenerica tab_factura = utilitario.consultar("select codigo_inarti,cantidad_ccdfa,precio_ccdfa,total_ccdfa,"
                 + "codigo_geper,nom_geper,ide_cntco,serie_ccdaf || secuencial_cccfa as numfactura,\n"
-                + "base_grabada_cccfa+base_tarifa0_cccfa+base_no_objeto_iva_cccfa as subtotal,valor_iva_cccfa,total_cccfa from cxc_deta_factura a\n"
+                + "base_grabada_cccfa+base_tarifa0_cccfa+base_no_objeto_iva_cccfa as subtotal,valor_iva_cccfa,total_cccfa,"
+                + "secuencial_cccfa,a.ide_cccfa,base_grabada_cccfa,base_tarifa0_cccfa+base_no_objeto_iva_cccfa as ventas0,"
+                + "nombre_cndfp,nombre_inuni ||' '|| nombre_inarti as nombre_inarti,nombre_vgven "
+                + "from cxc_deta_factura a\n"
                 + "inner join cxc_cabece_factura b on a.ide_cccfa=b.ide_cccfa\n"
                 + "inner join cxc_datos_fac c on b.ide_ccdaf=c.ide_ccdaf\n"
                 + "inner join gen_persona d on b.ide_geper=d.ide_geper\n"
                 + "inner join inv_articulo e on a.ide_inarti= e.ide_inarti\n"
+                + "inner join con_deta_forma_pago f on b.ide_cndfp=f.ide_cndfp\n"
+                + "left join  inv_unidad g on a.ide_inuni =g.ide_inuni\n"
+                + "inner join ven_vendedor h on b.ide_vgven=h.ide_vgven\n"
                 + "where a.ide_cccfa=" + ide_cccfa);
         //Guarda Kardex de productos de todos detalles de la factura
 
@@ -513,19 +519,7 @@ public class ServicioIntegracion extends ServicioBase {
             Conexion con_conecta = getConexionEscritorio();
             String fechae = utilitario.getFormatoFecha(new Date(), "yyyy-MM-dd");
             String numFactura = tab_factura.getValor("numfactura");
-            for (int i = 0; i < tab_factura.getTotalFilas(); i++) {
-                ///Kardex Productos
-                String codProd = tab_factura.getValor(i, "codigo_inarti");
-                double vcant = Double.parseDouble(tab_factura.getValor(i, "cantidad_ccdfa"));
-                double vpre = Double.parseDouble(tab_factura.getValor(i, "precio_ccdfa"));
-                double exan = getExisteciaProducto_Escritorio(codProd);
-                double exnue = exan - vcant;
-                String nombreCliente = tab_factura.getValor("nom_geper");
-                String sql_1 = "INSERT INTO  KARDEXPRODUCTOS VALUES((SELECT MAX(k.CODIGOKP )+1 FROM KARDEXPRODUCTOS k where  k.COD_PROD='" + codProd + " '),'" + codProd + "','" + fechae + "','" + numFactura + "','" + nombreCliente + "'," + vpre + ",0," + vcant + "," + exnue + ")";
-                String sql_2 = "UPDATE PRODUCTOS SET EXISTENCIA=" + exnue + " where COD_PROD='" + codProd + "'";
-                con_conecta.agregarSql(sql_1);
-                con_conecta.agregarSql(sql_2);
-            }
+
             //Guarda Kardex de clientes
             // String ide_cntco = tab_factura.getValor("ide_cntco");
             double retFuente = 0, retIva = 0;
@@ -590,17 +584,58 @@ public class ServicioIntegracion extends ServicioBase {
                     con_conecta.agregarSql(sql2);
                     break;
                 }
-//                default: {
-//                    //POR DEFECTO NO RETIENE NADA
-//                    retFuente = 0;
-//                    retIva = 0;
-//                    saldoNuevoClie = saldoInicialClie + total;
-//                    String sql = "INSERT INTO KARDEXCLIENTES VALUES((SELECT MAX(k.CODIGOKC )+1 FROM KARDEXCLIENTES k where  k.COD_CLIE='" + codClie + " '),'" + codClie + "','" + fechae + "','" + numFactura + "','F.E - COMPRA DE PRODUCTOS '," + total + ",0," + saldoNuevoClie + ")";
-//                    con_conecta.agregarSql(sql);
-//                }
+                default: {
+                    //POR DEFECTO NO RETIENE NADA
+                    retFuente = 0;
+                    retIva = 0;
+                    saldoNuevoClie = saldoInicialClie + total;
+                    String sql = "INSERT INTO KARDEXCLIENTES VALUES((SELECT MAX(k.CODIGOKC )+1 FROM KARDEXCLIENTES k where  k.COD_CLIE='" + codClie + " '),'" + codClie + "','" + fechae + "','" + numFactura + "','F.E - COMPRA DE PRODUCTOS '," + total + ",0," + saldoNuevoClie + ")";
+                    con_conecta.agregarSql(sql);
+                }
             }
             String sql = "UPDATE CLIENTES SET EXISTENCIA=" + saldoNuevoClie + " where COD_CLIE='" + codClie + "'";
             con_conecta.agregarSql(sql);
+
+            //Guarda Cabecera Factura electronica
+            String sqlCabFactura = "INSERT INTO facturas_fe "
+                    + "(NUM_FACTURA_FE,COD_CLIE,FECHA,SUBTOTAL,"
+                    + "IVA,TOTA,FORMA,ANULADA,"
+                    + "VENTAS0,VENTAS12,RTE1,RTE30,"
+                    + "NUM_GUIA,VENDEDOR,IDE_CCCFA)"
+                    + "values "
+                    + "(" + Integer.parseInt(tab_factura.getValor("secuencial_cccfa")) + ",'" + codClie + "','" + fechae + "'," + utilitario.getFormatoNumero(tab_factura.getValor("subtotal")) + ","
+                    + utilitario.getFormatoNumero(tab_factura.getValor("valor_iva_cccfa")) + "," + utilitario.getFormatoNumero(tab_factura.getValor("total_cccfa")) + ",'" + tab_factura.getValor("nombre_cndfp") + "',false,"
+                    + utilitario.getFormatoNumero(tab_factura.getValor("ventas0")) + "," + utilitario.getFormatoNumero(tab_factura.getValor("base_grabada_cccfa")) + "," + utilitario.getFormatoNumero(retFuente) + "," + utilitario.getFormatoNumero(retIva) + ","
+                    + Integer.parseInt(tab_factura.getValor("secuencial_cccfa")) + ",'" + tab_factura.getValor("nombre_vgven") + "'," + ide_cccfa + ")";
+
+            con_conecta.agregarSql(sqlCabFactura);
+
+            for (int i = 0; i < tab_factura.getTotalFilas(); i++) {
+                ///Kardex Productos
+                String codProd = tab_factura.getValor(i, "codigo_inarti");
+                double vcant = Double.parseDouble(tab_factura.getValor(i, "cantidad_ccdfa"));
+                double vpre = Double.parseDouble(tab_factura.getValor(i, "precio_ccdfa"));
+                double exan = getExisteciaProducto_Escritorio(codProd);
+                double exnue = exan - vcant;
+                double vtotaldetalle = Double.parseDouble(tab_factura.getValor(i, "total_ccdfa"));
+                String detallefactura = tab_factura.getValor(i, "nombre_inarti");
+                detallefactura = detallefactura.trim();
+                String nombreCliente = tab_factura.getValor("nom_geper");
+                String sql_1 = "INSERT INTO  KARDEXPRODUCTOS VALUES((SELECT MAX(k.CODIGOKP )+1 FROM KARDEXPRODUCTOS k where  k.COD_PROD='" + codProd + " '),'" + codProd + "','" + fechae + "','" + numFactura + "','" + nombreCliente + "'," + vpre + ",0," + vcant + "," + exnue + ")";
+                String sql_2 = "UPDATE PRODUCTOS SET EXISTENCIA=" + exnue + " where COD_PROD='" + codProd + "'";
+                con_conecta.agregarSql(sql_1);
+                con_conecta.agregarSql(sql_2);
+                //Guarda detalle Factura electronica
+                String sqlDetFactura = "INSERT INTO detalle_facturas_fe "
+                        + "(NUM_FACTURA_FE,COD_PROD,CANTIDAD,DETALLE,"
+                        + "PRECIO,PTOTAL)"
+                        + "VALUES"
+                        + "(" + Integer.parseInt(tab_factura.getValor("secuencial_cccfa")) + ",'" + codProd + "'," + vcant + ",'" + detallefactura + "',"
+                        + vpre + "," + utilitario.getFormatoNumero(vtotaldetalle) + ")";
+                con_conecta.agregarSql(sqlDetFactura);
+
+            }
+
             if (con_conecta.ejecutarListaSql().isEmpty()) {
                 System.out.println("OK guardo Kardex");
                 //Actualiza los campos de retenciones en la factura 
@@ -617,7 +652,7 @@ public class ServicioIntegracion extends ServicioBase {
     public void anularFactura_Escritorio(String ide_cccfa) {
         TablaGenerica tab_factura = utilitario.consultar("select codigo_inarti,cantidad_ccdfa,precio_ccdfa,"
                 + "codigo_geper,nom_geper,ide_cntco,serie_ccdaf || secuencial_cccfa as numfactura,\n"
-                + "base_grabada_cccfa+base_tarifa0_cccfa+base_no_objeto_iva_cccfa as subtotal,valor_iva_cccfa,total_cccfa from cxc_deta_factura a\n"
+                + "base_grabada_cccfa+base_tarifa0_cccfa+base_no_objeto_iva_cccfa as subtotal,valor_iva_cccfa,total_cccfa,secuencial_cccfa from cxc_deta_factura a\n"
                 + "inner join cxc_cabece_factura b on a.ide_cccfa=b.ide_cccfa\n"
                 + "inner join cxc_datos_fac c on b.ide_ccdaf=c.ide_ccdaf\n"
                 + "inner join gen_persona d on b.ide_geper=d.ide_geper\n"
@@ -628,7 +663,7 @@ public class ServicioIntegracion extends ServicioBase {
             String numFactura = tab_factura.getValor("numfactura");
             for (int i = 0; i < tab_factura.getTotalFilas(); i++) {
                 ///Kardex Productos
-                String codProd = tab_factura.getValor(i,"codigo_inarti");
+                String codProd = tab_factura.getValor(i, "codigo_inarti");
                 String sql_1 = "DELETE FROM KARDEXPRODUCTOS  WHERE  FACTURA ='" + numFactura + "' AND COD_PROD='" + codProd + "'";
                 String sql_2 = "call calcula('" + codProd + "');";
                 con_conecta.agregarSql(sql_1);
@@ -639,6 +674,11 @@ public class ServicioIntegracion extends ServicioBase {
             String sql_2 = "call calculaclie('" + codClie + "')";
             con_conecta.agregarSql(sql_1);
             con_conecta.agregarSql(sql_2);
+            //Factura Electronica
+            String sqlCabFact = "DELETE FROM facturas_fe WHERE NUM_FACTURA_FE=" + Integer.parseInt(tab_factura.getValor("secuencial_cccfa"));
+            String sqlDetFact = "DELETE FROM detalle_facturas_fe WHERE NUM_FACTURA_FE=" + Integer.parseInt(tab_factura.getValor("secuencial_cccfa"));
+            con_conecta.agregarSql(sqlCabFact);
+            con_conecta.agregarSql(sqlDetFact);
             if (con_conecta.ejecutarListaSql().isEmpty()) {
                 System.out.println("OK Anulo Kardex");
             }
