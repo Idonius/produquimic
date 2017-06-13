@@ -35,7 +35,7 @@ public class DetalleComprobante implements Serializable {
             this.codigoprincipal = resultado.getString("codigo_inarti");
             this.codigoauxiliar = resultado.getString("ide_inarti");
             this.cantidad = resultado.getBigDecimal("cantidad_ccdfa");
-            this.descripciondet = resultado.getString("nombre_inarti");
+            this.descripciondet = resultado.getString("nombre_inarti").trim();
             this.preciounitario = resultado.getBigDecimal("precio_ccdfa");
             this.descuento = new BigDecimal("0.00");
             this.preciototalsinimpuesto = resultado.getBigDecimal("total_ccdfa");
