@@ -229,8 +229,8 @@ public class FacturaCxC extends Dialogo {
 
     public void cambioFecha() {
         tarifaIVA = ser_configuracion.getPorcentajeIva(tab_cab_factura.getValor("fecha_emisi_cccfa"));
-        eti_subtotal.setValue("<strong>SUBTOTAL TARIFA " + (utilitario.getFormatoNumero(tarifaIVA * 100)) + "% :<s/trong>");
-        eti_iva.setValue("<strong>IVA " + (utilitario.getFormatoNumero(tarifaIVA * 100)) + "% :<s/trong>");
+        eti_subtotal.setValue("<strong>SUBTOTAL TARIFA " + (utilitario.getFormatoNumero(tarifaIVA * 100)) + "% :</strong>");
+        eti_iva.setValue("<strong>IVA " + (utilitario.getFormatoNumero(tarifaIVA * 100)) + "% :</strong>");
         calcularTotalFactura();
     }
 
@@ -838,24 +838,24 @@ public class FacturaCxC extends Dialogo {
         Grid gri_valores = new Grid();
         gri_valores.setId("gri_valores");
         gri_valores.setColumns(4);
-        eti_subtotal.setValue("<strong>SUBTOTAL TARIFA " + (utilitario.getFormatoNumero(tarifaIVA * 100)) + "% :<s/trong>");
+        eti_subtotal.setValue("<strong>SUBTOTAL TARIFA " + (utilitario.getFormatoNumero(tarifaIVA * 100)) + "% :</strong>");
         gri_valores.getChildren().add(eti_subtotal);
         tex_subtotal12.setDisabled(true);
         tex_subtotal12.setStyle("font-size: 14px;text-align: right;width:110px");
         gri_valores.getChildren().add(tex_subtotal12);
 
-        eti_iva.setValue("<strong>IVA " + (utilitario.getFormatoNumero(tarifaIVA * 100)) + "% :<s/trong>");
+        eti_iva.setValue("<strong>IVA " + (utilitario.getFormatoNumero(tarifaIVA * 100)) + "% :</strong>");
         gri_valores.getChildren().add(eti_iva);
         tex_iva.setDisabled(true);
         tex_iva.setStyle("font-size: 14px;text-align: right;width:110px");
         gri_valores.getChildren().add(tex_iva);
 
-        gri_valores.getChildren().add(new Etiqueta("<strong>SUBTOTAL TARIFA 0% :<s/trong>"));
+        gri_valores.getChildren().add(new Etiqueta("<strong>SUBTOTAL TARIFA 0% :</strong>"));
         tex_subtotal0.setDisabled(true);
         tex_subtotal0.setStyle("font-size: 14px;text-align: right;width:110px");
         gri_valores.getChildren().add(tex_subtotal0);
 
-        gri_valores.getChildren().add(new Etiqueta("<strong>TOTAL :<s/trong>"));
+        gri_valores.getChildren().add(new Etiqueta("<strong>TOTAL :</strong>"));
         tex_total.setDisabled(true);
         tex_total.setStyle("font-size: 14px;font-weight: bold;text-align: right;width:110px");
 
