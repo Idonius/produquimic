@@ -503,7 +503,7 @@ public class ServicioIntegracion extends ServicioBase {
                 + "codigo_geper,nom_geper,ide_cntco,serie_ccdaf || secuencial_cccfa as numfactura,\n"
                 + "base_grabada_cccfa+base_tarifa0_cccfa+base_no_objeto_iva_cccfa as subtotal,valor_iva_cccfa,total_cccfa,"
                 + "secuencial_cccfa,a.ide_cccfa,base_grabada_cccfa,base_tarifa0_cccfa+base_no_objeto_iva_cccfa as ventas0,"
-                + "nombre_cndfp,nombre_inuni ||' '|| nombre_inarti as nombre_inarti,nombre_vgven "
+                + "nombre_cndfp,COALESCE(nombre_inuni,'')  ||' '|| nombre_inarti as nombre_inarti,nombre_vgven "
                 + "from cxc_deta_factura a\n"
                 + "inner join cxc_cabece_factura b on a.ide_cccfa=b.ide_cccfa\n"
                 + "inner join cxc_datos_fac c on b.ide_ccdaf=c.ide_ccdaf\n"
@@ -599,7 +599,7 @@ public class ServicioIntegracion extends ServicioBase {
             //Guarda Cabecera Factura electronica
             String sqlCabFactura = "INSERT INTO facturas_fe "
                     + "(NUM_FACTURA_FE,COD_CLIE,FECHA,SUBTOTAL,"
-                    + "IVA,TOTA,FORMA,ANULADA,"
+                    + "IVA,TOTAL,FORMA,ANULADA,"
                     + "VENTAS0,VENTAS12,RTE1,RTE30,"
                     + "NUM_GUIA,VENDEDOR,IDE_CCCFA)"
                     + "values "
