@@ -157,7 +157,7 @@ public final class Comprobante implements Serializable {
                 //Busca los detalles del Comprobante
                 try {
                     detalle = new ArrayList<>();
-                    String sql = "select f.ide_inarti,codigo_inarti,observacion_ccdfa,nombre_inuni ||' '|| nombre_inarti as nombre_inarti,cantidad_ccdfa\n"
+                    String sql = "select f.ide_inarti,codigo_inarti,observacion_ccdfa,COALESCE(nombre_inuni,'') ||' '|| nombre_inarti as nombre_inarti,cantidad_ccdfa\n"
                             + ",precio_ccdfa,iva_inarti_ccdfa,total_ccdfa,nombre_inuni, tarifa_iva_cccfa \n"
                             + "from cxc_cabece_factura  a\n"
                             + "inner join cxc_deta_factura c on a.ide_cccfa=c.ide_cccfa\n"
@@ -180,7 +180,7 @@ public final class Comprobante implements Serializable {
                 //Busca los detalles del Comprobante
                 try {
                     detalle = new ArrayList<>();
-                    String sql = "select f.ide_inarti,codigo_inarti,observacion_cpdno as observacion_ccdfa,nombre_inuni ||' '|| nombre_inarti as nombre_inarti,cantidad_cpdno as cantidad_ccdfa\n"
+                    String sql = "select f.ide_inarti,codigo_inarti,observacion_cpdno as observacion_ccdfa,COALESCE(nombre_inuni,'') ||' '|| nombre_inarti as nombre_inarti,cantidad_cpdno as cantidad_ccdfa\n"
                             + ",precio_cpdno as precio_ccdfa,iva_inarti_cpdno as iva_inarti_ccdfa,valor_cpdno as total_ccdfa,nombre_inuni, tarifa_iva_cpcno as tarifa_iva_cccfa \n"
                             + "from cxp_cabecera_nota  a\n"
                             + "inner join cxp_detalle_nota c on a.ide_cpcno=c.ide_cpcno\n"
@@ -226,7 +226,7 @@ public final class Comprobante implements Serializable {
                 //Busca los detalles del Comprobante Factura asociado a la guia
                 try {
                     detalle = new ArrayList<>();
-                    String sql = "select f.ide_inarti,codigo_inarti,observacion_ccdfa,nombre_inuni ||' '|| nombre_inarti as nombre_inarti,cantidad_ccdfa\n"
+                    String sql = "select f.ide_inarti,codigo_inarti,observacion_ccdfa,COALESCE(nombre_inuni,'') ||' '|| nombre_inarti as nombre_inarti,cantidad_ccdfa\n"
                             + ",precio_ccdfa,iva_inarti_ccdfa,total_ccdfa,nombre_inuni,(tarifa_iva_cccfa*100)as tarifa_iva_cccfa \n"
                             + "from cxc_cabece_factura  a\n"
                             + "inner join cxc_deta_factura c on a.ide_cccfa=c.ide_cccfa\n"
