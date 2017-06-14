@@ -117,8 +117,8 @@ public class FacturaCxC extends Dialogo {
 
     private final Map<String, String> parametros;
 
-    private Etiqueta eti_subtotal = new Etiqueta();
-    private Etiqueta eti_iva = new Etiqueta();
+    private final Etiqueta eti_subtotal = new Etiqueta();
+    private final Etiqueta eti_iva = new Etiqueta();
 
     public FacturaCxC() {
         parametros = utilitario.getVariables("p_con_tipo_documento_factura",

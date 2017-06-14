@@ -379,4 +379,15 @@ public class ServicioProveedor {
         //      }
         return true;
     }
+
+    /**
+     * Busca el ide_geper de un Proveedor por identificacion
+     *
+     * @param identificac_geper
+     * @return
+     */
+    public String getIdeProveedor(String identificac_geper) {
+        TablaGenerica tag = utilitario.consultar("select  ide_geper,identificac_geper from gen_persona where identificac_geper='" + identificac_geper + "'");
+        return tag.getValor("ide_geper");
+    }
 }

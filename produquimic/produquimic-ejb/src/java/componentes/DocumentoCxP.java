@@ -18,11 +18,17 @@ import framework.componentes.PanelTabla;
 import framework.componentes.Tabla;
 import framework.componentes.Tabulador;
 import framework.componentes.Texto;
+import framework.componentes.Upload;
+import java.io.File;
+import java.io.FileOutputStream;
 import java.util.List;
 import java.util.Map;
+import java.util.Scanner;
 import javax.ejb.EJB;
 import javax.faces.event.AjaxBehaviorEvent;
+import org.apache.commons.io.IOUtils;
 import org.primefaces.component.separator.Separator;
+import org.primefaces.event.FileUploadEvent;
 import org.primefaces.event.SelectEvent;
 import servicios.contabilidad.ServicioComprobanteContabilidad;
 import servicios.contabilidad.ServicioConfiguracion;
@@ -95,8 +101,11 @@ public class DocumentoCxP extends Dialogo {
 
     //REEMBOLSOS
     private Tabla tab_com_reembolso;
-    private Etiqueta eti_subtotal = new Etiqueta();
-    private Etiqueta eti_iva = new Etiqueta();
+    private final Etiqueta eti_subtotal = new Etiqueta();
+    private final Etiqueta eti_iva = new Etiqueta();
+
+    private Upload upl_cxp_xml;
+    private Dialogo dia_cxp_xml;
 
     public DocumentoCxP() {
         //utilitario.getConexion().setImprimirSqlConsola(true);
@@ -145,6 +154,13 @@ public class DocumentoCxP extends Dialogo {
         dia_creacion_producto.setHeight("65%");
         dia_creacion_producto.setWidth("40%");
         utilitario.getPantalla().getChildren().add(dia_creacion_producto);
+
+        dia_cxp_xml = new Dialogo();
+        dia_cxp_xml.setId("dia_cxp_xml");
+        dia_cxp_xml.setTitle("SELECCIONAR FACTURA ELECTRÓNICA XML");
+        dia_cxp_xml.setWidth("45%");
+        dia_cxp_xml.setHeight("30%");
+        utilitario.getPantalla().getChildren().add(dia_cxp_xml);
     }
 
     public void setDocumentoCxP(String titulo) {
@@ -475,6 +491,31 @@ public class DocumentoCxP extends Dialogo {
         gri_pto.getChildren().add(com_tipo_documento);
 
         if (opcion == 1) {
+            //Seleccionar XML            
+            Grid gri_matriz = new Grid();
+            gri_matriz.setId("gridXmlCxp");
+            gri_matriz.setStyle("width:100%;");
+            upl_cxp_xml = new Upload();
+            upl_cxp_xml.setId("upl_cxp_xml");
+            upl_cxp_xml.setAllowTypes("/(\\.|\\/)(xml)$/");
+            upl_cxp_xml.setMetodoRuta("pre_index.clase." + getId() + ".seleccionarArchivoXML");
+            upl_cxp_xml.setUploadLabel("Validar Factura .xml");
+            upl_cxp_xml.setAuto(false);
+            gri_matriz.getChildren().add(upl_cxp_xml);
+
+            dia_cxp_xml.getGri_cuerpo().getChildren().clear();
+            dia_cxp_xml.setDialogo(gri_matriz);
+            dia_cxp_xml.getBot_aceptar().setRendered(false);
+            dia_cxp_xml.getBot_cancelar().setMetodoRuta("pre_index.clase." + getId() + ".cerrarDialogos");
+
+            Boton bt_panel = new Boton();
+            bt_panel.setValue("Cargar XML");
+            bt_panel.setTitle("Seleccionar una Factura Electrónica en formato XML");
+            bt_panel.setMetodoRuta("pre_index.clase." + getId() + ".abrirArchivoXML");
+
+            gri_pto.getChildren().add(new Espacio("10", "1"));
+            gri_pto.getChildren().add(bt_panel);
+
             dia_creacion_producto.getGri_cuerpo().getChildren().clear();
             dia_creacion_cliente.getGri_cuerpo().getChildren().clear();
             gri_pto.getChildren().add(new Espacio("10", "1"));
@@ -657,7 +698,7 @@ public class DocumentoCxP extends Dialogo {
         tab_cab_documento.getColumna("numero_cpcfa").setOrden(4);
         tab_cab_documento.getColumna("numero_cpcfa").setAncho(10);
         tab_cab_documento.getColumna("numero_cpcfa").setComentario("Debe ingresar el numero de serie - establecimiento y numero secuencial");
-        tab_cab_documento.getColumna("numero_cpcfa").setMascara("999-999-99999999");
+        tab_cab_documento.getColumna("numero_cpcfa").setMascara("999-999-999999999");
         tab_cab_documento.getColumna("numero_cpcfa").setQuitarCaracteresEspeciales(true);
         tab_cab_documento.getColumna("numero_cpcfa").setRequerida(true);
         tab_cab_documento.getColumna("base_grabada_cpcfa").setVisible(false);
@@ -692,7 +733,7 @@ public class DocumentoCxP extends Dialogo {
         tab_cab_documento.getColumna("fecha_emision_nc_cpcfa").setNombreVisual("FECHA EMISIÓN DOC. MODI.");
         tab_cab_documento.getColumna("numero_nc_cpcfa").setOrden(10);
         tab_cab_documento.getColumna("numero_nc_cpcfa").setNombreVisual("NÚMERO DOC. MODI.");
-        tab_cab_documento.getColumna("numero_nc_cpcfa").setMascara("999-999-99999999");
+        tab_cab_documento.getColumna("numero_nc_cpcfa").setMascara("999-999-999999999");
         tab_cab_documento.getColumna("numero_nc_cpcfa").setQuitarCaracteresEspeciales(true);
         tab_cab_documento.getColumna("autorizacio_nc_cpcfa").setNombreVisual("AUTORIZACIÓN DOC. MODI.");
         tab_cab_documento.getColumna("autorizacio_nc_cpcfa").setOrden(11);
@@ -765,8 +806,9 @@ public class DocumentoCxP extends Dialogo {
         tab_det_documento.getColumna("observacion_cpdfa").setOrden(6);
         tab_det_documento.getColumna("secuencial_cpdfa").setNombreVisual("SERIE / SECUENCIAL");
         tab_det_documento.getColumna("secuencial_cpdfa").setOrden(7);
+        tab_det_documento.getColumna("secuencial_cpdfa").setVisible(false);
         tab_det_documento.getColumna("devolucion_cpdfa").setValorDefecto("false");
-        tab_det_documento.getColumna("alter_tribu_cpdfa").setRequerida(true);
+        tab_det_documento.getColumna("alter_tribu_cpdfa").setVisible(false);
         tab_det_documento.getColumna("alter_tribu_cpdfa").setValorDefecto("00");
         tab_det_documento.getColumna("iva_inarti_cpdfa").setCombo(ser_producto.getListaTipoIVA());
         tab_det_documento.getColumna("iva_inarti_cpdfa").setMetodoChangeRuta(tab_det_documento.getRuta() + ".cambioPrecioCantidadIva");
@@ -825,8 +867,8 @@ public class DocumentoCxP extends Dialogo {
         tab_com_reembolso.getColumna("numero_cpcfa").setVisible(true);
         tab_com_reembolso.getColumna("numero_cpcfa").setNombreVisual("NÚMERO");
         tab_com_reembolso.getColumna("numero_cpcfa").setOrden(2);
-        tab_com_reembolso.getColumna("numero_cpcfa").setComentario("Debe ingresar el número de serie - establecimiento y número secuencial");
-        tab_com_reembolso.getColumna("numero_cpcfa").setMascara("999-999-99999999");
+        tab_com_reembolso.getColumna("numero_cpcfa").setComentario("Establecimiento - Punto de Emisión - Secuencial");
+        tab_com_reembolso.getColumna("numero_cpcfa").setMascara("999-999-999999999");
         tab_com_reembolso.getColumna("numero_cpcfa").setQuitarCaracteresEspeciales(true);
         tab_com_reembolso.getColumna("numero_cpcfa").setRequerida(true);
         tab_com_reembolso.getColumna("fecha_emisi_cpcfa").setVisible(true);
@@ -944,6 +986,65 @@ public class DocumentoCxP extends Dialogo {
         grupo.setStyle("overflow:hidden;display:block;");
 
         return grupo;
+    }
+
+    public void seleccionarArchivoXML(FileUploadEvent event) {
+
+        try {
+
+            File tempFile = File.createTempFile(event.getFile().getFileName(), "tmp");
+            tempFile.deleteOnExit();
+            FileOutputStream out = new FileOutputStream(tempFile);
+            IOUtils.copy(event.getFile().getInputstream(), out);
+            out.close();
+
+            StringBuilder fileContents = new StringBuilder((int) tempFile.length());
+            Scanner scanner = new Scanner(tempFile);
+            String lineSeparator = System.getProperty("line.separator");
+            try {
+                while (scanner.hasNextLine()) {
+                    fileContents.append(scanner.nextLine()).append(lineSeparator);
+                }
+            } finally {
+                scanner.close();
+            }
+            //Validaciones
+            String codDoc = utilitario.getValorEtiqueta(fileContents.toString(), "codDoc");
+            if (codDoc == null || codDoc.equals("01") == false) {
+                utilitario.agregarMensajeError("Error archivo XML", "Tipo de comprobante no válido");
+                return;
+            }
+            String ide_geper = ser_proveedor.getIdeProveedor(utilitario.getValorEtiqueta(fileContents.toString(), "ruc"));
+            if (ide_geper == null) {
+                utilitario.agregarMensajeError("Error", "El proveedor " + utilitario.getValorEtiqueta(fileContents.toString(), "razonSocial") + " no existe en la base de datos");
+                return;
+            }
+            String autorizacio_cpcfa = utilitario.getValorEtiqueta(fileContents.toString(), "numeroAutorizacion");
+            if (ser_cuentas_cxp.isExisteDocumentoElectronico(autorizacio_cpcfa)) {
+                utilitario.agregarMensajeError("Error", "La factura electronica seleccionada ya existe");
+                return;
+            }
+
+            com_tipo_documento.setValue(parametros.get("p_con_tipo_documento_factura"));
+            cargarProveedores();
+            String numero_cpcfa = utilitario.getValorEtiqueta(fileContents.toString(), "estab") + "-" + utilitario.getValorEtiqueta(fileContents.toString(), "ptoEmi") + "-" + utilitario.getValorEtiqueta(fileContents.toString(), "secuencial");
+            tab_cab_documento.setValor("ide_geper", ide_geper);
+            tab_cab_documento.setValor("autorizacio_cpcfa", autorizacio_cpcfa);
+            tab_cab_documento.setValor("numero_cpcfa", numero_cpcfa);
+            tab_cab_documento.setValor("fecha_emisi_cpcfa", utilitario.getFormatoFecha(utilitario.getValorEtiqueta(fileContents.toString(), "fechaEmision")));
+            System.out.println("*** " + utilitario.getValorEtiqueta(fileContents.toString(), "totalSinImpuestos"));
+            System.out.println("*** " + utilitario.getValorEtiqueta(fileContents.toString(), "totalDescuento"));
+            System.out.println("*** " + utilitario.getValorEtiqueta(fileContents.toString(), "importeTotal"));
+            System.out.println("*** " + utilitario.getValorEtiqueta(fileContents.toString(), "formaPago"));
+            //Detalles
+
+        } catch (Exception ex) {
+
+        }
+    }
+
+    public void abrirArchivoXML() {
+        dia_cxp_xml.dibujar();
     }
 
     private Grupo dibujarAsiento() {
@@ -1300,7 +1401,7 @@ public class DocumentoCxP extends Dialogo {
             return false;
         }
         //Valida que no se haya ingresado ya el documento
-        List lis_numeros_fact = utilitario.getConexion().consultar("select * from cxp_cabece_factur where numero_cpcfa='" + tab_cab_documento.getValor("numero_cpcfa") + "' and ide_geper=" + tab_cab_documento.getValor("ide_geper") + " and autorizacio_cpcfa='" + tab_cab_documento.getValor("autorizacio_cpcfa") + "'");
+        List lis_numeros_fact = utilitario.getConexion().consultar("select numero_cpcfa,autorizacio_cpcfa from cxp_cabece_factur where numero_cpcfa='" + tab_cab_documento.getValor("numero_cpcfa") + "' and ide_geper=" + tab_cab_documento.getValor("ide_geper") + " and autorizacio_cpcfa='" + tab_cab_documento.getValor("autorizacio_cpcfa") + "'");
         if (lis_numeros_fact.size() > 0) {
             utilitario.agregarMensajeError("Error al guardar el Documento", "El número de del documento ingresado ya existe ");
             return false;
@@ -1520,7 +1621,7 @@ public class DocumentoCxP extends Dialogo {
                 String num_liq = tab_cxp_cab.getValor(0, "numero_cpcfa");
                 String num = (Integer.parseInt(num_liq.substring(6, num_liq.length())) + 1) + "";
                 String num_liquidacion = num_liq.substring(0, 6);
-                num_liquidacion = num_liquidacion.concat(utilitario.generarCero(8 - num.length())).concat(num);
+                num_liquidacion = num_liquidacion.concat(utilitario.generarCero(9 - num.length())).concat(num);
                 System.out.println("num " + num_liquidacion);
                 tab_cab_documento.setValor("numero_cpcfa", num_liquidacion);
                 utilitario.addUpdate("tab_documenoCxP:0:tab_cab_documento:AUTORIZACIO_CPCFA_7,tab_documenoCxP:0:tab_cab_documento:NUMERO_CPCFA_6,tab_documenoCxP:0:tab_cab_documento:IDE_GEPER_4");
@@ -1632,7 +1733,7 @@ public class DocumentoCxP extends Dialogo {
             base = Double.parseDouble(tab_com_reembolso.getValor("base_grabada_cpcfa"));
         } catch (Exception e) {
         }
-        double tarifaIVAReemb = ser_configuracion.getPorcentajeIva(tab_com_reembolso.getValor("fecha_emisi_cpcfa"));        
+        double tarifaIVAReemb = ser_configuracion.getPorcentajeIva(tab_com_reembolso.getValor("fecha_emisi_cpcfa"));
         double iva = base * tarifaIVAReemb;
         tab_com_reembolso.setValor("valor_iva_cpcfa", utilitario.getFormatoNumero(iva));
         utilitario.addUpdateTabla(tab_com_reembolso, "valor_iva_cpcfa", "");
@@ -1675,6 +1776,9 @@ public class DocumentoCxP extends Dialogo {
         }
         if (dia_creacion_producto != null && dia_creacion_producto.isVisible()) {
             dia_creacion_producto.cerrar();
+        }
+        if (dia_cxp_xml != null && dia_cxp_xml.isVisible()) {
+            dia_cxp_xml.cerrar();
         }
     }
 
@@ -1825,6 +1929,22 @@ public class DocumentoCxP extends Dialogo {
 
     public void setTab_electronica(Tabla tab_electronica) {
         this.tab_electronica = tab_electronica;
+    }
+
+    public Upload getUpl_cxp_xml() {
+        return upl_cxp_xml;
+    }
+
+    public void setUpl_cxp_xml(Upload upl_cxp_xml) {
+        this.upl_cxp_xml = upl_cxp_xml;
+    }
+
+    public Dialogo getDia_cxp_xml() {
+        return dia_cxp_xml;
+    }
+
+    public void setDia_cxp_xml(Dialogo dia_cxp_xml) {
+        this.dia_cxp_xml = dia_cxp_xml;
     }
 
 }

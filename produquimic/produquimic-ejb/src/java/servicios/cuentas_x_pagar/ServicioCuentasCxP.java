@@ -614,4 +614,15 @@ public class ServicioCuentasCxP extends ServicioBase {
                 + " ORDER BY fecha_emisi_cpcfa desc,numero_cpcfa desc,ide_cpcfa desc";
     }
 
+    /**
+     * Verifica si existe una clave de acceso de un comprobante electronico
+     *
+     * @param autorizacio_cpcfa
+     * @return
+     */
+    public boolean isExisteDocumentoElectronico(String autorizacio_cpcfa) {
+        TablaGenerica tag = utilitario.consultar("select numero_cpcfa,autorizacio_cpcfa from cxp_cabece_factur where autorizacio_cpcfa='" + autorizacio_cpcfa + "'");
+        return !tag.isEmpty();
+    }
+
 }

@@ -675,4 +675,23 @@ public class ServicioTesoreria {
         return "select ide_geper,identificac_geper,nom_geper from gen_persona where identificac_geper is not null order by nom_geper ";
     }
 
+    public String getSqlTransaccionesEncontradasConciliarCuenta(String ide_teclb) {
+        return "select fecha_trans_teclb,numero_teclb,valor_teclb,beneficiari_teclb,"
+                + "observacion_teclb,ide_teclb "
+                + "from tes_cab_libr_banc a "
+                + "where ide_teclb in(" + ide_teclb + ")"
+                + "order by fecha_trans_teclb,ide_teclb";
+    }
+
+    public String getSqlTransaccionesConciliarCuenta(String ide_tecba, String fechaInicio, String fechaFin) {
+        return "select fecha_trans_teclb,numero_teclb,ide_cnccc,beneficiari_teclb,"
+                + "valor_teclb,observacion_teclb,ide_teclb,conciliado_teclb as conciliado "
+                + "from tes_cab_libr_banc a "
+                + "where ide_tecba=" + ide_tecba + " "
+                + "and ide_teelb =" + utilitario.getVariable("p_tes_estado_lib_banco_normal") + " "
+                + "and fecha_trans_teclb BETWEEN '" + fechaInicio + "' and '" + fechaFin + "' "
+                //+ "and conciliado_teclb=false  "
+                + "order by fecha_trans_teclb,ide_teclb";
+    }
+
 }
