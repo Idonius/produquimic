@@ -17,19 +17,30 @@ import framework.componentes.Combo;
 import framework.componentes.Dialogo;
 import framework.componentes.Etiqueta;
 import framework.componentes.Grid;
+import framework.componentes.Imagen;
 import framework.componentes.ItemMenu;
 import framework.componentes.Link;
 import framework.componentes.MenuPanel;
+import framework.componentes.Panel;
 import framework.componentes.PanelTabla;
 import framework.componentes.Radio;
+import framework.componentes.SeleccionTabla;
 import framework.componentes.Tabla;
 import framework.componentes.Texto;
+import framework.componentes.Upload;
+import java.io.File;
+import java.io.FileOutputStream;
+import java.nio.charset.StandardCharsets;
+import java.nio.file.Files;
 import java.util.ArrayList;
 import java.util.List;
 import javax.ejb.EJB;
+import javax.faces.component.UIComponent;
 import javax.faces.event.ActionEvent;
+import org.apache.commons.io.IOUtils;
 import org.primefaces.component.panelgrid.PanelGrid;
 import org.primefaces.component.separator.Separator;
+import org.primefaces.event.FileUploadEvent;
 import org.primefaces.event.SelectEvent;
 import org.primefaces.event.UnselectEvent;
 import servicios.cuentas_x_cobrar.ServicioCliente;
@@ -71,6 +82,8 @@ public class pre_libro_bancos extends Pantalla {
     @EJB
     private final ServicioCuentasCxP ser_cuentas_cxp = (ServicioCuentasCxP) utilitario.instanciarEJB(ServicioCuentasCxP.class);
 
+    private SeleccionTabla sel_conciliados = new SeleccionTabla();
+
     private AutoCompletar aut_persona;
     private Calendario cal_fecha_pago;
     private AutoCompletar aut_cuenta;
@@ -91,6 +104,11 @@ public class pre_libro_bancos extends Pantalla {
     private Dialogo dia_modifica = new Dialogo();
     private Tabla tab_tabla2;
 
+    private Upload upl_importa;
+    private Texto tex_separa;
+    private Combo com_colDocumento;
+    private Combo com_colValor;
+
     public pre_libro_bancos() {
 
         mep_menu.setMenuPanel("CONSULTAS", "20%");
@@ -102,7 +120,7 @@ public class pre_libro_bancos extends Pantalla {
         mep_menu.agregarItem("Anticipos a Proveedores", "dibujarAnticipo", "ui-icon-contact");//9
         mep_menu.agregarItem("Otras Transacciones", "dibujarOtros", "ui-icon-contact");//5
         mep_menu.agregarItem("Transferencias entre Cuentas", "dibujarTransferencias", "ui-icon-contact");//6
-        mep_menu.agregarSubMenu("HERRAMIENTAS");
+        mep_menu.agregarSubMenu("CONCILIACIÓN");
         mep_menu.agregarItem("Conciliación Manual", "dibujarConciliarM", "ui-icon-pencil"); //7
         mep_menu.agregarItem("Conciliación Automática", "dibujarConciliarA", "ui-icon-calculator");//8
 
@@ -142,6 +160,14 @@ public class pre_libro_bancos extends Pantalla {
         asc_asiento.getBot_aceptar().setMetodo("guardar");
         asc_asiento.getBot_cancelar().setMetodo("cerrarAsiento");
         agregarComponente(asc_asiento);
+
+        sel_conciliados.setId("sel_conciliados");
+        sel_conciliados.setSeleccionTabla(ser_tesoreria.getSqlTransaccionesEncontradasConciliarCuenta("-1"), "ide_teclb");
+        sel_conciliados.setTitle("MOVIMIENTOS ENCONTRADOS");
+        sel_conciliados.getBot_aceptar().setMetodo("aceptarSeleccionadosConciliar");
+        sel_conciliados.setWidth("65%");
+        sel_conciliados.setHeight("65");
+        agregarComponente(sel_conciliados);
 
         dia_modifica.setId("dia_modifica");
         dia_modifica.setHeight("55%");
@@ -884,6 +910,276 @@ public class pre_libro_bancos extends Pantalla {
         pat_panel.setFooter(bot_conciliar);
 
         mep_menu.dibujar(7, "CONCILIAZIÓN MANUAL", pat_panel);
+    }
+
+    public void dibujarConciliarA() {
+
+//        Grid gri_archivo = new Grid();
+//        gri_archivo.setWidth("95%");
+//        gri_archivo.setColumns(3);
+        upl_importa = new Upload();
+        Grid gri_matriz = new Grid();
+        gri_matriz.setId("grid");
+        gri_matriz.setStyle("width:100%;");
+        gri_matriz.setColumns(2);
+
+        //gri_archivo.getChildren().add(gri_matriz);
+        Panel pn = new Panel();
+        pn.setTitle("SELECCIONAR ARCHIVO CON EXTENSIÓN .CSV ");
+        Grid gri_valida = new Grid();
+        gri_valida.setId("gri_valida");
+        gri_valida.setColumns(3);
+        Etiqueta eti_valida = new Etiqueta();
+        eti_valida.setValueExpression("value", "pre_index.clase.upl_importa.nombreReal");
+        eti_valida.setValueExpression("rendered", "pre_index.clase.upl_importa.nombreReal != null");
+        gri_valida.getChildren().add(eti_valida);
+
+        Imagen ima_valida = new Imagen();
+        ima_valida.setWidth("22");
+        ima_valida.setHeight("22");
+        ima_valida.setValue("/imagenes/im_csv.png");
+        ima_valida.setValueExpression("rendered", "pre_index.clase.upl_importa.nombreReal != null");
+        gri_valida.getChildren().add(ima_valida);
+
+        upl_importa.setId("upl_importa");
+        upl_importa.setUpdate("gri_valida");
+        upl_importa.setAllowTypes("/(\\.|\\/)(csv)$/");
+        upl_importa.setMetodo("seleccionarArchivo");
+        //upl_importa.setProcess("@all");
+        upl_importa.setUploadLabel("Validar Archivo .csv");
+        upl_importa.setAuto(false);
+
+        Grid g2 = new Grid();
+        g2.getChildren().add(new Etiqueta("<strong>SEPARADOR DE COLUMNAS: </strong><span style='color:red;font-weight: bold;'>*</span>"));
+        tex_separa = new Texto();
+        tex_separa.setSize(5);
+        tex_separa.setValue(",");
+        g2.getChildren().add(tex_separa);
+        g2.setFooter(gri_valida);
+
+        gri_matriz.getChildren().add(g2);
+        gri_matriz.getChildren().add(upl_importa);
+
+        tab_tabla1 = new Tabla();
+        tab_tabla1.setId("tab_tabla1");
+        tab_tabla1.setSql("SELECT '' COLUMNA1,'' COLUMNA2,'' COLUMNA3 from sis_empresa WHERE IDE_EMPR=1");
+        tab_tabla1.setLectura(true);
+        tab_tabla1.setRows(15);
+        tab_tabla1.dibujar();
+        PanelTabla pat_panel = new PanelTabla();
+        pat_panel.setPanelTabla(tab_tabla1);
+        //grid.getChildren().add(pat_panel);
+        com_colDocumento = new Combo();
+        com_colDocumento.setStyle("width: 210px;");
+        com_colValor = new Combo();
+        com_colValor.setStyle("width: 210px;");
+        Grid g1 = new Grid();
+        g1.getChildren().add(new Etiqueta("<strong>COLUMNA NUM. DOCUMENTO :</strong><span style='color:red;font-weight: bold;'>*</span>"));
+        g1.getChildren().add(com_colDocumento);
+        g1.getChildren().add(new Etiqueta("<strong>COLUMNA VALOR :</strong><span style='color:red;font-weight: bold;'>*</span>"));
+        g1.getChildren().add(com_colValor);
+        g1.getChildren().add(new Etiqueta("<strong>CUENTA BANCARIA : </strong> <span style='color:red;font-weight: bold;'>*</span>"));
+
+        aut_cuenta = new AutoCompletar();
+        aut_cuenta.setId("aut_cuenta");
+        aut_cuenta.setAutoCompletar(ser_tesoreria.getSqlComboCuentasBancarias());
+        aut_cuenta.setDropdown(true);
+        aut_cuenta.setAutocompletarContenido();
+        aut_cuenta.setSize(30);
+        aut_cuenta.setMaxResults(25);
+
+        g1.getChildren().add(aut_cuenta);
+
+        Boton bot_procesar = new Boton();
+        bot_procesar.setValue("Conciliar");
+        bot_procesar.setMetodo("conciliacionAutmaitica");
+
+        g1.getChildren().add(bot_procesar);
+
+        gri_matriz.getChildren().add(g1);
+        gri_matriz.getChildren().add(pat_panel);
+
+        pn.getChildren().add(gri_matriz);
+        mep_menu.dibujar(10, "CONCILIACIÓN AUTOMÁTICA", pn);
+
+    }
+
+    public void conciliacionAutmaitica() {
+        if (com_colDocumento.getValue() == null) {
+            utilitario.agregarMensajeError("Seleccione la COLUMNA NUM. DOCUMENTO", "");
+            return;
+        }
+        if (com_colValor.getValue() == null) {
+            utilitario.agregarMensajeError("Seleccione la COLUMNA VALOR", "");
+            return;
+        }
+        if (tab_tabla1.getTotalFilas() <= 0) {
+            utilitario.agregarMensajeError("No hay movimientos para Conciliar", "");
+            return;
+        }
+        if (aut_cuenta.getValor() == null) {
+            utilitario.agregarMensajeError("Debe seleccionar la CUENTA BANCARIA", "");
+            return;
+        }
+
+        TablaGenerica tab_mov = utilitario.consultar(ser_tesoreria.getSqlTransaccionesConciliarCuenta(aut_cuenta.getValor(), cal_fecha_inicio.getFecha(), cal_fecha_fin.getFecha()));
+
+//reccore la tabla 
+        String str_econtrados = "";
+        for (int i = 0; i < tab_tabla1.getTotalFilas(); i++) {
+            double dou_valorC = 0;
+            long lon_docuC = 0;
+            try {
+                String valorC = tab_tabla1.getValor(i, String.valueOf(com_colValor.getValue()));
+                valorC = valorC.replace(",", "");
+                dou_valorC = Double.parseDouble(utilitario.getFormatoNumero(valorC));
+            } catch (Exception e) {
+                e.printStackTrace();
+                continue;
+            }
+
+            try {
+                String num_documento = tab_tabla1.getValor(i, String.valueOf(com_colDocumento.getValue()));
+                lon_docuC = Long.parseLong(num_documento);
+            } catch (Exception e) {
+                e.printStackTrace();
+                continue;
+            }
+
+            boolean encontro = false;
+            //busca en los movimientos
+
+            for (int j = 0; j < tab_mov.getTotalFilas(); j++) {
+                double dou_valor = 0;
+                long lon_docu = 0;
+
+                try {
+                    String val = tab_mov.getValor(j, "valor_teclb");
+                    val = val.replace(",", "");
+                    dou_valor = Double.parseDouble(utilitario.getFormatoNumero(val));
+                } catch (Exception e) {
+                    e.printStackTrace();
+                    continue;
+                }
+                try {
+                    String doc = tab_mov.getValor(j, "numero_teclb");
+                    lon_docu = Long.parseLong(doc);
+                } catch (Exception e) {
+                    e.printStackTrace();
+                    continue;
+                }
+                //        System.out.println("-- " + dou_valorC + "   ...  " + dou_valor + "   ===  " + lon_docuC + " === " + lon_docu);
+                if (dou_valor == dou_valorC) {
+                    if (lon_docu == lon_docuC) {
+                        encontro = true;
+                        if (str_econtrados.isEmpty() == false) {
+                            str_econtrados += ",";
+                        }
+                        str_econtrados += tab_mov.getValor(j, "ide_teclb");
+                        break;
+                    }
+                }
+
+            }
+
+            System.out.println("---" + encontro);
+            if (encontro) {
+                tab_tabla1.setValor(i, "ENCONTRO", "true");
+            } else {
+                tab_tabla1.setValor(i, "ENCONTRO", "false");
+            }
+
+        }
+        //  System.out.println("=== " + str_econtrados);
+        if (str_econtrados.isEmpty() == false) {
+            sel_conciliados.getTab_seleccion().setSql(ser_tesoreria.getSqlTransaccionesEncontradasConciliarCuenta(str_econtrados));
+            sel_conciliados.getTab_seleccion().ejecutarSql();
+            sel_conciliados.dibujar();
+            sel_conciliados.seleccionarTodas();
+        } else {
+            utilitario.agregarMensajeError("No se ecnontraron movimientos", "El archivo no contiene movimientos de la cuenta bancaria seleccionada");
+        }
+
+        // sel_conciliados.setSeleccionTabla(ser_tesoreria.getSqlTransaccionesEncontradasConciliarCuenta("-1"), "ide_teclb");
+    }
+
+    public void seleccionarArchivo(FileUploadEvent event) {
+        if (tex_separa.getValue() == null || tex_separa.getValue().toString().isEmpty()) {
+            utilitario.agregarMensajeError("Ingrese el separador de columnas del archivo", "");
+            return;
+        }
+        try {
+            final File tempFile = File.createTempFile("archivoConcilia", "csv");
+            tempFile.deleteOnExit();
+            try (FileOutputStream out = new FileOutputStream(tempFile)) {
+                IOUtils.copy(event.getFile().getInputstream(), out);
+            }
+            List<String> lines = Files.readAllLines(tempFile.toPath(),
+                    StandardCharsets.UTF_8);
+            int intFila = 0;
+            //Columnas            
+            String strColumnas = "";
+            List listaColumnas = new ArrayList();
+            if (lines.isEmpty() == false) {
+                String[] array = lines.get(0).split("" + tex_separa.getValue() + "\"");
+                for (String array1 : array) {
+
+                    if (strColumnas.isEmpty() == false) {
+                        strColumnas += ",";
+                    }
+                    if (array1.replace("\"", "").equalsIgnoreCase("FECHA")) {
+                        strColumnas += "'' FECHA_MOVIMIENTO";
+                        Object fila[] = {"FECHA_MOVIMIENTO", "FECHA_MOVIMIENTO"};
+                        listaColumnas.add(fila);
+                    } else {
+                        strColumnas += "'' " + array1.replace("\"", "");
+                        Object fila[] = {array1.replace("\"", ""), array1.replace("\"", "")};
+                        listaColumnas.add(fila);
+                    }
+
+                }
+            }
+            com_colDocumento.setCombo(listaColumnas);
+            com_colValor.setCombo(listaColumnas);
+            UIComponent padre = tab_tabla1.getParent();
+            padre.getChildren().remove(tab_tabla1);
+            tab_tabla1 = new Tabla();
+            tab_tabla1.setId("tab_tabla1");
+            tab_tabla1.setSql("SELECT 0 as ENCONTRO, " + strColumnas + " from sis_empresa WHERE IDE_EMPR=1");
+            tab_tabla1.setLectura(true);
+            tab_tabla1.setRows(10);
+            for (Columna col : tab_tabla1.getColumnas()) {
+                col.setFiltroContenido();
+                col.setLongitud(30);
+                col.setAncho(30);
+            }
+            tab_tabla1.getColumna("ENCONTRO").setVisible(false);
+            tab_tabla1.setValueExpression("rowStyleClass", "fila.campos[0] eq 'false' ? 'text-red' : fila.campos[1] eq 'true'  ? 'text-green' : null");
+
+            tab_tabla1.dibujar();
+            tab_tabla1.setLectura(false);
+            padre.getChildren().add(tab_tabla1);
+            //Filas
+            for (String line : lines) {
+                if (intFila == 0) {
+                    intFila++;
+                    continue;
+                }
+                tab_tabla1.insertar();
+                String[] array = line.split(",\"");
+                int intColumna = 1;
+                for (String array1 : array) {
+                    tab_tabla1.setValor(tab_tabla1.getColumnas()[intColumna].getNombre(), array1.replace("\"", ""));
+                    intColumna++;
+                }
+                intFila++;
+            }
+            upl_importa.setNombreReal(event.getFile().getFileName());
+            utilitario.addUpdate("gri_valida,grid");
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+
     }
 
     public void conciliarM() {
@@ -1784,4 +2080,20 @@ public class pre_libro_bancos extends Pantalla {
         this.tab_tabla2 = tab_tabla2;
     }
 
+    public SeleccionTabla getSel_conciliados() {
+        return sel_conciliados;
+    }
+
+    public void setSel_conciliados(SeleccionTabla sel_conciliados) {
+        this.sel_conciliados = sel_conciliados;
+    }
+
+    public Upload getUpl_importa() {
+        return upl_importa;
+    }
+
+    public void setUpl_importa(Upload upl_importa) {
+        this.upl_importa = upl_importa;
+    }   
+    
 }
