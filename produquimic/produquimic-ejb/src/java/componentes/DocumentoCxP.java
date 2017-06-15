@@ -5,6 +5,8 @@
  */
 package componentes;
 
+import dj.comprobantes.offline.enums.TipoComprobanteEnum;
+import dj.comprobantes.offline.enums.TipoImpuestoIvaEnum;
 import framework.aplicacion.TablaGenerica;
 import framework.componentes.AreaTexto;
 import framework.componentes.Boton;
@@ -510,6 +512,7 @@ public class DocumentoCxP extends Dialogo {
 
             Boton bt_panel = new Boton();
             bt_panel.setValue("Cargar XML");
+            bt_panel.setIcon("ui-icon-folder-open");
             bt_panel.setTitle("Seleccionar una Factura Electrónica en formato XML");
             bt_panel.setMetodoRuta("pre_index.clase." + getId() + ".abrirArchivoXML");
 
@@ -1010,7 +1013,7 @@ public class DocumentoCxP extends Dialogo {
             }
             //Validaciones
             String codDoc = utilitario.getValorEtiqueta(fileContents.toString(), "codDoc");
-            if (codDoc == null || codDoc.equals("01") == false) {
+            if (codDoc == null || codDoc.equals(TipoComprobanteEnum.FACTURA.getCodigo()) == false) {
                 utilitario.agregarMensajeError("Error archivo XML", "Tipo de comprobante no válido");
                 return;
             }
@@ -1037,9 +1040,30 @@ public class DocumentoCxP extends Dialogo {
             System.out.println("*** " + utilitario.getValorEtiqueta(fileContents.toString(), "importeTotal"));
             System.out.println("*** " + utilitario.getValorEtiqueta(fileContents.toString(), "formaPago"));
             //Detalles
-
+            String cadenaDetalles = utilitario.getValorEtiqueta(fileContents.toString(), "detalles");
+            String strDetalles[] = cadenaDetalles.split("</detalle>");
+            tab_det_documento.limpiar();
+            for (String strDetalleActual : strDetalles) {
+                tab_det_documento.insertar();
+                tab_det_documento.setValor("cantidad_cpdfa", utilitario.getValorEtiqueta(strDetalleActual, "cantidad"));
+                tab_det_documento.setValor("observacion_cpdfa", utilitario.getValorEtiqueta(strDetalleActual, "descripcion"));
+                tab_det_documento.setValor("precio_cpdfa", utilitario.getValorEtiqueta(strDetalleActual, "precioUnitario"));
+                tab_det_documento.setValor("valor_cpdfa", utilitario.getValorEtiqueta(strDetalleActual, "precioTotalSinImpuesto"));
+                String codigoPorcentaje = utilitario.getValorEtiqueta(strDetalleActual, "codigoPorcentaje");
+                System.out.println("--- " + codigoPorcentaje);
+                if (codigoPorcentaje.equals(TipoImpuestoIvaEnum.IVA_VENTA_0.getCodigo())) {                    //NO IVA
+                    tab_det_documento.setValor("iva_inarti_cpdfa", "-1");
+                } else if (codigoPorcentaje.equals(TipoImpuestoIvaEnum.IVA_NO_OBJETO.getCodigo())) {
+                    tab_det_documento.setValor("iva_inarti_cpdfa", "0");
+                } else {
+                    tab_det_documento.setValor("iva_inarti_cpdfa", "1");
+                }
+            }
+            calcularTotalDocumento();
+            dia_cxp_xml.cerrar();
+            utilitario.addUpdate("tab_documenoCxP:0:tab_cab_documento,tab_documenoCxP:0:tab_det_documento,tab_documenoCxP:0:gri_pto");
         } catch (Exception ex) {
-
+            utilitario.crearError("Error al Leer Factura XML", "en el método seleccionarArchivoXML()", ex);
         }
     }
 
