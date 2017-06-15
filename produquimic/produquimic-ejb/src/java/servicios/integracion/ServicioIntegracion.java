@@ -503,13 +503,14 @@ public class ServicioIntegracion extends ServicioBase {
                 + "codigo_geper,nom_geper,ide_cntco,serie_ccdaf || secuencial_cccfa as numfactura,\n"
                 + "base_grabada_cccfa+base_tarifa0_cccfa+base_no_objeto_iva_cccfa as subtotal,valor_iva_cccfa,total_cccfa,"
                 + "secuencial_cccfa,a.ide_cccfa,base_grabada_cccfa,base_tarifa0_cccfa+base_no_objeto_iva_cccfa as ventas0,"
-                + "nombre_cndfp,COALESCE(nombre_inuni,'')  ||' '|| nombre_inarti as nombre_inarti,nombre_vgven "
+                + "CASE WHEN dias_credito_cccfa=0 THEN 'CONTADO'\n"
+                + "             ELSE 'CRÉDITO '||dias_credito_cccfa||' DÍAS'\n"
+                + "       END as nombre_cndfp,COALESCE(nombre_inuni,'')  ||' '|| nombre_inarti as nombre_inarti,nombre_vgven "
                 + "from cxc_deta_factura a\n"
                 + "inner join cxc_cabece_factura b on a.ide_cccfa=b.ide_cccfa\n"
                 + "inner join cxc_datos_fac c on b.ide_ccdaf=c.ide_ccdaf\n"
                 + "inner join gen_persona d on b.ide_geper=d.ide_geper\n"
-                + "inner join inv_articulo e on a.ide_inarti= e.ide_inarti\n"
-                + "inner join con_deta_forma_pago f on b.ide_cndfp=f.ide_cndfp\n"
+                + "inner join inv_articulo e on a.ide_inarti= e.ide_inarti\n"                
                 + "left join  inv_unidad g on a.ide_inuni =g.ide_inuni\n"
                 + "inner join ven_vendedor h on b.ide_vgven=h.ide_vgven\n"
                 + "where a.ide_cccfa=" + ide_cccfa);
@@ -731,6 +732,12 @@ public class ServicioIntegracion extends ServicioBase {
             }
         }
         return dou_existencia;
+    }
+    
+    public void anularFacturaporNotadeCredito(String secuencialFa){
+         String sql = "UPDATE facturas_fe SET ANULADA=true where NUM_FACTURA_FE=" + Integer.parseInt(secuencialFa) + "";
+         Conexion con_conecta = getConexionEscritorio();
+         con_conecta.ejecutarSql(sql);
     }
 
     public String getTipoCliente(String CODIGO_CLIE) {
