@@ -37,7 +37,6 @@ import java.util.List;
 import javax.ejb.EJB;
 import javax.faces.component.UIComponent;
 import javax.faces.event.ActionEvent;
-import javax.faces.event.AjaxBehaviorEvent;
 import org.apache.commons.io.IOUtils;
 import org.primefaces.component.panelgrid.PanelGrid;
 import org.primefaces.component.separator.Separator;
@@ -58,7 +57,8 @@ import sistema.aplicacion.Pantalla;
 public class pre_libro_bancos extends Pantalla {
 
     private final MenuPanel mep_menu = new MenuPanel();
-    private AutoCompletar aut_cuentas = new AutoCompletar();
+    //private AutoCompletar aut_cuentas = new AutoCompletar();
+    private final Combo aut_cuentas = new Combo();
     @EJB
     private final ServicioTesoreria ser_tesoreria = (ServicioTesoreria) utilitario.instanciarEJB(ServicioTesoreria.class);
     private final Calendario cal_fecha_inicio = new Calendario();
@@ -109,6 +109,7 @@ public class pre_libro_bancos extends Pantalla {
     private Texto tex_separa;
     private Combo com_colDocumento;
     private Combo com_colValor;
+    private final List lisCuentas;
 
     public pre_libro_bancos() {
 
@@ -128,11 +129,14 @@ public class pre_libro_bancos extends Pantalla {
         agregarComponente(mep_menu);
 
         aut_cuentas.setId("aut_cuentas");
-        aut_cuentas.setAutocompletarContenido();
-        aut_cuentas.setDropdown(true);
-        aut_cuentas.setAutoCompletar(ser_tesoreria.getSqlComboCuentas());
-        aut_cuentas.setMetodoChange("actualizarMovimientos");   
-        aut_cuentas.setMaxResults(15);
+        //aut_cuentas.setAutocompletarContenido();
+        //aut_cuentas.setDropdown(true);
+        //aut_cuentas.setAutoCompletar(ser_tesoreria.getSqlComboCuentas());
+        lisCuentas = utilitario.getConexion().consultar(ser_tesoreria.getSqlComboCuentas());
+        aut_cuentas.setCombo(lisCuentas);
+        aut_cuentas.eliminarVacio();
+        aut_cuentas.setMetodo("actualizarMovimientos");
+        //aut_cuentas.setMaxResults(15);
 
         bar_botones.limpiar();
         bar_botones.agregarComponente(new Etiqueta("CUENTA :"));
@@ -203,7 +207,7 @@ public class pre_libro_bancos extends Pantalla {
         tab_tabla1.dibujar();
 
         if (tab_tabla1.isEmpty() == false) {
-            aut_cuentas.setValor(tab_tabla1.getValor("ide_tecba"));
+            aut_cuentas.setValue(tab_tabla1.getValor("ide_tecba"));
         }
 
         PanelTabla pat_panel = new PanelTabla();
@@ -232,12 +236,17 @@ public class pre_libro_bancos extends Pantalla {
     public void dibujarMovimienots() {
         tab_tabla1 = new Tabla();
         tab_tabla1.setId("tab_tabla1");
-        tab_tabla1.setSql(ser_tesoreria.getSqlTransaccionesCuenta(aut_cuentas.getValor(), cal_fecha_inicio.getFecha(), cal_fecha_fin.getFecha()));
+        tab_tabla1.setSql(ser_tesoreria.getSqlTransaccionesCuenta(String.valueOf(aut_cuentas.getValue()), cal_fecha_inicio.getFecha(), cal_fecha_fin.getFecha()));
         tab_tabla1.setRows(15);
         tab_tabla1.setLectura(true);
         tab_tabla1.setOrdenar(false);
         tab_tabla1.getColumna("ide_teclb").setVisible(false);
         tab_tabla1.setCampoPrimaria("ide_teclb");
+        tab_tabla1.getColumna("fecha_trans_teclb").setNombreVisual("FECHA");
+        tab_tabla1.getColumna("numero_teclb").setNombreVisual("N.TRANSACIÓN");
+        tab_tabla1.getColumna("nombre_tettb").setNombreVisual("TIPO TRANSACCIÓN");
+        tab_tabla1.getColumna("beneficiari_teclb").setNombreVisual("BENEFICIARIO");
+        tab_tabla1.getColumna("OBSERVACION_TECLB").setNombreVisual("OBSERVACION");
         tab_tabla1.getColumna("EGRESOS").alinearDerecha();
         tab_tabla1.getColumna("EGRESOS").setLongitud(25);
         tab_tabla1.getColumna("INGRESOS").alinearDerecha();
@@ -349,7 +358,7 @@ public class pre_libro_bancos extends Pantalla {
         aut_cuenta = new AutoCompletar();
         aut_cuenta.setId("aut_cuenta");
         aut_cuenta.setMetodoChange("cambioCuenta");
-        aut_cuenta.setAutoCompletar(aut_cuentas.getLista());
+        aut_cuenta.setAutoCompletar(lisCuentas);
         aut_cuenta.setDropdown(true);
         aut_cuenta.setAutocompletarContenido();
         aut_cuenta.setSize(66);
@@ -466,7 +475,7 @@ public class pre_libro_bancos extends Pantalla {
         aut_cuenta = new AutoCompletar();
         aut_cuenta.setId("aut_cuenta");
         aut_cuenta.setMetodoChange("cambioCuenta");
-        aut_cuenta.setAutoCompletar(aut_cuentas.getLista());
+        aut_cuenta.setAutoCompletar(lisCuentas);
         aut_cuenta.setDropdown(true);
         aut_cuenta.setSize(66);
         aut_cuenta.setAutocompletarContenido();
@@ -575,7 +584,7 @@ public class pre_libro_bancos extends Pantalla {
         aut_cuenta = new AutoCompletar();
         aut_cuenta.setId("aut_cuenta");
         aut_cuenta.setMetodoChange("cambioCuenta");
-        aut_cuenta.setAutoCompletar(aut_cuentas.getLista());
+        aut_cuenta.setAutoCompletar(lisCuentas);
         aut_cuenta.setDropdown(true);
         aut_cuenta.setSize(66);
         aut_cuenta.setAutocompletarContenido();
@@ -690,7 +699,7 @@ public class pre_libro_bancos extends Pantalla {
         aut_cuenta = new AutoCompletar();
         aut_cuenta.setId("aut_cuenta");
         aut_cuenta.setMetodoChange("cambioCuenta");
-        aut_cuenta.setAutoCompletar(aut_cuentas.getLista());
+        aut_cuenta.setAutoCompletar(lisCuentas);
         aut_cuenta.setDropdown(true);
         aut_cuenta.setAutocompletarContenido();
         aut_cuenta.setSize(66);
@@ -813,7 +822,7 @@ public class pre_libro_bancos extends Pantalla {
         gri1.getChildren().add(new Etiqueta("<strong>DE LA CUENTA : </strong><span style='color:red;font-weight: bold;'>*</span>"));
         aut_cuenta = new AutoCompletar();
         aut_cuenta.setId("aut_cuenta");
-        aut_cuenta.setAutoCompletar(aut_cuentas.getLista());
+        aut_cuenta.setAutoCompletar(lisCuentas);
         //aut_cuenta.setMetodoChange("cambioCuenta");        
         aut_cuenta.setDropdown(true);
         aut_cuenta.setAutocompletarContenido();
@@ -882,7 +891,7 @@ public class pre_libro_bancos extends Pantalla {
     public void dibujarConciliarM() {
         tab_tabla1 = new Tabla();
         tab_tabla1.setId("tab_seleccion");
-        tab_tabla1.setSql(ser_tesoreria.getSqlTransaccionesCuentaNoConciliado(aut_cuentas.getValor(), cal_fecha_inicio.getFecha(), cal_fecha_fin.getFecha()));
+        tab_tabla1.setSql(ser_tesoreria.getSqlTransaccionesCuentaNoConciliado(String.valueOf(aut_cuentas.getValue()), cal_fecha_inicio.getFecha(), cal_fecha_fin.getFecha()));
         tab_tabla1.setRows(15);
         tab_tabla1.setHeader("MOVIMIENTOS NO CONCILIADOS");
         tab_tabla1.setLectura(true);
@@ -1190,7 +1199,7 @@ public class pre_libro_bancos extends Pantalla {
         if (tab_tabla1.getFilasSeleccionadas() != null && tab_tabla1.getFilasSeleccionadas().isEmpty() == false) {
             ser_tesoreria.conciliarMovimientos(tab_tabla1.getFilasSeleccionadas());
             utilitario.agregarMensaje("Se Guardo correctamente", tab_tabla1.getFilasSeleccionadas());
-            tab_tabla1.setSql(ser_tesoreria.getSqlTransaccionesCuentaNoConciliado(aut_cuentas.getValor(), cal_fecha_inicio.getFecha(), cal_fecha_fin.getFecha()));
+            tab_tabla1.setSql(ser_tesoreria.getSqlTransaccionesCuentaNoConciliado(String.valueOf(aut_cuentas.getValue()), cal_fecha_inicio.getFecha(), cal_fecha_fin.getFecha()));
             tab_tabla1.ejecutarSql();
         } else {
             utilitario.agregarMensajeError("Debe seleccionar Movimientos", "");
@@ -1267,8 +1276,8 @@ public class pre_libro_bancos extends Pantalla {
     }
 
     private void actualizarSaldos() {
-        if (aut_cuentas.getValor() != null) {
-            double saldo_anterior = ser_tesoreria.getSaldoInicialCuenta(aut_cuentas.getValor(), cal_fecha_inicio.getFecha());
+        if (aut_cuentas.getValue() != null) {
+            double saldo_anterior = ser_tesoreria.getSaldoInicialCuenta(String.valueOf(aut_cuentas.getValue()), cal_fecha_inicio.getFecha());
             double dou_saldo_inicial = saldo_anterior;
             double dou_saldo_actual = 0;
             for (int i = 0; i < tab_tabla1.getTotalFilas(); i++) {
@@ -1300,20 +1309,18 @@ public class pre_libro_bancos extends Pantalla {
         }
     }
 
-    public void actualizarMovimientos(SelectEvent evt) {
-        //aut_cuentas.onSelect(evt);
-        actualizarMovimientos();
-    }
-
-    public void actualizarMovimientos(AjaxBehaviorEvent evt) {
-        //aut_cuentas.onSelect(evt);
-        actualizarMovimientos();
-    }
-
+////    public void actualizarMovimientos(SelectEvent evt) {
+////        //aut_cuentas.onSelect(evt);
+////        actualizarMovimientos();
+////    }
+////    public void actualizarMovimientos(AjaxBehaviorEvent evt) {
+////        //aut_cuentas.onSelect(evt);
+////        actualizarMovimientos();
+////    }
     public void actualizarMovimientos() {
         if (mep_menu.getOpcion() == 2) {
-            if (aut_cuentas.getValor() != null) {
-                tab_tabla1.setSql(ser_tesoreria.getSqlTransaccionesCuenta(aut_cuentas.getValor(), cal_fecha_inicio.getFecha(), cal_fecha_fin.getFecha()));
+            if (aut_cuentas.getValue() != null) {
+                tab_tabla1.setSql(ser_tesoreria.getSqlTransaccionesCuenta(String.valueOf(aut_cuentas.getValue()), cal_fecha_inicio.getFecha(), cal_fecha_fin.getFecha()));
                 tab_tabla1.ejecutarSql();
             } else {
                 tab_tabla1.limpiar();
@@ -2011,19 +2018,18 @@ public class pre_libro_bancos extends Pantalla {
     public void cargarMovimientosCuenta(ActionEvent evt) {
         Link lin_ide_tecba = (Link) evt.getComponent();
         tab_tabla1.setFilaActual(lin_ide_tecba.getDir());
-        aut_cuentas.setValor(tab_tabla1.getValor("ide_tecba"));
+        aut_cuentas.setValue(tab_tabla1.getValor("ide_tecba"));
         utilitario.addUpdate("aut_cuentas");
         dibujarMovimienots();
     }
 
-    public AutoCompletar getAut_cuentas() {
-        return aut_cuentas;
-    }
-
-    public void setAut_cuentas(AutoCompletar aut_cuentas) {
-        this.aut_cuentas = aut_cuentas;
-    }
-
+//    public AutoCompletar getAut_cuentas() {
+//        return aut_cuentas;
+//    }
+//
+//    public void setAut_cuentas(AutoCompletar aut_cuentas) {
+//        this.aut_cuentas = aut_cuentas;
+//    }
     public Tabla getTab_tabla1() {
         return tab_tabla1;
     }
