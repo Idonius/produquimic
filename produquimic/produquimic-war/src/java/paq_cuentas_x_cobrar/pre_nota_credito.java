@@ -28,6 +28,7 @@ import org.primefaces.component.panel.Panel;
 import servicios.ceo.ServicioComprobanteElectronico;
 import servicios.contabilidad.ServicioConfiguracion;
 import servicios.cuentas_x_cobrar.ServicioCuentasCxC;
+import servicios.integracion.ServicioIntegracion;
 import servicios.inventario.ServicioProducto;
 import sistema.aplicacion.Pantalla;
 
@@ -45,6 +46,8 @@ public class pre_nota_credito extends Pantalla {
     private final ServicioConfiguracion ser_configuracion = (ServicioConfiguracion) utilitario.instanciarEJB(ServicioConfiguracion.class);
     @EJB
     private final ServicioComprobanteElectronico ser_comprobante_electronico = (ServicioComprobanteElectronico) utilitario.instanciarEJB(ServicioComprobanteElectronico.class);
+    @EJB
+    private final ServicioIntegracion ser_integracion = (ServicioIntegracion) utilitario.instanciarEJB(ServicioIntegracion.class);
 
     private final Combo com_pto_emision = new Combo();
     private final Calendario cal_fecha_inicio = new Calendario();
@@ -672,6 +675,12 @@ public class pre_nota_credito extends Pantalla {
                     if (guardarPantalla().isEmpty()) {
                         if (ser_factura.isFacturaElectronica()) {
                             ser_comprobante_electronico.generarNotaCreditoElectronica(tab_tabla1.getValor("ide_cpcno"));
+                            //anula factura en reporte de utilidad
+                            String num_doc_mod_cpcno = tab_tabla1.getValor("num_doc_mod_cpcno");
+                            num_doc_mod_cpcno = num_doc_mod_cpcno.replace("-", "");
+                            String secuencial_cccfa = num_doc_mod_cpcno.substring(6, 15);
+                            ser_integracion.anularFacturaporNotadeCredito(secuencial_cccfa);
+
                             String aux = tab_tabla1.getValor("ide_cpcno");
                             dibujarNotaCredito();
                             tab_tabla1.setFilaActual(aux);

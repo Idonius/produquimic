@@ -37,6 +37,7 @@ import java.util.List;
 import javax.ejb.EJB;
 import javax.faces.component.UIComponent;
 import javax.faces.event.ActionEvent;
+import javax.faces.event.AjaxBehaviorEvent;
 import org.apache.commons.io.IOUtils;
 import org.primefaces.component.panelgrid.PanelGrid;
 import org.primefaces.component.separator.Separator;
@@ -130,10 +131,7 @@ public class pre_libro_bancos extends Pantalla {
         aut_cuentas.setAutocompletarContenido();
         aut_cuentas.setDropdown(true);
         aut_cuentas.setAutoCompletar(ser_tesoreria.getSqlComboCuentas());
-        aut_cuentas.setMetodoChange("actualizarMovimientos");
-        aut_cuentas.setGlobal(true);
-        aut_cuentas.setValue(null);
-        aut_cuentas.setGlobal(true);
+        aut_cuentas.setMetodoChange("actualizarMovimientos");   
         aut_cuentas.setMaxResults(15);
 
         bar_botones.limpiar();
@@ -259,6 +257,11 @@ public class pre_libro_bancos extends Pantalla {
         tab_tabla1.getColumna("nombre_tettb").setFiltroContenido();
         tab_tabla1.setColumnaSuma("INGRESOS,EGRESOS,SALDO");
         tab_tabla1.dibujar();
+
+        if (tab_tabla1.isEmpty() == false) {
+            //va a la ultima págia
+            tab_tabla1.fin();
+        }
         actualizarSaldos();
         PanelTabla pat_panel = new PanelTabla();
         pat_panel.setPanelTabla(tab_tabla1);
@@ -1298,7 +1301,12 @@ public class pre_libro_bancos extends Pantalla {
     }
 
     public void actualizarMovimientos(SelectEvent evt) {
-        aut_cuentas.onSelect(evt);
+        //aut_cuentas.onSelect(evt);
+        actualizarMovimientos();
+    }
+
+    public void actualizarMovimientos(AjaxBehaviorEvent evt) {
+        //aut_cuentas.onSelect(evt);
         actualizarMovimientos();
     }
 
@@ -2094,6 +2102,6 @@ public class pre_libro_bancos extends Pantalla {
 
     public void setUpl_importa(Upload upl_importa) {
         this.upl_importa = upl_importa;
-    }   
-    
+    }
+
 }

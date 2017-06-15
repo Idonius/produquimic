@@ -41,7 +41,6 @@ import org.primefaces.component.fieldset.Fieldset;
 import org.primefaces.component.panel.Panel;
 import servicios.ceo.ServicioComprobanteElectronico;
 import servicios.cuentas_x_cobrar.ServicioCuentasCxC;
-import servicios.integracion.ServicioIntegracion;
 
 import sistema.aplicacion.Pantalla;
 
@@ -930,7 +929,7 @@ public class pre_facturasCxC extends Pantalla {
     }
 
     @Override
-    public void insertar() {
+    public void insertar() {        
         fcc_factura.nuevaFactura();
         fcc_factura.dibujar();
     }
