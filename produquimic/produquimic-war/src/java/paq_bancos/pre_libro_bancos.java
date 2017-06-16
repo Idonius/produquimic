@@ -17,6 +17,7 @@ import framework.componentes.Combo;
 import framework.componentes.Dialogo;
 import framework.componentes.Etiqueta;
 import framework.componentes.Grid;
+import framework.componentes.Grupo;
 import framework.componentes.Imagen;
 import framework.componentes.ItemMenu;
 import framework.componentes.Link;
@@ -110,6 +111,8 @@ public class pre_libro_bancos extends Pantalla {
     private Combo com_colDocumento;
     private Combo com_colValor;
     private final List lisCuentas;
+
+    private Grid gri_dashboard;
 
     public pre_libro_bancos() {
 
@@ -216,6 +219,70 @@ public class pre_libro_bancos extends Pantalla {
         mep_menu.dibujar(1, "POSICIÓN CONSOLIDADA", pat_panel);
     }
 
+    private void dibujarDashboard() {
+
+        String nombre_banco = "";
+        String num_cuenta = "";
+        String saldo = "";
+        String saldo_contable = "";
+        String saldo_disponible = "";
+
+        TablaGenerica tag = utilitario.consultar(ser_tesoreria.getSqlPosicionConsolidada());
+        for (int i = 0; i < tag.getTotalFilas(); i++) {
+            if (String.valueOf(aut_cuentas.getValue()).equals(tag.getValor(i, "ide_tecba"))) {
+                nombre_banco = tag.getValor(i, "nombre_teban");
+                num_cuenta = tag.getValor(i, "nombre_tecba");
+                saldo = tag.getValor(i, "saldo_registrado");
+                saldo_contable = tag.getValor(i, "saldo_contable");
+                saldo_disponible = tag.getValor(i, "saldo_disponible");
+            }
+        }
+        gri_dashboard.getChildren().clear();
+        org.primefaces.component.panel.Panel p1 = new org.primefaces.component.panel.Panel();
+        p1.setStyle("margin-left: 2px;");
+        Grid g1 = new Grid();
+        g1.setWidth("100%");
+        g1.setColumns(2);
+        g1.setHeader(new Etiqueta("<span style='font-size:11px;' >" + nombre_banco + " </span>"));
+        g1.getChildren().add(new Etiqueta("<i class='fa fa-university fa-2x text-orange'></i>"));
+        g1.getChildren().add(new Etiqueta("<span style='font-size:15px; text-align: left;'>" + num_cuenta + "</span>"));
+        p1.getChildren().add(g1);
+        gri_dashboard.getChildren().add(p1);
+
+        org.primefaces.component.panel.Panel p2 = new org.primefaces.component.panel.Panel();
+        p2.setStyle("margin-left: 2px;");
+        Grid g2 = new Grid();
+        g2.setColumns(2);
+        g2.setWidth("100%");
+        g2.setHeader(new Etiqueta("<span style='font-size:11px;' >SALDO </span>"));
+        g2.getChildren().add(new Etiqueta("<i class='fa fa-usd fa-2x text-blue'></i>"));
+        g2.getChildren().add(new Etiqueta("<span style='font-size:15px; text-align: left;'>" + utilitario.getFormatoNumero(saldo) + "</span>"));
+        p2.getChildren().add(g2);
+        gri_dashboard.getChildren().add(p2);
+
+        org.primefaces.component.panel.Panel p3 = new org.primefaces.component.panel.Panel();
+        p3.setStyle("margin-left: 2px;");
+        Grid g3 = new Grid();
+        g3.setWidth("100%");
+        g3.setColumns(2);
+        g3.setHeader(new Etiqueta("<span style='font-size:11px;' >SALDO CONTABLE </span>"));
+        g3.getChildren().add(new Etiqueta("<i class='fa fa-book fa-2x text-navy'></i>"));
+        g3.getChildren().add(new Etiqueta("<span style='font-size:15px; text-align: left;'>" + utilitario.getFormatoNumero(saldo_contable) + "</span>"));
+        p3.getChildren().add(g3);
+        gri_dashboard.getChildren().add(p3);
+
+        org.primefaces.component.panel.Panel p4 = new org.primefaces.component.panel.Panel();
+        p4.setStyle("margin-left: 2px;");
+        Grid g4 = new Grid();
+        g4.setWidth("100%");
+        g4.setColumns(2);
+        g4.setHeader(new Etiqueta("<span style='font-size:11px;' >SALDO DISPONIBLE </span>"));
+        g4.getChildren().add(new Etiqueta("<i class='fa fa-money fa-2x text-green'></i>"));
+        g4.getChildren().add(new Etiqueta("<span style='font-size:15px; text-align: left;'>" + utilitario.getFormatoNumero(saldo_disponible) + "</span>"));
+        p4.getChildren().add(g4);
+        gri_dashboard.getChildren().add(p4);
+    }
+
     public void cerrarAsiento() {
         //limpia sql guardados
         utilitario.getConexion().getSqlPantalla().clear();
@@ -234,6 +301,12 @@ public class pre_libro_bancos extends Pantalla {
     }
 
     public void dibujarMovimienots() {
+
+        gri_dashboard = new Grid();
+        gri_dashboard.setId("gri_dashboard");
+        gri_dashboard.setWidth("100%");
+        gri_dashboard.setColumns(6);
+
         tab_tabla1 = new Tabla();
         tab_tabla1.setId("tab_tabla1");
         tab_tabla1.setSql(ser_tesoreria.getSqlTransaccionesCuenta(String.valueOf(aut_cuentas.getValue()), cal_fecha_inicio.getFecha(), cal_fecha_fin.getFecha()));
@@ -317,7 +390,11 @@ public class pre_libro_bancos extends Pantalla {
         dia_modifica.getGri_cuerpo().getChildren().clear();
         dia_modifica.setDialogo(tab_tabla2);
 
-        mep_menu.dibujar(2, "CONSULTA DE MOVIMIENTOS", pat_panel);
+        Grupo gru = new Grupo();
+        gru.getChildren().add(gri_dashboard);
+        gru.getChildren().add(pat_panel);
+        dibujarDashboard();
+        mep_menu.dibujar(2, "CONSULTA DE MOVIMIENTOS", gru);
     }
 
     public void abrirModificar() {

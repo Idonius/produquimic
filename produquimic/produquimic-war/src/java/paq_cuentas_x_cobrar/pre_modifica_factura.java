@@ -60,7 +60,7 @@ public class pre_modifica_factura extends Pantalla {
     private final ServicioConfiguracion ser_configuracion = (ServicioConfiguracion) utilitario.instanciarEJB(ServicioConfiguracion.class);
     @EJB
     private final ServicioComprobanteElectronico ser_comp_electronico = (ServicioComprobanteElectronico) utilitario.instanciarEJB(ServicioComprobanteElectronico.class);
- @EJB
+    @EJB
     private final ServicioIntegracion ser_integra = (ServicioIntegracion) utilitario.instanciarEJB(ServicioIntegracion.class);
 
     private boolean haceKardex = false;
@@ -286,7 +286,7 @@ public class pre_modifica_factura extends Pantalla {
                 //si es factura electronica valida que este en pendiente
                 String ide_srcom = tab_cab_factura.getValor("ide_srcom");
                 if (ide_srcom != null) {
-                    TablaGenerica tag_e = utilitario.consultar(ser_comp_electronico.getSqlComprobanteElectronico(ide_srcom));                    
+                    TablaGenerica tag_e = utilitario.consultar(ser_comp_electronico.getSqlComprobanteElectronico(ide_srcom));
                     if (tag_e.isEmpty() == false) {
                         //solo puede modificar si no esta RECIBIDA O AUTORIZADA
                         ide_sresc = tag_e.getValor("ide_sresc");
@@ -359,6 +359,16 @@ public class pre_modifica_factura extends Pantalla {
                         //Se debe generar nueva clave de acceso
                         ser_factura.generarNuevaClaveAcceso(tab_cab_factura.getValor("ide_srcom"));
                     }
+                    //Modifica los datos del cliente
+                    TablaGenerica tag_clie = new TablaGenerica();
+                    tag_clie.setTabla("gen_persona", "ide_geper");
+                    tag_clie.setCondicion("ide_geper=" + tab_cab_factura.getValor("ide_geper"));
+                    tag_clie.ejecutarSql();
+                    tag_clie.modificar(tag_clie.getFilaActual());
+                    tag_clie.setValor("direccion_geper", tab_cab_factura.getValor("direccion_cccfa"));
+                    tag_clie.setValor("telefono_geper", tab_cab_factura.getValor("telefono_cccfa"));
+                    tag_clie.setValor("correo_geper", tab_cab_factura.getValor("correo_cccfa"));
+                    tag_clie.guardar();
 
                     if (utilitario.getConexion().guardarPantalla().isEmpty()) {
                         if (ser_factura.isFacturaElectronica()) {
