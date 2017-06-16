@@ -99,8 +99,7 @@ public class pre_documentosCxP extends Pantalla {
         mep_menu.agregarSubMenu("INFORMES");
         mep_menu.agregarItem("Grafico de Compras", "dibujarGraficoCompras", "ui-icon-clock");
         // mep_menu.agregarItem("Estadística de Ventas", "dibujarEstadisticas", "ui-icon-bookmark");        
-        mep_menu.agregarSubMenu("FACTURAS ELECTRONICAS");
-        mep_menu.agregarItem("Seleccionar Factura XML", "dibujarFacturaElectronica", "ui-icon-signal-diag");
+               
         agregarComponente(mep_menu);
         dibujarDocumentos();
 
@@ -403,10 +402,6 @@ public class pre_documentosCxP extends Pantalla {
         gca_facturas.agregarSerie(tab_tabla1, "nombre_gemes", "total", "COMPRAS " + String.valueOf(com_periodo.getValue()));
         grupo.getChildren().add(gca_facturas);
         mep_menu.dibujar(6, "GRAFICOS DE COMPRAS", grupo);
-    }
-
-    public void dibujarFacturaElectronica() {
-
     }
 
     public void anularDocumento() {
