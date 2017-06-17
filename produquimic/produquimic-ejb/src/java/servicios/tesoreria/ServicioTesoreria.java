@@ -556,9 +556,18 @@ public class ServicioTesoreria {
     /**
      * Sql con las cuentas que tiene la empresa
      *
+     * @param ide_tecba
      * @return
      */
-    public String getSqlPosicionConsolidada() {
+    public String getSqlPosicionConsolidada(String ide_tecba) {
+        String condicion = "";
+        if (ide_tecba == null) {
+            ide_tecba = "";
+        }
+        if (ide_tecba.isEmpty() == false) {
+            condicion = " and a.ide_tecba=" + ide_tecba + " ";
+        }
+
         return "select a.ide_tecba,nombre_teban,nombre_tecba,nombre_tetcb,ide_cndpc, \n"
                 + "(Select sum(dcc.valor_cndcc*sc.signo_cnscu) as valor \n"
                 + "from con_cab_comp_cont ccc \n"
@@ -584,6 +593,7 @@ public class ServicioTesoreria {
                 + "inner join tes_banco b on a.ide_teban= b.ide_teban\n"
                 + "inner join tes_tip_cuen_banc c on a.ide_tetcb = c.ide_tetcb\n"
                 + "where a.ide_sucu=" + utilitario.getVariable("ide_sucu") + "\n"
+                + condicion
                 + "order by nombre_teban,nombre_tecba";
     }
 
