@@ -334,8 +334,8 @@ public class pre_modifica_factura extends Pantalla {
     public void guardar() {
         //Asigna punto de emision seleccionado y si solo guarda la factura
         tab_cab_factura.setValor("ide_ccdaf", String.valueOf(com_pto_emision.getValue()));
-        tab_cab_factura.setValor("OBSERVACION_CCCFA", String.valueOf(ate_observacion.getValue()));
-        tab_cab_factura.setValor("tarifa_iva_cccfa", utilitario.getFormatoNumero(tarifaIVA));
+        tab_cab_factura.setValor("OBSERVACION_CCCFA", String.valueOf(ate_observacion.getValue()));        
+        tab_cab_factura.setValor("tarifa_iva_cccfa", utilitario.getFormatoNumero((tarifaIVA * 100)));
         //valida la factura
         if (validarFactura()) {
             //SOLO GUARDA LA FACTURA
