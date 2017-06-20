@@ -253,7 +253,7 @@ public class ComprobanteServiceImp implements ComprobanteService {
                     String xmlGuia = guiaRemisionService.getXmlGuiaRemision(comprobanteGuia);
                     xmlGuia = utilitario.reemplazarCaracteresEspeciales(xmlGuia);
                     recepcionService.enviarRecepcionOfflineSRI(comprobanteGuia, xmlGuia);
-                    comprobanteGuia = getComprobantePorId(comprobanteGuia.getCodigocomprobante());                    
+                    comprobanteGuia = getComprobantePorId(comprobanteGuia.getCodigocomprobante());
                 } else {
                     try {
                         //Esperamos 6 segundos por recomendacion del SRI
@@ -282,7 +282,7 @@ public class ComprobanteServiceImp implements ComprobanteService {
                 if (comprobanteGuia != null) {
                     comprobanteGuia.getCliente().setNombreCliente(comprobanteActual.getCliente().getNombreCliente());
                     comprobanteGuia.getCliente().setIdentificacion(comprobanteActual.getCliente().getIdentificacion());
-                  //!!!  cPanelService.guardarComprobanteNube(comprobanteGuia);
+                    cPanelService.guardarComprobanteNube(comprobanteGuia);
                 }
             } catch (Exception e) {
                 System.out.println("ERROR. al subir comprobante a la Nube :" + e.getMessage());
