@@ -465,14 +465,15 @@ public class pre_nota_credito extends Pantalla {
         bar_menu.setId("bar_menu");
         bar_menu.limpiar();
         Boton bot_ver = new Boton();
-        bot_ver.setValue("Ver Nota de Crédito");
+        bot_ver.setValue("Ver");
+        bot_ver.setTitle("Ver Nota de Crédito");
         bot_ver.setMetodo("abrirVerNota");
         bot_ver.setIcon("ui-icon-search");
         bar_menu.agregarComponente(bot_ver);
-        bar_menu.agregarSeparador();
 
         Boton bot_anular = new Boton();
-        bot_anular.setValue("Anular Nota de Crédito");
+        bot_anular.setValue("Anular");
+        bot_anular.setTitle("Anular Nota de Crédito");
         bot_anular.setMetodo("abrirAnularNotas");
         bot_anular.setIcon("ui-icon-cancel");
         bar_menu.agregarComponente(bot_anular);
@@ -481,18 +482,18 @@ public class pre_nota_credito extends Pantalla {
         if (ser_factura.isFacturaElectronica()) {
             bar_menu.agregarSeparador();
 
-            Boton bot_ride = new Boton();
-            bot_ride.setValue("Imprimir RIDE");
-            bot_ride.setMetodo("abrirRIDE");
-            bot_ride.setIcon("ui-icon-print");
-            bar_menu.agregarBoton(bot_ride);
-
             Boton bot_enviar = new Boton();
             bot_enviar.setValue("Enviar al SRI");
             bot_enviar.setMetodo("enviarSRI");
             bot_enviar.setIcon("ui-icon-signal-diag");
             bar_menu.agregarBoton(bot_enviar);
 
+            Boton bot_ride = new Boton();
+            bot_ride.setValue("Imprimir");
+            bot_ride.setTitle("Imprimir RIDE");
+            bot_ride.setMetodo("abrirRIDE");
+            bot_ride.setIcon("ui-icon-print");
+            bar_menu.agregarBoton(bot_ride);
         }
 
         tab_tabla1 = new Tabla();

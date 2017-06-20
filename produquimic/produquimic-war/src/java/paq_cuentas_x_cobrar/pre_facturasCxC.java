@@ -16,6 +16,7 @@ import framework.componentes.Boton;
 import framework.componentes.Calendario;
 import framework.componentes.Combo;
 import framework.componentes.Confirmar;
+import framework.componentes.Dialogo;
 import framework.componentes.Espacio;
 import framework.componentes.Etiqueta;
 import framework.componentes.Grid;
@@ -30,6 +31,7 @@ import framework.componentes.Radio;
 import framework.componentes.Reporte;
 import framework.componentes.SeleccionFormatoReporte;
 import framework.componentes.Tabla;
+import framework.componentes.Texto;
 import framework.componentes.VisualizarPDF;
 import framework.componentes.graficos.GraficoCartesiano;
 import framework.componentes.graficos.GraficoPastel;
@@ -82,7 +84,7 @@ public class pre_facturasCxC extends Pantalla {
     private Confirmar con_confirma = new Confirmar();
 
     private Retencion ret_retencion = new Retencion();
-   
+
     @EJB
     private final ServicioComprobanteElectronico ser_facElect = (ServicioComprobanteElectronico) utilitario.instanciarEJB(ServicioComprobanteElectronico.class);
 
@@ -90,6 +92,9 @@ public class pre_facturasCxC extends Pantalla {
     private final Mensaje men_factura = new Mensaje();
 
     private final Grid gri_dashboard = new Grid();
+
+    private Dialogo dia_correo = new Dialogo();
+    private Texto tex_correo = new Texto();
 
     public pre_facturasCxC() {
 
@@ -163,6 +168,19 @@ public class pre_facturasCxC extends Pantalla {
         agregarComponente(ret_retencion);
         men_factura.setId("men_factura");
         utilitario.getPantalla().getChildren().add(men_factura);
+
+        dia_correo.setId("dia_correo");
+        dia_correo.setTitle("REENVIAR FACTURA ELECTRONICA AL CLIENTE");
+        dia_correo.setWidth("35%");
+        dia_correo.setHeight("17%");
+        dia_correo.getBot_aceptar().setMetodo("aceptarReenviar");
+        tex_correo.setStyle("width:" + (dia_correo.getAnchoPanel() - 35) + "px");
+        Grid gri = new Grid();
+        gri.setStyle("width:" + (dia_correo.getAnchoPanel() - 5) + "px; height:" + dia_correo.getAltoPanel() + "px;overflow:auto;display:block;vertical-align:middle;");
+        gri.getChildren().add(new Etiqueta("<strong> CORREO ELECTRÓNICO: </strong>"));
+        gri.getChildren().add(tex_correo);
+        dia_correo.setDialogo(gri);
+        agregarComponente(dia_correo);
 
     }
 
@@ -321,21 +339,21 @@ public class pre_facturasCxC extends Pantalla {
         bar_menu.setId("bar_menu");
         bar_menu.limpiar();
         Boton bot_ver = new Boton();
-        bot_ver.setValue("Ver Factura");
+        bot_ver.setValue("Ver");
+        bot_ver.setTitle("Ver Factura");
         bot_ver.setMetodo("abrirVerFactura");
         bot_ver.setIcon("ui-icon-search");
         bar_menu.agregarComponente(bot_ver);
-        bar_menu.agregarSeparador();
 
         Boton bot_anular = new Boton();
-        bot_anular.setValue("Anular Factura");
+        bot_anular.setValue("Anular");
+        bot_anular.setTitle("Anular Factura");
         bot_anular.setMetodo("abrirAnularFactura");
         bot_anular.setIcon("ui-icon-cancel");
         bar_menu.agregarComponente(bot_anular);
-        bar_menu.agregarSeparador();
-
         Boton bot_retencion = new Boton();
-        bot_retencion.setValue("Ingresar Retención");
+        bot_retencion.setValue("Retención");
+        bot_retencion.setTitle("Ingresar Comprobante Retención");
         bot_retencion.setMetodo("dibujarRetencion");
         bot_retencion.setIcon("ui-icon-note");
         bar_menu.agregarBoton(bot_retencion);
@@ -343,17 +361,25 @@ public class pre_facturasCxC extends Pantalla {
         if (ser_factura.isFacturaElectronica()) {
             bar_menu.agregarSeparador();
 
-            Boton bot_ride = new Boton();
-            bot_ride.setValue("Imprimir RIDE");
-            bot_ride.setMetodo("abrirRIDE");
-            bot_ride.setIcon("ui-icon-print");
-            bar_menu.agregarBoton(bot_ride);
-
             Boton bot_enviar = new Boton();
             bot_enviar.setValue("Enviar al SRI");
             bot_enviar.setMetodo("enviarSRI");
             bot_enviar.setIcon("ui-icon-signal-diag");
             bar_menu.agregarBoton(bot_enviar);
+
+            Boton bot_ride = new Boton();
+            bot_ride.setValue("Imprimir");
+            bot_ride.setTitle("Imprimir RIDE");
+            bot_ride.setMetodo("abrirRIDE");
+            bot_ride.setIcon("ui-icon-print");
+            bar_menu.agregarBoton(bot_ride);
+
+            Boton bot_reenviar = new Boton();
+            bot_reenviar.setValue("Reenviar");
+            bot_reenviar.setTitle("Enviar nuevamente al correo del cliente");
+            bot_reenviar.setMetodo("reenviarFactura");
+            bot_reenviar.setIcon("ui-icon-mail-closed");
+            bar_menu.agregarBoton(bot_reenviar);
 
         }
 
@@ -419,6 +445,31 @@ public class pre_facturasCxC extends Pantalla {
         gru.getChildren().add(pat_panel);
 
         mep_menu.dibujar(1, "LISTADO DE FACTURAS", gru);
+    }
+
+    public void reenviarFactura() {
+        //Valida que la factura este AUTORIZADA
+        if (tab_tabla.getValor("ide_cccfa") != null) {
+            if (tab_tabla.getValor("ide_srcom") != null) {
+                if (tab_tabla.getValor("nombre_ccefa") != null && !tab_tabla.getValor("nombre_ccefa").equals(EstadoComprobanteEnum.AUTORIZADO.getDescripcion())) {
+                    dia_correo.dibujar();
+                } else {
+                    utilitario.agregarMensajeError("No se puede reenviar la factura", "La Factura seleccionada debe estar en estado AUTORIZADO");
+                }
+            } else {
+                utilitario.agregarMensajeInfo("La factura seleccionada no es electrónica", "");
+            }
+        } else {
+            utilitario.agregarMensajeInfo("Seleccione una factura", "");
+        }
+    }
+
+    public void aceptarReenviar() {
+        if (utilitario.isCorreoValido(String.valueOf(tex_correo.getValue()))) {
+            dia_correo.cerrar();
+        } else {
+            utilitario.agregarMensajeError("Correo electrónico no válido", "");
+        }
     }
 
     public void abrirRIDE() {
@@ -929,7 +980,7 @@ public class pre_facturasCxC extends Pantalla {
     }
 
     @Override
-    public void insertar() {        
+    public void insertar() {
         fcc_factura.nuevaFactura();
         fcc_factura.dibujar();
     }
