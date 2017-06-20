@@ -51,7 +51,7 @@ public class CPanelServiceImp implements CPanelService {
         params.put("IDENTIFICACION_USUARIO", comprobante.getCliente().getIdentificacion());
         params.put("CORREO_USUARIO", comprobante.getCliente().getCorreo());
         params.put("CODIGO_ESTADO", EstadoUsuarioEnum.NUEVO.getCodigo());
-        params.put("DIRECCION_USUARIO", comprobante.getCliente().getDireccion());        
+        params.put("DIRECCION_USUARIO", comprobante.getCliente().getDireccion());
         params.put("PK_CODIGO_COMP", comprobante.getCodigocomprobante());
         params.put("CODIGO_DOCUMENTO", comprobante.getCoddoc());
         params.put("ESTADO", EstadoComprobanteEnum.AUTORIZADO.getDescripcion());
@@ -179,6 +179,81 @@ public class CPanelServiceImp implements CPanelService {
         for (Comprobante comprobanteActual : lisCompPendientes) {
             guardarComprobanteNube(comprobanteActual);
         }
+    }
+
+    @Override
+    public void reenviarComprobante(String correo, Long id) throws GenericException {
+        Map<String, Object> params = new LinkedHashMap<>();
+        params.put("PK_CODIGO_COMP", id);
+        params.put("CORREO_USUARIO", correo);
+        StringBuilder postData = new StringBuilder();
+        postData.append("{");
+        for (Map.Entry<String, Object> param : params.entrySet()) {
+            if (postData.length() != 1) {
+                postData.append(',');
+            }
+            postData.append("\"").append(param.getKey()).append("\"");
+            postData.append(":\"");
+            postData.append(String.valueOf(param.getValue())).append("\"");
+        }
+
+        //guarda en la nuebe el comprobante AUTORIZADO
+        HttpURLConnection connection = null;
+        DataOutputStream outputStream = null;
+        InputStream inputStream = null;
+        String twoHyphens = "--";
+        String boundary = "*****" + Long.toString(System.currentTimeMillis()) + "*****";
+        String lineEnd = "\r\n";
+        String result = "";
+
+        try {
+
+            URL url = new URL(ParametrosSistemaEnum.CPANEL_WEB_REENVIAR.getCodigo());
+            connection = (HttpURLConnection) url.openConnection();
+            connection.setDoInput(true);
+            connection.setDoOutput(true);
+            connection.setUseCaches(false);
+            connection.setRequestMethod("POST");
+            connection.setRequestProperty("Connection", "Keep-Alive");
+            connection.setRequestProperty("Content-Type", "application/x-www-form-urlencoded");
+            outputStream = new DataOutputStream(connection.getOutputStream());
+            outputStream.writeBytes(twoHyphens + boundary + lineEnd);
+            //outputStream.writeBytes(lineEnd);
+            // Upload POST Data
+            Iterator<String> keys = params.keySet().iterator();
+            while (keys.hasNext()) {
+                String key = keys.next();
+                String value = String.valueOf(params.get(key));
+                outputStream.writeBytes(twoHyphens + boundary + lineEnd);
+                outputStream.writeBytes("Content-Disposition: form-data; name=\"" + key + "\"" + lineEnd);
+                outputStream.writeBytes("Content-Type: text/plain" + lineEnd);
+                outputStream.writeBytes(lineEnd);
+                outputStream.writeBytes(value);
+                outputStream.writeBytes(lineEnd);
+            }
+            outputStream.writeBytes(twoHyphens + boundary + twoHyphens + lineEnd);
+
+            if (200 != connection.getResponseCode()) {
+                throw new Exception("Failed to upload code:" + connection.getResponseCode() + " " + connection.getResponseMessage());
+            }
+
+            inputStream = connection.getInputStream();
+            BufferedReader br = new BufferedReader(new InputStreamReader(
+                    (inputStream)));
+
+            String output;
+            while ((output = br.readLine()) != null) {
+                result += output;
+            }
+            System.out.println(result);
+            inputStream.close();
+            outputStream.flush();
+            outputStream.close();
+
+        } catch (Exception e) {
+            throw new GenericException(e);
+        }
+
     }
 
 }

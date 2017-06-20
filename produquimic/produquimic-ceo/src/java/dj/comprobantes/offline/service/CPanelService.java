@@ -31,4 +31,12 @@ public interface CPanelService {
      * @throws GenericException
      */
     public void subirComprobantesPendientes() throws GenericException;
+
+    /**
+     * Reenvia un comprobante a un correo electronico
+     *
+     * @param correo
+     * @param id
+     */
+    public void reenviarComprobante(String correo, Long id) throws GenericException;
 }
