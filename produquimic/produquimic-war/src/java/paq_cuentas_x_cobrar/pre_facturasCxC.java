@@ -466,6 +466,7 @@ public class pre_facturasCxC extends Pantalla {
 
     public void aceptarReenviar() {
         if (utilitario.isCorreoValido(String.valueOf(tex_correo.getValue()))) {
+            ser_facElect.reenviarComprobante(String.valueOf(tex_correo.getValue()), tab_tabla.getValor("ide_srcom"));
             dia_correo.cerrar();
         } else {
             utilitario.agregarMensajeError("Correo electrónico no válido", "");
