@@ -11,6 +11,7 @@ import dj.comprobantes.offline.enums.TipoComprobanteEnum;
 import dj.comprobantes.offline.enums.TipoEmisionEnum;
 import dj.comprobantes.offline.exception.GenericException;
 import dj.comprobantes.offline.service.ArchivoService;
+import dj.comprobantes.offline.service.CPanelService;
 import dj.comprobantes.offline.service.ComprobanteService;
 import framework.aplicacion.TablaGenerica;
 import java.io.File;
@@ -38,6 +39,8 @@ public class ServicioComprobanteElectronico extends ServicioBase {
     private ComprobanteService comprobanteService;
     @EJB
     private ArchivoService archivoService;
+    @EJB
+    private CPanelService cPanelService;
 
     /**
      * Genera un comprobante electrónico a partir de una factura ya guardada
@@ -574,11 +577,26 @@ public class ServicioComprobanteElectronico extends ServicioBase {
 
     /**
      * Retorna un comprobante electronico
+     *
      * @param ide_srcom
-     * @return 
+     * @return
      */
     public String getSqlComprobanteElectronico(String ide_srcom) {
         return "SELECT * from sri_comprobante where ide_srcom=" + ide_srcom;
     }
-   
+
+    /**
+     * Reenvia al correo de un cliente el comprobante
+     *
+     * @param correo
+     * @param ide_srcom
+     */
+    public void reenviarComprobante(String correo, String ide_srcom) {
+        try {
+            cPanelService.reenviarComprobante(correo, Long.parseLong(ide_srcom));
+        } catch (NumberFormatException | GenericException e) {
+            utilitario.crearError("Error al reenviar el comprobante electrónico", "En el método reenviarComprobante", e);
+        }
+    }
+
 }
