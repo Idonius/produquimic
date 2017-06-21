@@ -17,8 +17,10 @@ import java.io.DataOutputStream;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
+import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
+import java.io.OutputStream;
 import java.net.HttpURLConnection;
 import java.net.URL;
 import java.util.Iterator;
@@ -187,70 +189,39 @@ public class CPanelServiceImp implements CPanelService {
         params.put("PK_CODIGO_COMP", id);
         params.put("CORREO_USUARIO", correo);
         StringBuilder postData = new StringBuilder();
-        postData.append("{");
-        for (Map.Entry<String, Object> param : params.entrySet()) {
-            if (postData.length() != 1) {
-                postData.append(',');
-            }
-            postData.append("\"").append(param.getKey()).append("\"");
-            postData.append(":\"");
-            postData.append(String.valueOf(param.getValue())).append("\"");
-        }
-
-        //guarda en la nuebe el comprobante AUTORIZADO
-        HttpURLConnection connection = null;
-        DataOutputStream outputStream = null;
-        InputStream inputStream = null;
-        String twoHyphens = "--";
-        String boundary = "*****" + Long.toString(System.currentTimeMillis()) + "*****";
-        String lineEnd = "\r\n";
-        String result = "";
-
         try {
-
             URL url = new URL(ParametrosSistemaEnum.CPANEL_WEB_REENVIAR.getCodigo());
-            connection = (HttpURLConnection) url.openConnection();
-            connection.setDoInput(true);
-            connection.setDoOutput(true);
-            connection.setUseCaches(false);
-            connection.setRequestMethod("POST");
-            connection.setRequestProperty("Connection", "Keep-Alive");
-            connection.setRequestProperty("Content-Type", "application/x-www-form-urlencoded");
-            outputStream = new DataOutputStream(connection.getOutputStream());
-            outputStream.writeBytes(twoHyphens + boundary + lineEnd);
-            //outputStream.writeBytes(lineEnd);
-            // Upload POST Data
-            Iterator<String> keys = params.keySet().iterator();
-            while (keys.hasNext()) {
-                String key = keys.next();
-                String value = String.valueOf(params.get(key));
-                outputStream.writeBytes(twoHyphens + boundary + lineEnd);
-                outputStream.writeBytes("Content-Disposition: form-data; name=\"" + key + "\"" + lineEnd);
-                outputStream.writeBytes("Content-Type: text/plain" + lineEnd);
-                outputStream.writeBytes(lineEnd);
-                outputStream.writeBytes(value);
-                outputStream.writeBytes(lineEnd);
+            HttpURLConnection conn = (HttpURLConnection) url.openConnection();
+            conn.setDoOutput(true);
+            conn.setRequestMethod("POST");
+            conn.setRequestProperty("Content-Type", "application/x-www-form-urlencoded");
+            conn.setRequestProperty("Accept", "application/json;odata=verbose");
+            conn.setRequestProperty("Authorization", "AccesToken");
+            postData.append("{");
+            for (Map.Entry<String, Object> param : params.entrySet()) {
+                if (postData.length() != 1) {
+                    postData.append(',');
+                }
+                postData.append("\"").append(param.getKey()).append("\"");
+                postData.append(":\"");
+                postData.append(String.valueOf(param.getValue())).append("\"");
             }
-            outputStream.writeBytes(twoHyphens + boundary + twoHyphens + lineEnd);
-
-            if (200 != connection.getResponseCode()) {
-                throw new Exception("Failed to upload code:" + connection.getResponseCode() + " " + connection.getResponseMessage());
+            postData.append("}");
+            byte[] postDataBytes = postData.toString().getBytes("UTF-8");
+            OutputStream os = conn.getOutputStream();
+            os.write(postDataBytes);
+            os.flush();
+            if (conn.getResponseCode() != 200) {
+                throw new RuntimeException("Failed : HTTP error code : " + conn.getResponseCode());
             }
-
-            inputStream = connection.getInputStream();
             BufferedReader br = new BufferedReader(new InputStreamReader(
-                    (inputStream)));
-
+                    (conn.getInputStream())));
             String output;
             while ((output = br.readLine()) != null) {
-                result += output;
+                System.out.println(output);
             }
-            System.out.println(result);
-            inputStream.close();
-            outputStream.flush();
-            outputStream.close();
-
-        } catch (Exception e) {
+            conn.disconnect();
+        } catch (IOException | RuntimeException e) {
             throw new GenericException(e);
         }
 
