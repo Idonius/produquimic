@@ -25,18 +25,18 @@ public class ServicioRetenciones extends ServicioBase {
     /**
      * Retenciones realizadas
      *
-     * @param autorizacion_cncre
+     * @param ide_ccdaf
      * @param fechaInicio
      * @param fechaFin
      * @return
      */
-    public String getSqlRetenciones(String autorizacion_cncre, String fechaInicio, String fechaFin) {
-        if (autorizacion_cncre == null) {
-            autorizacion_cncre = "";
+    public String getSqlRetenciones(String ide_ccdaf, String fechaInicio, String fechaFin) {
+        if (ide_ccdaf == null) {
+            ide_ccdaf = "";
         }
-        autorizacion_cncre = autorizacion_cncre.replace("null", "").trim();
-        if (autorizacion_cncre.isEmpty() == false) {
-            autorizacion_cncre = " and autorizacion_cncre='" + autorizacion_cncre + "' ";
+        ide_ccdaf = ide_ccdaf.replace("null", "").trim();
+        if (ide_ccdaf.isEmpty() == false) {
+            ide_ccdaf = " and ide_ccdaf='" + ide_ccdaf + "' ";
         }
         return "SELECT a.ide_cncre,ide_cnere,fecha_emisi_cncre,a.ide_cnccc,observacion_cncre,numero_cncre AS NUMERO,autorizacion_cncre AS AUTORIZACION,"
                 + "(select sum(base_cndre) from con_detall_retenc where ide_cncre=a.ide_cncre)AS BASE_IMPONIBLE,"
@@ -47,7 +47,30 @@ public class ServicioRetenciones extends ServicioBase {
                 + "WHERE a.ide_empr=" + utilitario.getVariable("ide_empr") + "\n"
                 + "and fecha_emisi_cncre BETWEEN '" + fechaInicio + "' and '" + fechaFin + "' \n"
                 + "and es_venta_cncre = false\n"
-                + autorizacion_cncre
+                + ide_ccdaf
+                + "ORDER BY ide_cncre desc";
+    }
+
+    public String getSqlRetencionesElectronicas(String ide_ccdaf, String fechaInicio, String fechaFin) {
+        if (ide_ccdaf == null) {
+            ide_ccdaf = "-1";
+        }
+        ide_ccdaf = ide_ccdaf.replace("null", "-1").trim();
+        if (ide_ccdaf.isEmpty() == false) {
+            ide_ccdaf = " and ide_ccdaf='" + ide_ccdaf + "' ";
+        }
+        return "SELECT a.ide_cncre,ide_cnere,fecha_emisi_cncre,a.ide_cnccc,nombre_sresc,observacion_cncre,numero_cncre AS NUMERO,autorizacion_cncre AS AUTORIZACION,"
+                + "(select sum(base_cndre) from con_detall_retenc where ide_cncre=a.ide_cncre)AS BASE_IMPONIBLE,"
+                + "(select sum(valor_cndre) from con_detall_retenc where ide_cncre=a.ide_cncre)AS VALOR,ide_cpcfa,numero_cpcfa as NUM_FACTURA,nom_geper AS PROVEEDOR,claveacceso_srcom as CLAVE_ACCESO\n"
+                + "FROM con_cabece_retenc a\n"
+                + "left join cxp_cabece_factur b on a.ide_cncre=b.ide_cncre\n"
+                + "left join gen_persona c on b.ide_geper=c.ide_geper\n"
+                + "left join sri_comprobante d on a.ide_srcom=d.ide_srcom "
+                + "left join sri_estado_comprobante f on d.ide_sresc=f.ide_sresc "
+                + "WHERE a.ide_empr=" + utilitario.getVariable("ide_empr") + "\n"
+                + "and fecha_emisi_cncre BETWEEN '" + fechaInicio + "' and '" + fechaFin + "' \n"
+                + "and es_venta_cncre = false\n"
+                + ide_ccdaf
                 + "ORDER BY ide_cncre desc";
     }
 
@@ -99,13 +122,13 @@ public class ServicioRetenciones extends ServicioBase {
 
     }
 
-    public String getSqlRetencionesAnuladas(String autorizacion_cncre, String fechaInicio, String fechaFin) {
-        if (autorizacion_cncre == null) {
-            autorizacion_cncre = "";
+    public String getSqlRetencionesAnuladas(String ide_ccdaf, String fechaInicio, String fechaFin) {
+        if (ide_ccdaf == null) {
+            ide_ccdaf = "-1";
         }
-        autorizacion_cncre = autorizacion_cncre.replace("null", "").trim();
-        if (autorizacion_cncre.isEmpty() == false) {
-            autorizacion_cncre = " and autorizacion_cncre='" + autorizacion_cncre + "' ";
+        ide_ccdaf = ide_ccdaf.replace("null", "-1").trim();
+        if (ide_ccdaf.isEmpty() == false) {
+            ide_ccdaf = " and ide_ccdaf='" + ide_ccdaf + "' ";
         }
         return "SELECT a.ide_cncre,fecha_emisi_cncre,observacion_cncre AS OBSERVACION,numero_cncre AS NUMERO,autorizacion_cncre AS AUTORIZACION,numero_cpcfa AS NUM_FACTURA,nom_geper AS PROVEEDOR\n"
                 + "FROM con_cabece_retenc a\n"
@@ -115,7 +138,7 @@ public class ServicioRetenciones extends ServicioBase {
                 + "and fecha_emisi_cncre BETWEEN '" + fechaInicio + "' and '" + fechaFin + "' \n"
                 + "and es_venta_cncre = false\n"
                 + "and ide_cnere=" + utilitario.getVariable("p_con_estado_comprobante_rete_anulado") + " "
-                + autorizacion_cncre
+                + ide_ccdaf
                 + "ORDER BY ide_cncre desc";
     }
 
