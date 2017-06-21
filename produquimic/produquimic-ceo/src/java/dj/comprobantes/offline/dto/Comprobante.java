@@ -249,7 +249,17 @@ public final class Comprobante implements Serializable {
                 //Busca los detalles de impuestos del Comprobante
                 try {
                     impuesto = new ArrayList();
-                    String sql = "SELECT * FROM sri_imp_comprobante where ide_srcom=" + this.codigocomprobante;
+                    String sql = "select  b.ide_cnimp as codigo_fe_cnimp,\n"
+                            + "casillero_cncim as codigo_fe_retencion_cncim,\n"
+                            + "base_cndre,porcentaje_cndre,valor_cndre,\n"
+                            + "alter_tribu_cntdo,numero_cpcfa,fecha_emisi_cpcfa\n"
+                            + "from con_detall_retenc a\n"
+                            + "inner join con_cabece_impues b on a.ide_cncim=b.ide_cncim\n"
+                            + "inner join con_impuesto c on b.ide_cnimp = c.ide_cnimp\n"
+                            + "inner join con_cabece_retenc d on a.ide_cncre=d.ide_cncre\n"
+                            + "inner join cxp_cabece_factur e on d.ide_cncre=e.ide_cncre\n"
+                            + "inner join con_tipo_document g on e.ide_cntdo=g.ide_cntdo\n"
+                            + "where  ide_srcom=" + this.codigocomprobante;
                     Statement sentensia = con.getConnection().createStatement();
                     ResultSet res = sentensia.executeQuery(sql);
                     while (res.next()) {

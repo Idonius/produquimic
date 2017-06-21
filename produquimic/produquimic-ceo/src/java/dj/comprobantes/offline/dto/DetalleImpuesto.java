@@ -32,14 +32,14 @@ public class DetalleImpuesto implements Serializable {
 
     public DetalleImpuesto(ResultSet resultado) {
         try {
-            this.codigo = resultado.getString("codigo_srico");
-            this.codigoRetencion = resultado.getString("codigo_retencion_srico");
-            this.baseImponible = resultado.getBigDecimal("base_imponible_srico");
-            this.porcentajeRetener = resultado.getBigDecimal("porcentaje_retener_srico");
-            this.valorRetenido = resultado.getBigDecimal("valor_retenido_srico");
-            this.codDocSustento = resultado.getString("cod_doc_sustento_srico");
-            this.numDocSustento = resultado.getString("num_doc_sustento_srico");
-            this.fechaEmisionDocSustento = resultado.getDate("fecha_emi_doc_sust_srico");
+            this.codigo = resultado.getString("codigo_fe_cnimp");
+            this.codigoRetencion = resultado.getString("codigo_fe_retencion_cncim");
+            this.baseImponible = resultado.getBigDecimal("base_cndre");
+            this.porcentajeRetener = resultado.getBigDecimal("porcentaje_cndre");
+            this.valorRetenido = resultado.getBigDecimal("valor_cndre");
+            this.codDocSustento = resultado.getString("alter_tribu_cntdo");
+            this.numDocSustento = resultado.getString("numero_cpcfa");
+            this.fechaEmisionDocSustento = resultado.getDate("fecha_emisi_cpcfa");
         } catch (SQLException e) {
             e.printStackTrace();
         }

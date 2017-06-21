@@ -37,6 +37,7 @@ public interface CPanelService {
      *
      * @param correo
      * @param id
+     * @throws dj.comprobantes.offline.exception.GenericException
      */
     public void reenviarComprobante(String correo, Long id) throws GenericException;
 }
