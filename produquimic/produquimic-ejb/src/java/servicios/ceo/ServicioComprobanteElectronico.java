@@ -104,7 +104,7 @@ public class ServicioComprobanteElectronico extends ServicioBase {
             } catch (Exception e) {
             }
             dou_subtotal = dou_base0 + dou_basegraba;
-            
+
             tab_cabecara.setValor("ide_sresc", String.valueOf(EstadoComprobanteEnum.PENDIENTE.getCodigo()));
             tab_cabecara.setValor("coddoc_srcom", TipoComprobanteEnum.FACTURA.getCodigo());
             tab_cabecara.setValor("tipoemision_srcom", TipoEmisionEnum.NORMAL.getCodigo());
@@ -129,7 +129,7 @@ public class ServicioComprobanteElectronico extends ServicioBase {
             tab_cabecara.setValor("forma_cobro_srcom", tab_factura.getValor("alterno_ats"));
             tab_cabecara.setValor("ide_empr", utilitario.getVariable("ide_empr"));
             tab_cabecara.setValor("ide_sucu", utilitario.getVariable("ide_sucu"));
-            
+
             tab_cabecara.guardar();
             ide_srcom = tab_cabecara.getValor("ide_srcom");
 //////****COMENTADO POR QUE SE VA A LEER EL DETALLE DE LA FACTURA 
@@ -179,7 +179,7 @@ public class ServicioComprobanteElectronico extends ServicioBase {
                         e.printStackTrace();
                     }
                 }
-                
+
             }
         }
         return ide_srcom;
@@ -218,7 +218,7 @@ public class ServicioComprobanteElectronico extends ServicioBase {
                 + "inner join con_deta_forma_pago e on a.ide_cndfp=e.ide_cndfp\n"
                 + "inner join  cxp_motivo_nota h on a.ide_cpmno =h.ide_cpmno\n"
                 + "where a.ide_cpcno=" + ide_cpcno);
-        
+
         if (tab_factura.isEmpty() == false) {
             if (tab_factura.getValor("ide_srcom") != null) {
                 ide_srcom = tab_factura.getValor("ide_srcom");
@@ -250,13 +250,13 @@ public class ServicioComprobanteElectronico extends ServicioBase {
             } catch (Exception e) {
             }
             dou_subtotal = dou_base0 + dou_basegraba;
-            
+
             tab_cabecara.setValor("num_doc_mod_srcom", tab_factura.getValor("num_doc_mod_cpcno"));
             tab_cabecara.setValor("fecha_emision_mod_srcom", tab_factura.getValor("fecha_emision_mod_cpcno"));
             tab_cabecara.setValor("valor_mod_srcom", tab_factura.getValor("valor_mod_cpcno"));
             tab_cabecara.setValor("codigo_docu_mod_srcom", TipoComprobanteEnum.FACTURA.getCodigo());
             tab_cabecara.setValor("motivo_srcom", tab_factura.getValor("nombre_cpmno"));
-            
+
             tab_cabecara.setValor("ide_sresc", String.valueOf(EstadoComprobanteEnum.PENDIENTE.getCodigo()));
             tab_cabecara.setValor("coddoc_srcom", TipoComprobanteEnum.NOTA_DE_CREDITO.getCodigo());
             tab_cabecara.setValor("tipoemision_srcom", TipoEmisionEnum.NORMAL.getCodigo());
@@ -343,7 +343,7 @@ public class ServicioComprobanteElectronico extends ServicioBase {
      */
     public String generarGuiaRemisionElectronica(String ide_ccgui) {
         String ide_srcom = "-1";
-        
+
         TablaGenerica tab_guia = utilitario.consultar("select serie_ccdaf,fecha_emision_ccgui,identificac_geper,\n"
                 + "g.ide_geper,ide_cntdo,a.ide_srcom, e.ide_srcom as ide_srcom_factura,g.placa_gecam,fecha_ini_trasla_ccgui,fecha_fin_trasla_ccgui,punto_partida_ccgui \n"
                 + "from cxc_guia a\n"
@@ -352,7 +352,7 @@ public class ServicioComprobanteElectronico extends ServicioBase {
                 + "left join cxc_datos_fac d on a.ide_ccdaf=d.ide_ccdaf\n"
                 + "inner join cxc_cabece_factura e on a.ide_cccfa=e.ide_cccfa "
                 + "where a.ide_ccgui=" + ide_ccgui);
-        
+
         if (tab_guia.isEmpty() == false) {
             if (tab_guia.getValor("ide_srcom") != null) {
                 ide_srcom = tab_guia.getValor("ide_srcom");
@@ -367,13 +367,13 @@ public class ServicioComprobanteElectronico extends ServicioBase {
             } else {
                 tab_cabecara.modificar(tab_cabecara.getFilaActual());
             }
-            
+
             tab_cabecara.setValor("sri_ide_srcom", tab_guia.getValor("ide_srcom_factura"));
             tab_cabecara.setValor("placa_srcom", tab_guia.getValor("placa_gecam"));
             tab_cabecara.setValor("fecha_fin_trans_srcom", tab_guia.getValor("fecha_fin_trasla_ccgui"));
             tab_cabecara.setValor("fecha_ini_trans_srcom", tab_guia.getValor("fecha_ini_trasla_ccgui"));
             tab_cabecara.setValor("direcion_partida_srcom", tab_guia.getValor("punto_partida_ccgui"));
-            
+
             tab_cabecara.setValor("ide_sresc", String.valueOf(EstadoComprobanteEnum.PENDIENTE.getCodigo()));
             tab_cabecara.setValor("coddoc_srcom", TipoComprobanteEnum.GUIA_DE_REMISION.getCodigo());
             tab_cabecara.setValor("tipoemision_srcom", TipoEmisionEnum.NORMAL.getCodigo());
@@ -389,7 +389,7 @@ public class ServicioComprobanteElectronico extends ServicioBase {
             tab_cabecara.setValor("ide_cntdo", "7"); //Guia de Remisión
             tab_cabecara.setValor("ide_empr", utilitario.getVariable("ide_empr"));
             tab_cabecara.setValor("ide_sucu", utilitario.getVariable("ide_sucu"));
-            
+
             if (tab_cabecara.guardar()) {
                 ide_srcom = tab_cabecara.getValor("ide_srcom");
                 if (utilitario.getConexion().ejecutarListaSql().isEmpty()) {
@@ -427,13 +427,13 @@ public class ServicioComprobanteElectronico extends ServicioBase {
      */
     public String generarRetencionElectronica(String ide_cncre) {
         String ide_srcom = "-1";
-        
+
         TablaGenerica tab_factura = utilitario.consultar("select serie_ccdaf,fecha_emisi_cncre,identificac_geper"
                 + ",a.ide_geper  from con_cabece_retenc a"
                 + "inner join gen_persona b on a.ide_geper = b.ide_geper  \n"
                 + "inner join cxc_datos_fac d on a.ide_ccdaf=d.ide_ccdaf\n"
                 + "where a.ide_cncre=" + ide_cncre);
-        
+
         if (tab_factura.isEmpty() == false) {
             if (tab_factura.getValor("ide_srcom") != null) {
                 ide_srcom = tab_factura.getValor("ide_srcom");
@@ -466,15 +466,14 @@ public class ServicioComprobanteElectronico extends ServicioBase {
             tab_cabecara.setValor("periodo_fiscal_srcom", utilitario.getMes(tab_factura.getValor("fecha_emisi_cncre")) + "/" + utilitario.getAnio(tab_factura.getValor("fecha_emisi_cncre")));
             tab_cabecara.guardar();
             ide_srcom = tab_cabecara.getValor("ide_srcom");
-            
+
             if (utilitario.getConexion().ejecutarListaSql().isEmpty()) {
                 //Si la Nota de Credito es nueva Asigna nuevo secuencial
                 if (tab_cabecara.getValor("secuencial_srcom") == null) {
                     String strSecuencialF = getSecuencialComprobante(TipoComprobanteEnum.COMPROBANTE_DE_RETENCION);
                     utilitario.getConexion().ejecutarSql("UPDATE sri_comprobante SET secuencial_srcom='" + strSecuencialF + "' where ide_srcom=" + ide_srcom);
                     utilitario.getConexion().ejecutarSql("UPDATE sri_comprobante SET reutiliza_srcom= false where secuencial_srcom='" + strSecuencialF + "' and reutiliza_srcom=true and coddoc_srcom='" + TipoComprobanteEnum.COMPROBANTE_DE_RETENCION.getCodigo() + "'");
-                    utilitario.getConexion().ejecutarSql("UPDATE con_cabece_retenc SET  ide_srcom=" + ide_srcom + " where ide_cncre=" + ide_cncre);
-                    //UPDATE secuecial ghuia en la factura
+                    utilitario.getConexion().ejecutarSql("UPDATE con_cabece_retenc SET  ide_srcom=" + ide_srcom + " , numero_cncre='" + tab_factura.getValor("serie_ccdaf") + strSecuencialF + "' where ide_cncre=" + ide_cncre);                   
                 }
                 //Si esta en estado PENDIENTE genero nueva clave de acceso por si se modifico la fecha
                 if (tab_cabecara.getValor("ide_sresc").equals(String.valueOf(EstadoComprobanteEnum.PENDIENTE.getCodigo()))) {
@@ -508,7 +507,7 @@ public class ServicioComprobanteElectronico extends ServicioBase {
             return (String.valueOf(lisResultado.get(0)));
         } catch (Exception e) {
         }
-        
+
         try {
             StringBuilder sql = new StringBuilder();
             sql.append("SELECT MAX(secuencial_srcom) FROM sri_comprobante where coddoc_srcom='").append(tipoComprobante.getCodigo()).append("'");
@@ -522,7 +521,7 @@ public class ServicioComprobanteElectronico extends ServicioBase {
         fmt.close();
         return secuencial;
     }
-    
+
     public String enviarComprobante(String claveAcceso) {
         String mensaje = "";
         try {
@@ -532,7 +531,7 @@ public class ServicioComprobanteElectronico extends ServicioBase {
         }
         return mensaje;
     }
-    
+
     public void getRIDE(String ide_srcom) throws GenericException {
         try {
             byte[] ar = archivoService.getPdf(comprobanteService.getComprobantePorId(new Long(ide_srcom)));
@@ -547,11 +546,11 @@ public class ServicioComprobanteElectronico extends ServicioBase {
             e.printStackTrace();
         }
     }
-    
+
     public String getSqlXmlComprobante(String ide_srcom) {
         return "select xml_srxmc ,msg_recepcion_srxmc,msg_autoriza_srxmc from sri_xml_comprobante where ide_srcom=" + ide_srcom;
     }
-    
+
     public int getNumeroComprobantesporEstado(TipoComprobanteEnum tipo, EstadoComprobanteEnum estado) {
         String sql = "SELECT coddoc_srcom,count(coddoc_srcom) as num FROM sri_comprobante WHERE coddoc_srcom =" + tipo.getCodigo() + "  AND ide_sresc=" + estado.getCodigo() + " group by coddoc_srcom,ide_sresc";
         TablaGenerica tab = utilitario.consultar(sql);
@@ -598,5 +597,5 @@ public class ServicioComprobanteElectronico extends ServicioBase {
             utilitario.crearError("Error al reenviar el comprobante electrónico", "En el método reenviarComprobante", e);
         }
     }
-    
+
 }

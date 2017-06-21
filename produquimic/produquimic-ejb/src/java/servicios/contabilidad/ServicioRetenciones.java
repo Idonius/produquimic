@@ -192,4 +192,13 @@ public class ServicioRetenciones extends ServicioBase {
                 + "ORDER BY ide_cncre desc";
     }
 
+    /**
+     * Retorna la sentencia SQL con los puntos de emision de retenciones
+     *
+     * @return
+     */
+    public String getSqlPuntosEmision() {
+        return "select ide_ccdaf,serie_ccdaf, autorizacion_ccdaf,observacion_ccdaf from cxc_datos_fac where ide_empr=" + utilitario.getVariable("IDE_EMPR");
+    }
+
 }
