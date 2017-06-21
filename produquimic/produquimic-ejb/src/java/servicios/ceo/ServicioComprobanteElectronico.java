@@ -594,6 +594,7 @@ public class ServicioComprobanteElectronico extends ServicioBase {
     public void reenviarComprobante(String correo, String ide_srcom) {
         try {
             cPanelService.reenviarComprobante(correo, Long.parseLong(ide_srcom));
+            utilitario.agregarMensaje("La factura se envio correctamente", "");
         } catch (NumberFormatException | GenericException e) {
             utilitario.crearError("Error al reenviar el comprobante electrónico", "En el método reenviarComprobante", e);
         }
