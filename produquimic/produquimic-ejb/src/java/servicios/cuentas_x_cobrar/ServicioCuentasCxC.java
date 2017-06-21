@@ -841,4 +841,8 @@ public class ServicioCuentasCxC extends ServicioBase {
     public void generarNuevaClaveAcceso(String factura) {
         utilitario.getConexion().agregarSqlPantalla("UPDATE sri_comprobante set claveacceso_srcom=null where ide_srcom=" + factura);
     }
+
+    public String getSqlVendedoresNombre() {
+        return "SELECT nombre_vgven,nombre_vgven FROM ven_vendedor ORDER BY nombre_vgven";
+    }
 }

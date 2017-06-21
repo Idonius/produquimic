@@ -510,7 +510,7 @@ public class ServicioIntegracion extends ServicioBase {
                 + "inner join cxc_cabece_factura b on a.ide_cccfa=b.ide_cccfa\n"
                 + "inner join cxc_datos_fac c on b.ide_ccdaf=c.ide_ccdaf\n"
                 + "inner join gen_persona d on b.ide_geper=d.ide_geper\n"
-                + "inner join inv_articulo e on a.ide_inarti= e.ide_inarti\n"                
+                + "inner join inv_articulo e on a.ide_inarti= e.ide_inarti\n"
                 + "left join  inv_unidad g on a.ide_inuni =g.ide_inuni\n"
                 + "inner join ven_vendedor h on b.ide_vgven=h.ide_vgven\n"
                 + "where a.ide_cccfa=" + ide_cccfa);
@@ -733,11 +733,11 @@ public class ServicioIntegracion extends ServicioBase {
         }
         return dou_existencia;
     }
-    
-    public void anularFacturaporNotadeCredito(String secuencialFa){
-         String sql = "UPDATE facturas_fe SET ANULADA=true where NUM_FACTURA_FE=" + Integer.parseInt(secuencialFa) + "";
-         Conexion con_conecta = getConexionEscritorio();
-         con_conecta.ejecutarSql(sql);
+
+    public void anularFacturaporNotadeCredito(String secuencialFa) {
+        String sql = "UPDATE facturas_fe SET ANULADA=true where NUM_FACTURA_FE=" + Integer.parseInt(secuencialFa) + "";
+        Conexion con_conecta = getConexionEscritorio();
+        con_conecta.ejecutarSql(sql);
     }
 
     public String getTipoCliente(String CODIGO_CLIE) {
@@ -765,4 +765,17 @@ public class ServicioIntegracion extends ServicioBase {
         }
         return ide_cntco;
     }
+
+    /**
+     * Retorna utilidad en ventas de todas las facturas
+     *
+     * @param vendedor
+     * @param anio
+     * @param fecha
+     * @return
+     */
+    public String getSqlUtilidadVentas(String vendedor, String anio, String fecha) {
+        return "";
+    }
+
 }
