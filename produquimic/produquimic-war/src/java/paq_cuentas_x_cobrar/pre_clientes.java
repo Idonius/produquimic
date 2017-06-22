@@ -25,6 +25,7 @@ import framework.componentes.graficos.GraficoCartesiano;
 import javax.ejb.EJB;
 import javax.faces.event.ActionEvent;
 import org.primefaces.component.fieldset.Fieldset;
+import org.primefaces.component.separator.Separator;
 import org.primefaces.event.SelectEvent;
 import servicios.contabilidad.ServicioComprobanteContabilidad;
 import servicios.contabilidad.ServicioContabilidadGeneral;
@@ -195,7 +196,7 @@ public class pre_clientes extends Pantalla {
             tab_tabla.getColumna("EGRESO").alinearDerecha();
             tab_tabla.getColumna("TOTAL").alinearDerecha();
             tab_tabla.setOrdenar(false);
-            tab_tabla.setRows(25);            
+            tab_tabla.setRows(25);
             tab_tabla.dibujar();
             tab_tabla.fin();
             PanelTabla pat_panel = new PanelTabla();
@@ -296,6 +297,9 @@ public class pre_clientes extends Pantalla {
      * Dibuja el formulario de datos del Cliente, osigna opcion 1
      */
     public void dibujarCliente() {
+        Grupo gru = new Grupo();
+        gru.getChildren().add(new Etiqueta("<i class='fa fa-user fa-2x'></i> &nbsp; <span style='font-size:14px; text-shadow: none;'>Datos generales del cliente. </span>"));
+        //gru.getChildren().add(new Separator());
         tab_tabla = new Tabla();
         tab_tabla.setId("tab_tabla");
         ser_cliente.configurarTablaCliente(tab_tabla);
@@ -306,7 +310,8 @@ public class pre_clientes extends Pantalla {
         PanelTabla pat_panel = new PanelTabla();
         pat_panel.setPanelTabla(tab_tabla);
         pat_panel.getMenuTabla().getItem_buscar().setRendered(false);
-        mep_menu.dibujar(1, "DATOS DEL CLIENTE", pat_panel);
+        gru.getChildren().add(pat_panel);
+        mep_menu.dibujar(1, "", gru);
     }
 
     public void dibujarIngresarTransacciones() {
