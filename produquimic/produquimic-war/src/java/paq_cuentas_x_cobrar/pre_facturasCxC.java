@@ -731,6 +731,9 @@ public class pre_facturasCxC extends Pantalla {
         fie_anula.getChildren().add(gri);
 
         Grupo gru = new Grupo();
+
+        gru.getChildren().add(new Etiqueta("<span class='fa-stack fa-2x'><i class='fa fa-newspaper-o fa-stack-1x'></i><i class='fa fa-ban fa-stack-2x text-red'></i></span> &nbsp; <span style='font-size:14px; text-shadow: none;'>Listado de Facturas Anuladas. </span>"));
+        gru.getChildren().add(new Separator());
         gru.getChildren().add(fie_anula);
         gru.getChildren().add(pat_panel);
         mep_menu.dibujar(3, "FACTURAS ANULADAS", gru);
