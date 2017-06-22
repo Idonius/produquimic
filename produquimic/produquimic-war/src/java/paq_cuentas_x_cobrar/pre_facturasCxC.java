@@ -234,6 +234,7 @@ public class pre_facturasCxC extends Pantalla {
         tab_tabla.getColumna("PRODUCTO").setFiltroContenido();
         tab_tabla.getColumna("PRECIO").setNombreVisual("PRECIO VENTA");
         tab_tabla.getColumna("PRECIO").alinearDerecha();
+        tab_tabla.getColumna("CANTIDAD").setDecimales(2);
         tab_tabla.getColumna("PRECIO_COMPRA").alinearDerecha();
         tab_tabla.getColumna("UTILIDAD").alinearDerecha();
         tab_tabla.getColumna("UTILIDAD_NETA").alinearDerecha();
@@ -241,7 +242,7 @@ public class pre_facturasCxC extends Pantalla {
         tab_tabla.getColumna("TOTAL_VENTA").alinearDerecha();
         tab_tabla.getColumna("TIPO").setVisible(false);
         tab_tabla.setColumnaSuma("UTILIDAD_NETA,TOTAL_COMPRA,TOTAL_VENTA");
-        tab_tabla.setRows(20);
+        tab_tabla.setRows(15);
         tab_tabla.dibujar();
         tab_tabla.fin();
         PanelTabla pat_panel = new PanelTabla();
