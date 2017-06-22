@@ -655,6 +655,9 @@ public class pre_facturasCxC extends Pantalla {
         PanelTabla pat_panel = new PanelTabla();
         pat_panel.setPanelTabla(tab_tabla);
         Grupo gru = new Grupo();
+        gru.getChildren().add(new Etiqueta("<i class='fa fa-book fa-2x'></i> &nbsp; <span style='font-size:14px; text-shadow: none;'>Generar asiento contable de las facturas generadas. </span>"));
+        gru.getChildren().add(new Separator());
+
         gru.getChildren().add(bar_menu);
         gru.getChildren().add(pat_panel);
         mep_menu.dibujar(2, "FACTURAS NO CONTABILIZADAS", gru);
