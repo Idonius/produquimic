@@ -732,7 +732,7 @@ public class pre_facturasCxC extends Pantalla {
 
         Grupo gru = new Grupo();
 
-        gru.getChildren().add(new Etiqueta("<span class='fa-stack fa-2x'><i class='fa fa-newspaper-o fa-stack-1x'></i><i class='fa fa-ban fa-stack-2x text-red'></i></span> &nbsp; <span style='font-size:14px; text-shadow: none;'>Listado de Facturas Anuladas. </span>"));
+        gru.getChildren().add(new Etiqueta("<span class='fa-stack fa-lg'><i class='fa fa-newspaper-o fa-stack-1x'></i><i class='fa fa-ban fa-stack-2x text-red'></i></span> &nbsp; <span style='font-size:14px; text-shadow: none;'>Listado de Facturas Anuladas. </span>"));
         gru.getChildren().add(new Separator());
         gru.getChildren().add(fie_anula);
         gru.getChildren().add(pat_panel);
