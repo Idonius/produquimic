@@ -193,12 +193,11 @@ public class pre_facturasCxC extends Pantalla {
 
     public void dibujarUtilidadVentas() {
         Grupo gru = new Grupo();
+        gru.getChildren().add(new Etiqueta("<i class='fa fa-line-chart fa-2x'></i> &nbsp; <span style='font-size:14px; text-shadow: none;'>Utilidad en Ventas detallado por vendedor en un período determinado. </span>"));
+        gru.getChildren().add(new Separator());
         Grid gri = new Grid();
-        gri.setColumns(3);
+        gri.setColumns(6);
         gri.getChildren().add(new Etiqueta("<strong>VENDEDOR :</strong>"));
-        gri.getChildren().add(new Etiqueta("<strong>MES :</strong>"));
-        gri.getChildren().add(new Etiqueta("<strong>AÑO :</strong>"));
-
         com_mes = new Combo();
         com_mes.setMetodo("actualizarUtilidad");
         com_mes.setCombo(ser_factura.getSqlMeses());
@@ -216,22 +215,33 @@ public class pre_facturasCxC extends Pantalla {
         com_vendedor.setCombo(ser_factura.getSqlVendedoresNombre());
 
         gri.getChildren().add(com_vendedor);
+        gri.getChildren().add(new Etiqueta("<strong>MES :</strong>"));
         gri.getChildren().add(com_mes);
+        gri.getChildren().add(new Etiqueta("<strong>AÑO :</strong>"));
         gri.getChildren().add(com_periodo);
         gru.getChildren().add(gri);
-        gru.getChildren().add(new Separator());
+
         tab_tabla = new Tabla();
         tab_tabla.setId("tab_tabla");
-        tab_tabla.setNumeroTabla(10);
+        tab_tabla.setNumeroTabla(-1);
         tab_tabla.setConexion(ser_integra.getConexionEscritorio());
         tab_tabla.setLectura(true);
         tab_tabla.setSql(ser_integra.getSqlUtilidadVentas(String.valueOf(com_vendedor.getValue()), String.valueOf(com_periodo.getValue()), String.valueOf(com_mes.getValue())));
-        tab_tabla.getColumna("FECHA_MOVI").setNombreVisual("FECHA");
-        tab_tabla.getColumna("INGRESO").alinearDerecha();
-        tab_tabla.getColumna("EGRESO").alinearDerecha();
-        tab_tabla.getColumna("TOTAL").alinearDerecha();
-        tab_tabla.setOrdenar(false);
-        tab_tabla.setRows(25);
+        tab_tabla.getColumna("FECHA_EMISION").setNombreVisual("FECHA");
+        tab_tabla.getColumna("NUM_FACTURA").setNombreVisual("FACTURA");
+        tab_tabla.getColumna("NUM_FACTURA").setFiltroContenido();
+        tab_tabla.getColumna("CLIENTE").setFiltroContenido();
+        tab_tabla.getColumna("PRODUCTO").setFiltroContenido();
+        tab_tabla.getColumna("PRECIO").setNombreVisual("PRECIO VENTA");
+        tab_tabla.getColumna("PRECIO").alinearDerecha();
+        tab_tabla.getColumna("PRECIO_COMPRA").alinearDerecha();
+        tab_tabla.getColumna("UTILIDAD").alinearDerecha();
+        tab_tabla.getColumna("UTILIDAD_NETA").alinearDerecha();
+        tab_tabla.getColumna("TOTAL_COMPRA").alinearDerecha();
+        tab_tabla.getColumna("TOTAL_VENTA").alinearDerecha();
+        tab_tabla.getColumna("TIPO").setVisible(false);
+        tab_tabla.setColumnaSuma("UTILIDAD_NETA,TOTAL_COMPRA,TOTAL_VENTA");
+        tab_tabla.setRows(20);
         tab_tabla.dibujar();
         tab_tabla.fin();
         PanelTabla pat_panel = new PanelTabla();

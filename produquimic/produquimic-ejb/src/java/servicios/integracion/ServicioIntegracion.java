@@ -771,11 +771,38 @@ public class ServicioIntegracion extends ServicioBase {
      *
      * @param vendedor
      * @param anio
-     * @param fecha
+     * @param mes
      * @return
      */
-    public String getSqlUtilidadVentas(String vendedor, String anio, String fecha) {
-        return "";
+    public String getSqlUtilidadVentas(String vendedor, String anio, String mes) {
+        if (vendedor == null) {
+            vendedor = "";
+        }
+        vendedor = vendedor.replace("null", "").trim();
+        if (vendedor.isEmpty() == false) {
+            vendedor = " and VENDEDOR like '%" + vendedor + "%' ";
+        }
+
+        return "select DATE_FORMAT(fecha,'%d/%m/%Y') as FECHA_EMISION,NOM_CLIE as CLIENTE,facturas.NUM_FACTURA,NOM_PROD as PRODUCTO,CANTIDAD,PRECIO,PRECIO_COMPRA,PRECIO-PRECIO_COMPRA as UTILIDAD,(PRECIO-PRECIO_COMPRA)*CANTIDAD as UTILIDAD_NETA,CANTIDAD * PRECIO_COMPRA as TOTAL_COMPRA,CANTIDAD * PRECIO as TOTAL_VENTA ,'FN' as TIPO \n"
+                + "from facturas,detalle_facturas,productos,clientes \n"
+                + "where facturas.NUM_FACTURA =detalle_facturas.NUM_FACTURA \n"
+                + "and facturas.COD_CLIE=clientes.COD_CLIE \n"
+                + "and detalle_facturas.COD_PROD=productos.COD_PROD \n"
+                + "and DATE_FORMAT(fecha,'%m')=" + mes + " \n"
+                + "and DATE_FORMAT(fecha,'%Y')=" + anio + " \n"
+                + vendedor
+                + "and anulada=false \n"
+                + "UNION\n"
+                + "select DATE_FORMAT(fecha,'%d/%m/%Y')as FECHA_EMISION,NOM_CLIE as CLIENTE,facturas_fe.NUM_FACTURA_FE,NOM_PROD as PRODUCTO,CANTIDAD,PRECIO,PRECIO_COMPRA,PRECIO-PRECIO_COMPRA as UTILIDAD,(PRECIO-PRECIO_COMPRA)*CANTIDAD as UTILIDAD_NETA,CANTIDAD * PRECIO_COMPRA as TOTAL_COMPRA,CANTIDAD * PRECIO as TOTAL_VENTA ,'FE' as TIPO\n"
+                + "from facturas_fe,detalle_facturas_fe,productos,clientes \n"
+                + "where facturas_fe.NUM_FACTURA_FE =detalle_facturas_fe.NUM_FACTURA_FE\n"
+                + "and facturas_fe.COD_CLIE=clientes.COD_CLIE \n"
+                + "and detalle_facturas_fe.COD_PROD=productos.COD_PROD \n"
+                + "and DATE_FORMAT(fecha,'%m')=" + mes + " \n"
+                + "and DATE_FORMAT(fecha,'%Y')=" + anio + " \n"
+                + vendedor
+                + "and anulada=false \n"
+                + "order by 1,3";
     }
 
 }
