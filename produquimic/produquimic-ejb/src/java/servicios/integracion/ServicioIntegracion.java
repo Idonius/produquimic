@@ -805,4 +805,30 @@ public class ServicioIntegracion extends ServicioBase {
                 + "order by 1,3";
     }
 
+    /**
+     * Retorna Listado de clientes
+     *
+     * @return
+     */
+    public String getSqlListaClientes() {
+        return "";
+    }
+
+    /**
+     * Retorna Listado de proveedores
+     *
+     * @return
+     */
+    public String getSqlListaProveedores() {
+        return "";
+    }
+
+    /**
+     * Retorna Listado de productos
+     *
+     * @return
+     */
+    public String getSqlListaProductos() {
+        return "";
+    }
 }
