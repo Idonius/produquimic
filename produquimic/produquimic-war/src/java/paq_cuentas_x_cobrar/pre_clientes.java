@@ -106,7 +106,7 @@ public class pre_clientes extends Pantalla {
         mep_menu.agregarItem("Ingresar Transacción", "dibujarIngresarTransacciones", "ui-icon-contact");
         mep_menu.agregarItem("Productos Cliente", "dibujarProductos", "ui-icon-cart");
         mep_menu.agregarItem("Facturas Por Cobrar", "dibujarFacturas", "ui-icon-calculator");
-        mep_menu.agregarItem("Préstamos - Créditos", "dibujarPrestamos", "ui-icon-calculator");
+
         mep_menu.agregarSubMenu("CONTABILIDAD");
         mep_menu.agregarItem("Configura Cuenta Contable", "dibujarConfiguraCuenta", "ui-icon-wrench");
         mep_menu.agregarItem("Movimientos Contables", "dibujarMovimientos", "ui-icon-note");
@@ -159,9 +159,6 @@ public class pre_clientes extends Pantalla {
                 case 10:
                     dibujarIngresarTransacciones();
                     break;
-                case 11:
-                    dibujarPrestamos();
-                    break;
                 case 12:
                     dibujarReporteCxC();
                     break;
@@ -203,7 +200,8 @@ public class pre_clientes extends Pantalla {
             pat_panel.setPanelTabla(tab_tabla);
             gru_grupo.getChildren().add(pat_panel);
         }
-        mep_menu.dibujar(13, "TARJETA KARDEX", gru_grupo);
+        mep_menu.dibujar(13, "fa fa-list-alt", "Tarjeta Kardex con las transacciones del cliente.", gru_grupo, true);
+
     }
 
     public void dibujarImportar() {
@@ -251,55 +249,12 @@ public class pre_clientes extends Pantalla {
 
     }
 
-    public void dibujarPrestamos() {
-//11  
-        Grupo gru_grupo = new Grupo();
-        if (isClienteSeleccionado()) {
-
-            tab_tabla = new Tabla();
-            tab_tabla.setId("tab_tabla");
-            tab_tabla.setSql(ser_prestamo.getSqlPrestamosCliente(aut_clientes.getValor()));
-            tab_tabla.getColumna("ide_ipcpr").setVisible(false);
-            tab_tabla.getColumna("tipo").setLongitud(10);
-            tab_tabla.getColumna("fecha_prestamo_ipcpr").setNombreVisual("FECHA");
-            tab_tabla.getColumna("num_prestamo_ipcpr").setNombreVisual("NUM. PRESTAMO");
-            tab_tabla.getColumna("monto_ipcpr").setNombreVisual("MONTO");
-            tab_tabla.getColumna("monto_ipcpr").alinearDerecha();
-            tab_tabla.getColumna("interes_ipcpr").setNombreVisual("% INTERES");
-            tab_tabla.getColumna("interes_ipcpr").alinearDerecha();
-            tab_tabla.getColumna("num_pagos_ipcpr").setNombreVisual("NUM. PAGOS");
-            tab_tabla.getColumna("num_pagos_ipcpr").alinearDerecha();
-            tab_tabla.getColumna("pagos").setNombreVisual("PAGADOS");
-            tab_tabla.getColumna("saldo").alinearDerecha();
-            tab_tabla.getColumna("pagos").alinearDerecha();
-            tab_tabla.getColumna("valor_pagado").setNombreVisual("VALOR PAGADO");
-            tab_tabla.getColumna("valor_pagado").alinearDerecha();
-            tab_tabla.getColumna("capital").alinearDerecha();
-            tab_tabla.getColumna("interes").alinearDerecha();
-            tab_tabla.getColumna("cuota").alinearDerecha();
-            tab_tabla.getColumna("fecha_ultimo_pago").setNombreVisual("FECHA ULT. PAGO");
-            tab_tabla.setColumnaSuma("saldo,capital,interes");
-            tab_tabla.setOrdenar(false);
-            tab_tabla.setNumeroTabla(-1);
-            tab_tabla.setRows(20);
-            tab_tabla.setLectura(true);
-            tab_tabla.dibujar();
-            PanelTabla pat_panel = new PanelTabla();
-            pat_panel.setPanelTabla(tab_tabla);
-            pat_panel.getMenuTabla().getItem_buscar().setRendered(false);
-            gru_grupo.getChildren().add(pat_panel);
-        }
-        mep_menu.dibujar(11, "PRÉSTAMOS - CRÉDITOS", gru_grupo);
-
-    }
-
     /**
      * Dibuja el formulario de datos del Cliente, osigna opcion 1
      */
     public void dibujarCliente() {
         Grupo gru = new Grupo();
-        gru.getChildren().add(new Etiqueta("<i class='fa fa-user fa-2x'></i> &nbsp; <span style='font-size:14px; text-shadow: none;'>Datos generales del cliente. </span>"));
-        //gru.getChildren().add(new Separator());
+
         tab_tabla = new Tabla();
         tab_tabla.setId("tab_tabla");
         ser_cliente.configurarTablaCliente(tab_tabla);
@@ -311,7 +266,8 @@ public class pre_clientes extends Pantalla {
         pat_panel.setPanelTabla(tab_tabla);
         pat_panel.getMenuTabla().getItem_buscar().setRendered(false);
         gru.getChildren().add(pat_panel);
-        mep_menu.dibujar(1, "", gru);
+
+        mep_menu.dibujar(1, "fa fa-user", "Datos generales del cliente.", gru, false);
     }
 
     public void dibujarIngresarTransacciones() {
@@ -661,8 +617,10 @@ public class pre_clientes extends Pantalla {
         }
         PanelArbol paa_panel = new PanelArbol();
         paa_panel.setPanelArbol(arb_estructura);
+
         gru_grupo.getChildren().add(paa_panel);
-        mep_menu.dibujar(7, "CLASIFICACIÓN DE CLIENTES", gru_grupo);
+        mep_menu.dibujar(7, "fa fa-users", "Clasificación de grupo de clientes.", gru_grupo, true);
+
     }
 
     public void agregarPadre() {

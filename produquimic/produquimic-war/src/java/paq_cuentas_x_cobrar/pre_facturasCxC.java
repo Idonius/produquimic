@@ -619,8 +619,6 @@ public class pre_facturasCxC extends Pantalla {
 
     public void dibujarFacturasNoContabilizadas() {
         Grupo gru = new Grupo();
-        gru.getChildren().add(new Etiqueta("<i class='fa fa-book fa-2x'></i> &nbsp; <span style='font-size:14px; text-shadow: none;'>Generar asiento contable de las facturas generadas. </span>"));
-        gru.getChildren().add(new Separator());
 
         Barra bar_menu = new Barra();
         bar_menu.setId("bar_menu");
@@ -660,7 +658,8 @@ public class pre_facturasCxC extends Pantalla {
 
         gru.getChildren().add(bar_menu);
         gru.getChildren().add(pat_panel);
-        mep_menu.dibujar(2, "", gru);
+
+        mep_menu.dibujar(2, "fa fa-book", "Generar asiento contable de las facturas generadas.", gru, true);
     }
 
     public void abrirGeneraAsiento() {
@@ -688,8 +687,6 @@ public class pre_facturasCxC extends Pantalla {
 
     public void dibujarFacturasAnuladas() {
         Grupo gru = new Grupo();
-        gru.getChildren().add(new Etiqueta("<i class='fa fa-file-excel-o fa-2x'></i>&nbsp; <span style='font-size:14px; text-shadow: none;'>Listado de Facturas Anuladas. </span>"));
-        gru.getChildren().add(new Separator());
 
         tab_tabla = new Tabla();
         tab_tabla.setId("tab_tabla");
@@ -736,13 +733,11 @@ public class pre_facturasCxC extends Pantalla {
 
         gru.getChildren().add(fie_anula);
         gru.getChildren().add(pat_panel);
-        mep_menu.dibujar(3, "", gru);
+        mep_menu.dibujar(3, "fa fa-file-excel-o", "Listado de Facturas Anuladas.", gru, true);
     }
 
     public void dibujarFacturasPorCobrar() {
         Grupo grupo = new Grupo();
-        grupo.getChildren().add(new Etiqueta("<i class='fa fa-clock-o fa-2x'></i> &nbsp; <span style='font-size:14px; text-shadow: none;'>Listado de facturas pendientes de cobro. </span>"));
-        grupo.getChildren().add(new Separator());
 
         tab_tabla = new Tabla();
         tab_tabla.setId("tab_tabla");
@@ -772,13 +767,11 @@ public class pre_facturasCxC extends Pantalla {
         pat_panel.setPanelTabla(tab_tabla);
         grupo.getChildren().add(pat_panel);
 
-        mep_menu.dibujar(4, "", grupo);
+        mep_menu.dibujar(4, "fa fa-clock-o", "Listado de facturas pendientes de cobro.", grupo, true);
     }
 
     public void dibujarGraficoVentas() {
         Grupo grupo = new Grupo();
-        grupo.getChildren().add(new Etiqueta("<i class='fa fa-bar-chart fa-2x'></i> &nbsp; <span style='font-size:14px; text-shadow: none;'>Gráficos estadísticos de ventas realizadas. </span>"));
-        grupo.getChildren().add(new Separator());
 
         gca_facturas = new GraficoCartesiano();
         gca_facturas.setId("gca_facturas");
@@ -825,13 +818,12 @@ public class pre_facturasCxC extends Pantalla {
         gca_facturas.setTitulo("VENTAS MENSUALES");
         gca_facturas.agregarSerie(tab_tabla, "nombre_gemes", "total", "VENTAS " + String.valueOf(com_periodo.getValue()));
         grupo.getChildren().add(gca_facturas);
-        mep_menu.dibujar(5, "", grupo);
+
+        mep_menu.dibujar(5, "fa fa-bar-chart", "Gráficos estadísticos de ventas realizadas.", grupo, true);
     }
 
     public void dibujarReporteVentas() {
         Grupo grupo = new Grupo();
-        grupo.getChildren().add(new Etiqueta("<i class='fa fa-calendar fa-2x'></i>&nbsp; <span style='font-size:14px; text-shadow: none;'>Reporte de Ventas mensuales en un período determinado. </span>"));
-        grupo.getChildren().add(new Separator());
 
         Barra bar_menu = new Barra();
         bar_menu.setId("bar_menu");
@@ -877,14 +869,11 @@ public class pre_facturasCxC extends Pantalla {
         grupo.getChildren().add(bar_menu);
         grupo.getChildren().add(pat_panel);
 
-        mep_menu.dibujar(7, "", grupo);
+        mep_menu.dibujar(7, "fa fa-calendar", "Reporte de Ventas mensuales en un período determinado.", grupo, true);
 
     }
 
     public void dibujarConfiguraFE() {
-        Grupo gru = new Grupo();
-        gru.getChildren().add(new Etiqueta("<i class='fa fa-cogs fa-2x'></i>&nbsp; <span style='font-size:14px; text-shadow: none;'>Configuración para generar comprobantes electrónicos.</span>"));
-        //gru.getChildren().add(new Separator());
 
         tab_tabla = new Tabla();
         tab_tabla.setId("tab_tabla");
@@ -930,10 +919,10 @@ public class pre_facturasCxC extends Pantalla {
         pat_panel1.getMenuTabla().getItem_eliminar().setRendered(false);
         pat_panel1.getMenuTabla().getItem_buscar().setRendered(false);
 
+        Grupo gru = new Grupo();
         gru.getChildren().add(pat_panel);
         gru.getChildren().add(pat_panel1);
-
-        mep_menu.dibujar(9, "CONFIGURACIÓN FACTURAS ELECTRÓNICAS", gru);
+        mep_menu.dibujar(9, "fa fa-cogs", "Configuración para generar comprobantes electrónicos.", gru, false);
 
     }
 
