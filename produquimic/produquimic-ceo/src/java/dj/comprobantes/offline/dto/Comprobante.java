@@ -249,8 +249,8 @@ public final class Comprobante implements Serializable {
                 //Busca los detalles de impuestos del Comprobante
                 try {
                     impuesto = new ArrayList();
-                    String sql = "select  b.ide_cnimp as codigo_fe_cnimp,\n"
-                            + "casillero_cncim as codigo_fe_retencion_cncim,\n"
+                    String sql = "select codigo_fe_cnimp,\n"
+                            + "coalesce(codigo_fe_retencion_cncim,casillero_cncim) as codigo_fe_retencion_cncim,\n"
                             + "base_cndre,porcentaje_cndre,valor_cndre,\n"
                             + "alter_tribu_cntdo,numero_cpcfa,fecha_emisi_cpcfa\n"
                             + "from con_detall_retenc a\n"

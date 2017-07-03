@@ -221,11 +221,12 @@ public class ArchivoServiceImp implements ArchivoService {
         File reporte = null;
         if (comprobante.getCoddoc().equals(TipoComprobanteEnum.FACTURA.getCodigo())) {
             reporte = generarReporte.crearPDF(parametros, "factura.jasper", parametros.get("CLAVE_ACC") + "");
-
         } else if (comprobante.getCoddoc().equals(TipoComprobanteEnum.NOTA_DE_CREDITO.getCodigo())) {
             reporte = generarReporte.crearPDF(parametros, "notaCredito.jasper", parametros.get("CLAVE_ACC") + "");
         } else if (comprobante.getCoddoc().equals(TipoComprobanteEnum.GUIA_DE_REMISION.getCodigo())) {
             reporte = generarReporte.crearPDF(parametros, "guiaRemisionFinal.jasper", parametros.get("CLAVE_ACC") + "");
+        } else if (comprobante.getCoddoc().equals(TipoComprobanteEnum.COMPROBANTE_DE_RETENCION.getCodigo())) {
+            reporte = generarReporte.crearPDF(parametros, "comprobanteRetencion.jasper", parametros.get("CLAVE_ACC") + "");
         }
 
         try {
