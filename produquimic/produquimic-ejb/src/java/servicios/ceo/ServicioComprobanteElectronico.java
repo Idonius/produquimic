@@ -429,8 +429,9 @@ public class ServicioComprobanteElectronico extends ServicioBase {
         String ide_srcom = "-1";
 
         TablaGenerica tab_factura = utilitario.consultar("select serie_ccdaf,fecha_emisi_cncre,identificac_geper"
-                + ",a.ide_geper  from con_cabece_retenc a"
-                + "inner join gen_persona b on a.ide_geper = b.ide_geper  \n"
+                + ",e.ide_geper,a.ide_srcom  from con_cabece_retenc a "
+                + "inner join cxp_cabece_factur e on a.ide_cncre=e.ide_cncre\n"
+                + "inner join gen_persona b on e.ide_geper = b.ide_geper  \n"
                 + "inner join cxc_datos_fac d on a.ide_ccdaf=d.ide_ccdaf\n"
                 + "where a.ide_cncre=" + ide_cncre);
 
@@ -473,7 +474,7 @@ public class ServicioComprobanteElectronico extends ServicioBase {
                     String strSecuencialF = getSecuencialComprobante(TipoComprobanteEnum.COMPROBANTE_DE_RETENCION);
                     utilitario.getConexion().ejecutarSql("UPDATE sri_comprobante SET secuencial_srcom='" + strSecuencialF + "' where ide_srcom=" + ide_srcom);
                     utilitario.getConexion().ejecutarSql("UPDATE sri_comprobante SET reutiliza_srcom= false where secuencial_srcom='" + strSecuencialF + "' and reutiliza_srcom=true and coddoc_srcom='" + TipoComprobanteEnum.COMPROBANTE_DE_RETENCION.getCodigo() + "'");
-                    utilitario.getConexion().ejecutarSql("UPDATE con_cabece_retenc SET  ide_srcom=" + ide_srcom + " , numero_cncre='" + tab_factura.getValor("serie_ccdaf") + strSecuencialF + "' where ide_cncre=" + ide_cncre);                   
+                    utilitario.getConexion().ejecutarSql("UPDATE con_cabece_retenc SET  ide_srcom=" + ide_srcom + " , numero_cncre='" + tab_factura.getValor("serie_ccdaf") + strSecuencialF + "' where ide_cncre=" + ide_cncre);
                 }
                 //Si esta en estado PENDIENTE genero nueva clave de acceso por si se modifico la fecha
                 if (tab_cabecara.getValor("ide_sresc").equals(String.valueOf(EstadoComprobanteEnum.PENDIENTE.getCodigo()))) {
