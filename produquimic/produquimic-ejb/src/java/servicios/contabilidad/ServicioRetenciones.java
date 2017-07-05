@@ -59,9 +59,9 @@ public class ServicioRetenciones extends ServicioBase {
         if (ide_ccdaf.isEmpty() == false) {
             ide_ccdaf = " and ide_ccdaf='" + ide_ccdaf + "' ";
         }
-        return "SELECT a.ide_cncre,ide_cnere,fecha_emisi_cncre,a.ide_cnccc,nombre_sresc,observacion_cncre,numero_cncre AS NUMERO,autorizacion_cncre AS AUTORIZACION,"
+        return "SELECT a.ide_cncre,ide_cnere,fecha_emisi_cncre,a.ide_cnccc,nombre_sresc as ESTADO,observacion_cncre as OBSERVACION,numero_cncre AS NUMERO,autorizacion_cncre AS AUTORIZACION,"
                 + "(select sum(base_cndre) from con_detall_retenc where ide_cncre=a.ide_cncre)AS BASE_IMPONIBLE,"
-                + "(select sum(valor_cndre) from con_detall_retenc where ide_cncre=a.ide_cncre)AS VALOR,ide_cpcfa,numero_cpcfa as NUM_FACTURA,nom_geper AS PROVEEDOR,claveacceso_srcom as CLAVE_ACCESO\n"
+                + "(select sum(valor_cndre) from con_detall_retenc where ide_cncre=a.ide_cncre)AS VALOR,ide_cpcfa,numero_cpcfa as NUM_FACTURA,nom_geper AS PROVEEDOR,a.ide_srcom\n"
                 + "FROM con_cabece_retenc a\n"
                 + "left join cxp_cabece_factur b on a.ide_cncre=b.ide_cncre\n"
                 + "left join gen_persona c on b.ide_geper=c.ide_geper\n"
@@ -222,6 +222,10 @@ public class ServicioRetenciones extends ServicioBase {
      */
     public String getSqlPuntosEmision() {
         return "select ide_ccdaf,serie_ccdaf, autorizacion_ccdaf,observacion_ccdaf from cxc_datos_fac where ide_empr=" + utilitario.getVariable("IDE_EMPR");
+    }
+
+    public boolean isElectronica() {
+        return true;
     }
 
 }

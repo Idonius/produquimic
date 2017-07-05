@@ -7,13 +7,11 @@ package servicios.integracion;
 
 import framework.aplicacion.TablaGenerica;
 import java.util.Date;
-import javax.ejb.EJB;
 import javax.ejb.Stateless;
 import javax.ejb.TransactionManagement;
 import javax.ejb.TransactionManagementType;
 import persistencia.Conexion;
 import servicios.ServicioBase;
-import servicios.inventario.ServicioInventario;
 
 /**
  *
@@ -22,9 +20,6 @@ import servicios.inventario.ServicioInventario;
 @Stateless
 @TransactionManagement(TransactionManagementType.BEAN)
 public class ServicioIntegracion extends ServicioBase {
-
-    @EJB
-    private ServicioInventario ser_inventario;
 
     public Conexion getConexionEscritorio() {
         Conexion con_conecta = new Conexion();
@@ -76,6 +71,28 @@ public class ServicioIntegracion extends ServicioBase {
             }
         }
         return dou_precio;
+    }
+
+    /**
+     * Retorna el codigo de compra para ser insertado
+     *
+     * @return
+     */
+    private int getCodigoCompra() {
+        String sql = "(SELECT MAX(k.COD_COMPRA)+1 as COD_COMPRA,'1' as TOTAL  FROM compras K)";
+        TablaGenerica tab = new TablaGenerica();
+        Conexion con_conecta = getConexionEscritorio();
+        tab.setConexion(con_conecta);
+        tab.setSql(sql);
+        tab.ejecutarSql();
+        int codCompra = 0;
+        if (tab.isEmpty() == false) {
+            try {
+                codCompra = Integer.parseInt(tab.getValor("COD_COMPRA"));
+            } catch (Exception e) {
+            }
+        }
+        return codCompra;
     }
 
     public String importarClientes() {
@@ -214,6 +231,149 @@ public class ServicioIntegracion extends ServicioBase {
         if (utilitario.getConexion().ejecutarListaSql().isEmpty()) {
             if (tab_cod.getTotalFilas() > 0) {
                 utilitario.agregarMensaje("Se importaron correctamente ", tab_cod.getTotalFilas() + " CLIENTES del sistema de facturación");
+            }
+        }
+
+        return str_ide_geper;
+    }
+
+    public String importarProveedores() {
+        String str_ide_geper = "";
+        TablaGenerica tab_cod = new TablaGenerica();
+        tab_cod.setTabla("gen_persona", "ide_geper", -1);
+        tab_cod.setCondicion("es_proveedo_geper=true and gen_ide_geper=1234");
+        tab_cod.getColumna("codigo_geper").setQuitarCaracteresEspeciales(true);
+        tab_cod.setGenerarPrimaria(false);
+        tab_cod.ejecutarSql();
+        tab_cod.getColumna("ide_geper").setExterna(false);
+        String str_cod = tab_cod.getStringColumna("codigo_geper");
+        tab_cod.limpiar();
+
+        Conexion con_conecta = getConexionEscritorio();
+        TablaGenerica tab_clie = new TablaGenerica();
+        tab_clie.setConexion(con_conecta);
+        if (str_cod != null && str_cod.isEmpty() == false) {
+            tab_clie.setSql("select * from proveedores where cod_prove not in(" + str_cod + ",'')");
+        } else {
+            tab_clie.setCampoPrimaria("cod_prove");
+            tab_clie.setSql("select * from proveedores");
+        }
+        tab_clie.ejecutarSql();
+        long int_maximo_cliente = utilitario.getConexion().getMaximo("gen_persona", "ide_geper", tab_clie.getTotalFilas());
+//////        TablaGenerica tab_cabcxc = new TablaGenerica();
+//////        tab_cabcxc.setTabla("cxc_cabece_transa", "ide_ccctr", -1);
+//////        tab_cabcxc.setCondicion("ide_ccctr=-1");
+//////        tab_cabcxc.setGenerarPrimaria(false);
+//////        tab_cabcxc.getColumna("ide_ccctr").setExterna(false);
+//////        tab_cabcxc.ejecutarSql();
+//////        long int_maximo_cab = utilitario.getConexion().getMaximo("cxc_cabece_transa", "ide_ccctr", tab_clie.getTotalFilas());
+//////
+//////        TablaGenerica tab_detcxc = new TablaGenerica();
+//////        tab_detcxc.setTabla("cxc_detall_transa", "ide_ccdtr", -1);
+//////        tab_detcxc.setCondicion("ide_ccdtr=-1");
+//////        tab_detcxc.setGenerarPrimaria(false);
+//////        tab_detcxc.getColumna("ide_ccdtr").setExterna(false);
+//////        tab_detcxc.ejecutarSql();
+//////        long int_maximo_det = utilitario.getConexion().getMaximo("cxc_detall_transa", "ide_ccdtr", tab_clie.getTotalFilas());
+
+        for (int i = 0; i < tab_clie.getTotalFilas(); i++) {
+
+            if (tab_clie.getValor(i, "nom_prove") == null || tab_clie.getValor(i, "nom_prove").isEmpty()) {
+                continue;
+            }
+            tab_cod.insertar();
+            tab_cod.setValor("codigo_geper", tab_clie.getValor(i, "cod_prove")); //!!!AUMENTAR codigo_geper
+            tab_cod.setValor("ide_geper", String.valueOf(int_maximo_cliente));
+            if (str_ide_geper.isEmpty() == false) {
+                str_ide_geper += ",";
+            }
+            str_ide_geper += int_maximo_cliente;
+            tab_cod.setValor("gen_ide_geper", "1234");
+            tab_cod.setValor("ide_empr", "0");
+            tab_cod.setValor("ide_sucu", "0");
+            String ide_getid = tab_clie.getValor(i, "ruc_prove");
+            if (ide_getid != null) {
+                if (ide_getid.length() > 10) {
+                    ide_getid = "1";//RUC
+                } else {
+                    ide_getid = "0";//CEDULA    
+                }
+            }
+            tab_cod.setValor("ide_getid", ide_getid);
+            tab_cod.setValor("identificac_geper", tab_clie.getValor(i, "ruc_prove").replace("-", ""));
+            tab_cod.setValor("nom_geper", tab_clie.getValor(i, "nom_prove"));
+            tab_cod.setValor("nombre_compl_geper", tab_clie.getValor(i, "nom_prove"));
+            tab_cod.setValor("direccion_geper", tab_clie.getValor(i, "dir_prove"));
+            tab_cod.setValor("telefono_geper", tab_clie.getValor(i, "telef_prove"));
+            tab_cod.setValor("fax_geper", tab_clie.getValor(i, "telef2"));
+            tab_cod.setValor("contacto_geper", tab_clie.getValor(i, "contacto"));
+            tab_cod.setValor("correo_geper", tab_clie.getValor(i, "correo"));
+            tab_cod.setValor("observacion_geper", tab_clie.getValor(i, "observaciones"));
+            tab_cod.setValor("nivel_geper", "HIJO");
+            tab_cod.setValor("es_proveedo_geper", "true");
+
+//////            String ide_cntco = tab_clie.getValor(i, "tipo");
+//////            if (ide_cntco != null) {
+//////                ide_cntco = ide_cntco.toUpperCase();
+//////                if (ide_cntco.startsWith("OBLIGADO A LLEVAR CONTABILIDAD")) {
+//////                    ide_cntco = "3";
+//////                } else if (ide_cntco.startsWith("PERSONA NATURAL")) {
+//////                    ide_cntco = "2";
+//////                } else if (ide_cntco.startsWith("CONTRIBUYENTE ESPECIAL")) {
+//////                    ide_cntco = "1";
+//////                } else if (ide_cntco.startsWith("ESPECIALES-EXPORTADORES")) {
+//////                    ide_cntco = "6";
+//////                } else {
+//////                    ide_cntco = "2";
+//////                }
+//////            }
+            String ide_cntco = "1"; // por defecto CONTRIBUYENTE ESPECIAL
+            tab_cod.setValor("ide_cntco", ide_cntco);
+
+//////            double dou_saldo_inicial = 0;
+//////            try {
+//////                dou_saldo_inicial = Double.parseDouble(tab_clie.getValor(i, "existencia"));
+//////            } catch (Exception e) {
+//////            }
+//////            if (dou_saldo_inicial != 0) {
+//////                //Creo la transaccion
+//////                tab_cabcxc.insertar();
+//////                tab_cabcxc.setValor("ide_ccctr", String.valueOf(int_maximo_cab));
+//////                tab_cabcxc.setValor("ide_ccttr", "13");
+//////                tab_cabcxc.setValor("ide_sucu", "0");
+//////                tab_cabcxc.setValor("ide_empr", "0");
+//////                tab_cabcxc.setValor("ide_geper", String.valueOf(int_maximo_cliente));
+//////                tab_cabcxc.setValor("fecha_trans_ccctr", utilitario.getFechaActual());
+//////                tab_cabcxc.setValor("observacion_ccctr", "Saldo inicial al " + utilitario.getFechaActual());
+//////
+//////                tab_detcxc.insertar();
+//////                tab_detcxc.setValor("ide_ccdtr", String.valueOf(int_maximo_det));
+//////                tab_detcxc.setValor("ide_ccctr", String.valueOf(int_maximo_cab));
+//////                tab_detcxc.setValor("ide_ccttr", "13");
+//////                tab_detcxc.setValor("ide_sucu", "0");
+//////                tab_detcxc.setValor("ide_empr", "0");
+//////                tab_detcxc.setValor("ide_usua", utilitario.getVariable("ide_usua"));
+//////                tab_detcxc.setValor("fecha_trans_ccdtr", utilitario.getFechaActual());
+//////                tab_detcxc.setValor("fecha_venci_ccdtr", utilitario.getFechaActual());
+//////                tab_detcxc.setValor("numero_pago_ccdtr", "0");
+//////                tab_detcxc.setValor("valor_ccdtr", utilitario.getFormatoNumero(dou_saldo_inicial));
+//////                tab_detcxc.setValor("observacion_ccdtr", "Saldo inicial al " + utilitario.getFechaActual());
+//////
+//////                int_maximo_cab++;
+//////                int_maximo_det++;
+//////
+//////            }
+            int_maximo_cliente++;
+
+        }
+
+        tab_cod.guardar();
+//////        tab_cabcxc.guardar();
+//////        tab_detcxc.guardar();
+
+        if (utilitario.getConexion().ejecutarListaSql().isEmpty()) {
+            if (tab_cod.getTotalFilas() > 0) {
+                utilitario.agregarMensaje("Se importaron correctamente ", tab_cod.getTotalFilas() + " PROVEEDORES del sistema de facturación");
             }
         }
 
@@ -646,6 +806,95 @@ public class ServicioIntegracion extends ServicioBase {
     }
 
     /**
+     * Guarda en kardex de proveedores y de productos
+     *
+     * @param ide_cpcfa
+     */
+    public void guardarKardexCompras(String ide_cpcfa) {
+
+        TablaGenerica tab_factura = utilitario.consultar("select codigo_inarti,cantidad_cpdfa,precio_cpdfa,valor_cpdfa,"
+                + "codigo_geper,nom_geper, numero_cpcfa as numfactura,autorizacio_cpcfa,\n"
+                + "base_grabada_cpcfa+base_tarifa0_cpcfa+base_no_objeto_iva_cpcfa as subtotal,valor_iva_cpcfa,total_cpcfa,"
+                + "a.ide_cpcfa,base_grabada_cpcfa,base_tarifa0_cpcfa+base_no_objeto_iva_cpcfa as ventas0,"
+                + "CASE WHEN dias_credito_cpcfa=0 THEN 'CONTADO'\n" //Crear tabla o campo  dias_credito_cpcfa 
+                + "             ELSE 'CRÉDITO '||dias_credito_cpcfa||' DÍAS'\n"
+                + "       END as nombre_cndfp,COALESCE(nombre_inuni,'')  ||' '|| nombre_inarti as nombre_inarti "
+                + "from cxp_detall_factur a\n"
+                + "inner join cxp_cabece_factur b on a.ide_cpcfa=b.ide_cpcfa\n"
+                + "inner join gen_persona d on b.ide_geper=d.ide_geper\n"
+                + "inner join inv_articulo e on a.ide_inarti= e.ide_inarti\n"
+                + "left join  inv_unidad g on a.ide_inuni =g.ide_inuni\n"
+                + "where a.ide_cpcfa=" + ide_cpcfa);
+        //Guarda Kardex de productos de todos detalles de la factura
+
+        if (tab_factura.isEmpty() == false) {
+            Conexion con_conecta = getConexionEscritorio();
+            String fechae = utilitario.getFormatoFecha(new Date(), "yyyy-MM-dd");
+            String numFactura = tab_factura.getValor("numfactura");
+
+            //Guarda Kardex de proveedores
+            String codProve = tab_factura.getValor("codigo_geper");
+            double saldoInicialClie = getSaldoProveedor_Escritorio(codProve);
+            double saldoNuevoClie = 0;
+            double subtotal = Double.parseDouble(tab_factura.getValor("subtotal"));
+            double tiva = Double.parseDouble(tab_factura.getValor("valor_iva_cpcfa"));
+            double total = Double.parseDouble(tab_factura.getValor("total_cpcfa"));
+
+            saldoNuevoClie = saldoInicialClie + total;
+            String sql = "INSERT INTO kardexproveedores VALUES((SELECT MAX(k.CODIGOKPV )+1 FROM kardexproveedores k where  k.COD_PROVE='" + codProve + " '),'" + codProve + "','" + fechae + "','" + numFactura + "','COMPRA DE PRODUCTOS (WEB)'," + total + ",0," + saldoNuevoClie + ")";
+            con_conecta.agregarSql(sql);
+
+            String sql1 = "UPDATE proveedores SET EXISTENCIA=" + saldoNuevoClie + " where COD_PROVE='" + codProve + "'";
+            con_conecta.agregarSql(sql1);
+            int codCompra = getCodigoCompra();
+            //Guarda Cabecera Factura compra
+            String sqlCabFactura = "INSERT INTO compras "
+                    + "(COD_COMPRA,FACTURA,COD_PROVE,FECHA_COMPRA,"
+                    + "SUBTOTAL,IVA,TOTAL,FORMA,"
+                    + ",DESCUENTO,AUTORIZACION,"
+                    + "TARIFA0,TARIFA12)"
+                    + "values "
+                    + "( " + codCompra + ", " + tab_factura.getValor("numfactura") + ",'" + codProve + "','" + fechae + "'," + utilitario.getFormatoNumero(subtotal) + ","
+                    + utilitario.getFormatoNumero(tiva) + "," + utilitario.getFormatoNumero(tab_factura.getValor("total_cpcfa")) + ",'" + tab_factura.getValor("nombre_cndfp") + "',0,'" + tab_factura.getValor("autorizacio_cpcfa") + "',"
+                    + utilitario.getFormatoNumero(tab_factura.getValor("ventas0")) + "," + utilitario.getFormatoNumero(tab_factura.getValor("base_grabada_cpcfa")) + ")";
+
+            con_conecta.agregarSql(sqlCabFactura);
+
+            for (int i = 0; i < tab_factura.getTotalFilas(); i++) {
+                ///Kardex Productos
+                String codProd = tab_factura.getValor(i, "codigo_inarti");
+                double vcant = Double.parseDouble(tab_factura.getValor(i, "cantidad_cpdfa"));
+                double vpre = Double.parseDouble(tab_factura.getValor(i, "precio_cpdfa"));
+                double exan = getExisteciaProducto_Escritorio(codProd);
+                double exnue = exan - vcant;
+                double vtotaldetalle = Double.parseDouble(tab_factura.getValor(i, "valor_cpdfa"));
+                String detallefactura = tab_factura.getValor(i, "nombre_inarti");
+                detallefactura = detallefactura.trim();
+                String nombreCliente = tab_factura.getValor("nom_geper");
+                String sql_1 = "INSERT INTO  KARDEXPRODUCTOS VALUES((SELECT MAX(k.CODIGOKP )+1 FROM KARDEXPRODUCTOS k where  k.COD_PROD='" + codProd + " '),'" + codProd + "','" + fechae + "','" + numFactura + "','" + nombreCliente + "'," + vpre + ",0," + vcant + "," + exnue + ")";
+                String sql_2 = "UPDATE PRODUCTOS SET EXISTENCIA=" + exnue + " where COD_PROD='" + codProd + "'";
+                con_conecta.agregarSql(sql_1);
+                con_conecta.agregarSql(sql_2);
+
+                //Guarda detalle Factura compra
+                String sqlDetFactura = "INSERT INTO detalle_compras "
+                        + "(COD_COMPRA,COD_PROD,CANT,DETALLE,"
+                        + "PRECIO,TOTAL)"
+                        + "VALUES"
+                        + "(" + codCompra + ",'" + codProd + "'," + vcant + ",'" + detallefactura + "',"
+                        + vpre + "," + utilitario.getFormatoNumero(vtotaldetalle) + ")";
+                con_conecta.agregarSql(sqlDetFactura);
+
+            }
+
+            if (con_conecta.ejecutarListaSql().isEmpty()) {
+                System.out.println("OK guardo Kardex");
+            }
+        }
+
+    }
+
+    /**
      * Elimina los movimientos en kardex de clientes y productos
      *
      * @param ide_cccfa
@@ -719,6 +968,30 @@ public class ServicioIntegracion extends ServicioBase {
      */
     public Double getSaldoCliente_Escritorio(String codigoCliente) {
         String sql = "SELECT COD_CLIE,EXISTENCIA from CLIENTES where COD_CLIE='" + codigoCliente + "'";
+        TablaGenerica tab = new TablaGenerica();
+        Conexion con_conecta = getConexionEscritorio();
+        tab.setConexion(con_conecta);
+        tab.setSql(sql);
+        tab.ejecutarSql();
+        double dou_existencia = 0;
+        if (tab.isEmpty() == false) {
+            try {
+                dou_existencia = Double.parseDouble(tab.getValor("EXISTENCIA"));
+            } catch (Exception e) {
+            }
+        }
+        return dou_existencia;
+    }
+
+    /**
+     * Retorna el saldo del proveedor
+     *
+     * @param codigoProveedor
+     *
+     * @return
+     */
+    public Double getSaldoProveedor_Escritorio(String codigoProveedor) {
+        String sql = "SELECT COD_PROVE,EXISTENCIA from PROVEEDORES where COD_PROVE='" + codigoProveedor + "'";
         TablaGenerica tab = new TablaGenerica();
         Conexion con_conecta = getConexionEscritorio();
         tab.setConexion(con_conecta);
