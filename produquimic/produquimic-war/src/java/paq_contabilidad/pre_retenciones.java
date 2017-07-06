@@ -136,11 +136,16 @@ public class pre_retenciones extends Pantalla {
 
     }
 
+    public void dibujarConsultaConsolidada() {
+        Grupo gru_grupo = new Grupo();
+
+        mep_menu.dibujar(6, "fa fa-list-alt", "Consulta consolidada de retenciones.", gru_grupo, true);
+    }
+
     public void dibujarConsulta() {
         Grupo gru_grupo = new Grupo();
         com_impuesto = new Combo();
-        com_impuesto.setCombo("SELECT ide_cncim, nombre_cncim,casillero_cncim FROM con_cabece_impues");
-
+        com_impuesto.setCombo(ser_retencion.getSqlComboImpuestos());
         tab_tabla = new Tabla();
         tab_tabla.setId("tab_tabla");
         tab_tabla.setSql(ser_retencion.getSqlConsultaImpuestos(String.valueOf(com_autoriza.getValue()), cal_fecha_inicio.getFecha(), cal_fecha_fin.getFecha(), String.valueOf(com_impuesto.getValue())));
@@ -176,8 +181,7 @@ public class pre_retenciones extends Pantalla {
 
         gru_grupo.getChildren().add(pat_panel);
 
-
-        mep_menu.dibujar(4, "fa fa-list-ol", "Consulta Detalla de Retenciones por impuesto.", gru_grupo, true);
+        mep_menu.dibujar(4, "fa fa-list", "Consulta detalla de retenciones por impuesto.", gru_grupo, true);
     }
 
     public void actualizarConsultar() {
@@ -224,7 +228,7 @@ public class pre_retenciones extends Pantalla {
         PanelTabla pat_panel = new PanelTabla();
         pat_panel.setPanelTabla(tab_tabla);
         gru_grupo.getChildren().add(pat_panel);
-        mep_menu.dibujar(1, "COMPROBANTES DE RETENCIÓN EN VENTAS", gru_grupo);
+        mep_menu.dibujar(5, "COMPROBANTES DE RETENCIÓN EN VENTAS", gru_grupo);
     }
 
     public void dibujarListado() {
