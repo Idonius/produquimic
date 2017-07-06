@@ -181,7 +181,7 @@ public class DocumentoCxP extends Dialogo {
         ate_observacion.setDisabled(false);
         tex_otros_valores.setDisabled(false);
         tex_valor_descuento.setDisabled(false);
-        ate_observacion.setValue("");
+        ate_observacion.setValue("COMPRA DE PRODUCTOS QUÍMICOS");
         tab_documenoCxP.getTab(0).getChildren().clear();
         tab_documenoCxP.getTab(1).getChildren().clear();
         tab_documenoCxP.getTab(2).getChildren().clear();
@@ -665,7 +665,7 @@ public class DocumentoCxP extends Dialogo {
         tab_cab_documento.getColumna("ide_cntdo").setVisible(false);
         tab_cab_documento.getColumna("ide_cpefa").setValorDefecto(parametros.get("p_cxp_estado_factura_normal"));
         tab_cab_documento.getColumna("ide_cpefa").setVisible(false);
-        tab_cab_documento.getColumna("ide_cndfp").setCombo("con_deta_forma_pago", "ide_cndfp", "nombre_cndfp", "ide_cndfp not in ( " + parametros.get("p_con_for_pag_reembolso_caja") + "," + parametros.get("p_con_for_pag_anticipo") + " )");
+        tab_cab_documento.getColumna("ide_cndfp").setCombo("con_deta_forma_pago", "ide_cndfp", "nombre_cndfp", "");
         tab_cab_documento.getColumna("ide_cndfp").setRequerida(true);
         tab_cab_documento.getColumna("TARIFA_IVA_CPCFA").setVisible(false);
         tab_cab_documento.getColumna("ide_cndfp").setNombreVisual("FORMA DE PAGO");
@@ -1033,10 +1033,8 @@ public class DocumentoCxP extends Dialogo {
             tab_cab_documento.setValor("ide_geper", ide_geper);
             tab_cab_documento.setValor("autorizacio_cpcfa", autorizacio_cpcfa);
             tab_cab_documento.setValor("numero_cpcfa", numero_cpcfa);
-            tab_cab_documento.setValor("fecha_emisi_cpcfa", utilitario.getFormatoFecha(utilitario.getValorEtiqueta(fileContents.toString(), "fechaEmision")));
-            System.out.println("*** " + utilitario.getValorEtiqueta(fileContents.toString(), "fechaEmision") + "   ///  " + utilitario.getFormatoFecha(utilitario.getValorEtiqueta(fileContents.toString(), "fechaEmision")));
-
-            System.out.println("*** " + utilitario.getValorEtiqueta(fileContents.toString(), "formaPago"));
+            tab_cab_documento.setValor("fecha_emisi_cpcfa", utilitario.getFormatoFecha(utilitario.toDate(utilitario.getFormatoFecha(utilitario.getValorEtiqueta(fileContents.toString(), "fechaEmision")), "dd/MM/yyyy")));
+            tab_cab_documento.setValor("ide_cndfp", ser_cuentas_cxp.getFormaPago(utilitario.getValorEtiqueta(fileContents.toString(), "formaPago")));
             //Detalles
             String cadenaDetalles = utilitario.getValorEtiqueta(fileContents.toString(), "detalles");
             String strDetalles[] = cadenaDetalles.split("</detalle>");
@@ -1048,7 +1046,6 @@ public class DocumentoCxP extends Dialogo {
                 tab_det_documento.setValor("precio_cpdfa", utilitario.getValorEtiqueta(strDetalleActual, "precioUnitario"));
                 tab_det_documento.setValor("valor_cpdfa", utilitario.getValorEtiqueta(strDetalleActual, "precioTotalSinImpuesto"));
                 String codigoPorcentaje = utilitario.getValorEtiqueta(strDetalleActual, "codigoPorcentaje");
-                System.out.println("--- " + codigoPorcentaje);
                 if (codigoPorcentaje.equals(TipoImpuestoIvaEnum.IVA_VENTA_0.getCodigo())) {                    //NO IVA
                     tab_det_documento.setValor("iva_inarti_cpdfa", "-1");
                 } else if (codigoPorcentaje.equals(TipoImpuestoIvaEnum.IVA_NO_OBJETO.getCodigo())) {

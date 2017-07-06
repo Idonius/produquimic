@@ -227,5 +227,9 @@ public class ServicioRetenciones extends ServicioBase {
     public boolean isElectronica() {
         return true;
     }
+    
+    public String getSqlComboImpuestos(){
+        return "SELECT ide_cncim, nombre_cncim,casillero_cncim FROM con_cabece_impues order by ide_cnimp,casillero_cncim";
+    }
 
 }
