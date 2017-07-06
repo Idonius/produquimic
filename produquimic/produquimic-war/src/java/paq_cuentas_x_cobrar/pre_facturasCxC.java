@@ -641,7 +641,10 @@ public class pre_facturasCxC extends Pantalla {
         tab_tabla.getColumna("ide_geper").setVisible(false);
         tab_tabla.getColumna("secuencial_cccfa").setFiltroContenido();
         tab_tabla.getColumna("nom_geper").setFiltroContenido();
+        tab_tabla.getColumna("nom_geper").setNombreVisual("CLIENTE");
         tab_tabla.getColumna("identificac_geper").setFiltroContenido();
+        tab_tabla.getColumna("identificac_geper").setNombreVisual("IDENTIFICACIÓN");
+        tab_tabla.getColumna("fecha_emisi_cccfa").setNombreVisual("FECHA");
         tab_tabla.getColumna("ventas0").alinearDerecha();
         tab_tabla.getColumna("ventas12").alinearDerecha();
         tab_tabla.getColumna("valor_iva_cccfa").alinearDerecha();
@@ -695,7 +698,10 @@ public class pre_facturasCxC extends Pantalla {
         tab_tabla.getColumna("ide_cccfa").setVisible(false);
         tab_tabla.getColumna("secuencial_cccfa").setFiltroContenido();
         tab_tabla.getColumna("nom_geper").setFiltroContenido();
+        tab_tabla.getColumna("nom_geper").setNombreVisual("CLIENTE");
+        tab_tabla.getColumna("fecha_emisi_cccfa").setNombreVisual("FECHA");
         tab_tabla.getColumna("identificac_geper").setFiltroContenido();
+        tab_tabla.getColumna("identificac_geper").setNombreVisual("IDENTIFICACIÓN");
         tab_tabla.getColumna("ventas0").alinearDerecha();
         tab_tabla.getColumna("ventas12").alinearDerecha();
         tab_tabla.getColumna("valor_iva_cccfa").alinearDerecha();
@@ -746,7 +752,10 @@ public class pre_facturasCxC extends Pantalla {
         tab_tabla.getColumna("ide_cccfa").setVisible(false);
         tab_tabla.getColumna("secuencial_cccfa").setFiltroContenido();
         tab_tabla.getColumna("nom_geper").setFiltroContenido();
+        tab_tabla.getColumna("nom_geper").setNombreVisual("CLIENTE");
         tab_tabla.getColumna("identificac_geper").setFiltroContenido();
+        tab_tabla.getColumna("identificac_geper").setNombreVisual("IDENTIFICACIÓN");
+        tab_tabla.getColumna("fecha_emisi_cccfa").setNombreVisual("FECHA");
         tab_tabla.getColumna("ventas0").alinearDerecha();
         tab_tabla.getColumna("ventas12").alinearDerecha();
         tab_tabla.getColumna("valor_iva_cccfa").alinearDerecha();
@@ -791,6 +800,8 @@ public class pre_facturasCxC extends Pantalla {
         tab_tabla.setId("tab_tabla");
         tab_tabla.setSql(ser_factura.getSqlTotalVentasMensuales(String.valueOf(com_pto_emision.getValue()), String.valueOf(com_periodo.getValue())));
         tab_tabla.setLectura(true);
+        tab_tabla.getColumna("nombre_gemes").setNombreVisual("MES");
+        tab_tabla.getColumna("num_facturas").setNombreVisual("N. FACTURAS");
         tab_tabla.setColumnaSuma("num_facturas,ventas12,ventas0,iva,total");
         tab_tabla.getColumna("num_facturas").alinearDerecha();
         tab_tabla.getColumna("ventas12").alinearDerecha();
@@ -855,6 +866,9 @@ public class pre_facturasCxC extends Pantalla {
 
         tab_tabla.setLectura(true);
         tab_tabla.getColumna("NOM_GEPER").setLongitud(100);
+        tab_tabla.getColumna("nom_geper").setNombreVisual("CLIENTE");
+        tab_tabla.getColumna("fecha_emisi_cccfa").setNombreVisual("FECHA");
+        tab_tabla.getColumna("fecha_emisi_cccfa").setNombreVisual("FECHA");
         tab_tabla.setColumnaSuma("ventas12,ventas0,valor_iva_cccfa,total_cccfa,RET_FUENTE,RET_IVA");
         tab_tabla.getColumna("ventas12").alinearDerecha();
         tab_tabla.getColumna("ventas0").alinearDerecha();
