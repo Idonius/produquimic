@@ -465,6 +465,7 @@ public class ServicioComprobanteElectronico extends ServicioBase {
             tab_cabecara.setValor("ide_empr", utilitario.getVariable("ide_empr"));
             tab_cabecara.setValor("ide_sucu", utilitario.getVariable("ide_sucu"));
             tab_cabecara.setValor("periodo_fiscal_srcom", utilitario.getMes(tab_factura.getValor("fecha_emisi_cncre")) + "/" + utilitario.getAnio(tab_factura.getValor("fecha_emisi_cncre")));
+            tab_cabecara.setValor("total_srcom", "0.00");
             tab_cabecara.guardar();
             ide_srcom = tab_cabecara.getValor("ide_srcom");
 

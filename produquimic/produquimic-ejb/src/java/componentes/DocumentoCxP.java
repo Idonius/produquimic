@@ -383,6 +383,8 @@ public class DocumentoCxP extends Dialogo {
         tab_cb_rete.getColumna("autorizacion_cncre").setEtiqueta();
         tab_cb_rete.getColumna("autorizacion_cncre").setEstilo("font-size: 12px;font-weight: bold");
         tab_cb_rete.getColumna("OBSERVACION_CNCRE").setVisible(false);
+        tab_cb_rete.getColumna("IDE_CCDAF").setVisible(false);
+        tab_cb_rete.getColumna("IDE_SRCOM").setVisible(false);
         tab_cb_rete.getColumna("FECHA_EMISI_CNCRE").setNombreVisual("FECHA EMISIÓN");
         tab_cb_rete.getColumna("FECHA_EMISI_CNCRE").setEtiqueta();
         tab_cb_rete.setTipoFormulario(true);
@@ -432,7 +434,7 @@ public class DocumentoCxP extends Dialogo {
             tab_electronica.setTipoFormulario(true);
 
             if (tab_cb_rete.getValor("ide_srcom") != null) {
-                tab_electronica.setCondicion("ide_srcom=" + tab_cab_documento.getValor("ide_srcom"));
+                tab_electronica.setCondicion("ide_srcom=" + tab_cb_rete.getValor("ide_srcom"));
             } else {
                 tab_electronica.setCondicion("ide_srcom=-1");
             }
@@ -446,10 +448,7 @@ public class DocumentoCxP extends Dialogo {
             tab_electronica.getColumna("ide_sresc").setCombo("sri_estado_comprobante", "ide_sresc", "nombre_sresc", "");
             tab_electronica.getColumna("ide_sresc").setNombreVisual("ESTADO");
             tab_electronica.getColumna("ide_sresc").setOrden(1);
-            tab_electronica.getColumna("claveacceso_srcom").setVisible(true);
-            tab_electronica.getColumna("claveacceso_srcom").setNombreVisual("NUM. AUTORIZACIÓN");
-            tab_electronica.getColumna("claveacceso_srcom").setOrden(2);
-            tab_electronica.getColumna("claveacceso_srcom").setEtiqueta();
+            tab_electronica.getColumna("ide_sresc").setAutoCompletar();
             tab_electronica.getColumna("fechaautoriza_srcom").setVisible(true);
             tab_electronica.getColumna("fechaautoriza_srcom").setNombreVisual("FECHA AUTORIZACIÓN");
             tab_electronica.getColumna("fechaautoriza_srcom").setOrden(3);
@@ -1035,9 +1034,8 @@ public class DocumentoCxP extends Dialogo {
             tab_cab_documento.setValor("autorizacio_cpcfa", autorizacio_cpcfa);
             tab_cab_documento.setValor("numero_cpcfa", numero_cpcfa);
             tab_cab_documento.setValor("fecha_emisi_cpcfa", utilitario.getFormatoFecha(utilitario.getValorEtiqueta(fileContents.toString(), "fechaEmision")));
-            System.out.println("*** " + utilitario.getValorEtiqueta(fileContents.toString(), "totalSinImpuestos"));
-            System.out.println("*** " + utilitario.getValorEtiqueta(fileContents.toString(), "totalDescuento"));
-            System.out.println("*** " + utilitario.getValorEtiqueta(fileContents.toString(), "importeTotal"));
+            System.out.println("*** " + utilitario.getValorEtiqueta(fileContents.toString(), "fechaEmision") + "   ///  " + utilitario.getFormatoFecha(utilitario.getValorEtiqueta(fileContents.toString(), "fechaEmision")));
+
             System.out.println("*** " + utilitario.getValorEtiqueta(fileContents.toString(), "formaPago"));
             //Detalles
             String cadenaDetalles = utilitario.getValorEtiqueta(fileContents.toString(), "detalles");

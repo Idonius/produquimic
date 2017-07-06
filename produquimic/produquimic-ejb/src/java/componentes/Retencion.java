@@ -125,22 +125,28 @@ public class Retencion extends Dialogo {
         tab_dto_proveedor = new Tabla();
         tab_dto_proveedor.setRuta("pre_index.clase." + getId());
         tab_dto_proveedor.setId("tab_dto_proveedor");
-        tab_dto_proveedor.setSql("select ide_geper,nom_geper,direccion_geper,identificac_geper,correo_geper "
-                + "from gen_persona gp "
-                + "where ide_geper=" + tab_cab_documento.getValor("ide_geper"));
-        tab_dto_proveedor.setNumeroTabla(999);
-        tab_dto_proveedor.setCampoPrimaria("ide_geper");
+        tab_dto_proveedor.setTabla("gen_persona", "ide_geper", 997);
+        tab_dto_proveedor.setCondicion("ide_geper=" + tab_cab_documento.getValor("ide_geper"));
+        //OCULTA TODAS LAS COLUMNAS
+        for (int i = 0; i < tab_dto_proveedor.getTotalColumnas(); i++) {
+            tab_dto_proveedor.getColumnas()[i].setVisible(false);
+            tab_dto_proveedor.getColumnas()[i].setLectura(true);
+        }
+        tab_dto_proveedor.getColumna("correo_geper").setVisible(true);
         tab_dto_proveedor.getColumna("correo_geper").setNombreVisual("E-MAIL");
         tab_dto_proveedor.getColumna("correo_geper").setOrden(4);
         tab_dto_proveedor.getColumna("identificac_geper").setEtiqueta();
+        tab_dto_proveedor.getColumna("identificac_geper").setVisible(true);
         tab_dto_proveedor.getColumna("identificac_geper").setNombreVisual("IDENTIFICACIÓN");
         tab_dto_proveedor.getColumna("identificac_geper").setOrden(3);
         tab_dto_proveedor.getColumna("nom_geper").setOrden(1);
+        tab_dto_proveedor.getColumna("nom_geper").setVisible(true);
         tab_dto_proveedor.getColumna("nom_geper").setNombreVisual("PROVEEDOR");
         tab_dto_proveedor.getColumna("nom_geper").setEtiqueta();
         tab_dto_proveedor.getColumna("direccion_geper").setNombreVisual("DIRECCIÓN");
         tab_dto_proveedor.getColumna("direccion_geper").setEtiqueta();
         tab_dto_proveedor.getColumna("direccion_geper").setOrden(2);
+        tab_dto_proveedor.getColumna("direccion_geper").setVisible(true);
         tab_dto_proveedor.getColumna("ide_geper").setVisible(false);
         tab_dto_proveedor.setNumeroTabla(-1);
         tab_dto_proveedor.setLectura(true);
@@ -406,28 +412,31 @@ public class Retencion extends Dialogo {
         Grupo grupo = new Grupo();
 
         grupo.getChildren().add(gri_pto);
+
         tab_dto_proveedor = new Tabla();
         tab_dto_proveedor.setRuta("pre_index.clase." + getId());
         tab_dto_proveedor.setId("tab_dto_proveedor");
-        tab_dto_proveedor.setSql("select ide_geper,identificac_geper,nom_geper,direccion_geper,correo_geper "
-                + "from gen_persona  "
-                + "where ide_geper=" + tab_cab_documento.getValor("ide_geper"));
-        tab_dto_proveedor.setNumeroTabla(999);
-        tab_dto_proveedor.setCampoPrimaria("ide_geper");
+        tab_dto_proveedor.setTabla("gen_persona", "ide_geper", 997);
+        tab_dto_proveedor.setCondicion("ide_geper=" + tab_cab_documento.getValor("ide_geper"));
+        //OCULTA TODAS LAS COLUMNAS
+        for (int i = 0; i < tab_dto_proveedor.getTotalColumnas(); i++) {
+            tab_dto_proveedor.getColumnas()[i].setVisible(false);
+        }
+        tab_dto_proveedor.getColumna("correo_geper").setVisible(true);
         tab_dto_proveedor.getColumna("correo_geper").setNombreVisual("E-MAIL");
         tab_dto_proveedor.getColumna("correo_geper").setOrden(4);
         tab_dto_proveedor.getColumna("identificac_geper").setEtiqueta();
+        tab_dto_proveedor.getColumna("identificac_geper").setVisible(true);
         tab_dto_proveedor.getColumna("identificac_geper").setNombreVisual("IDENTIFICACIÓN");
-        tab_dto_proveedor.getColumna("identificac_geper").setOrden(3);
+        tab_dto_proveedor.getColumna("identificac_geper").setOrden(2);
         tab_dto_proveedor.getColumna("nom_geper").setOrden(1);
+        tab_dto_proveedor.getColumna("nom_geper").setVisible(true);
         tab_dto_proveedor.getColumna("nom_geper").setNombreVisual("PROVEEDOR");
-        tab_dto_proveedor.getColumna("nom_geper").setLectura(true);
         tab_dto_proveedor.getColumna("nom_geper").setEtiqueta();
         tab_dto_proveedor.getColumna("direccion_geper").setNombreVisual("DIRECCIÓN");
-        tab_dto_proveedor.getColumna("direccion_geper").setOrden(2);
+        tab_dto_proveedor.getColumna("direccion_geper").setOrden(3);
+        tab_dto_proveedor.getColumna("direccion_geper").setVisible(true);
         tab_dto_proveedor.getColumna("ide_geper").setVisible(false);
-
-        tab_dto_proveedor.setNumeroTabla(-1);
         tab_dto_proveedor.setTipoFormulario(true);
         tab_dto_proveedor.getGrid().setColumns(4);
         tab_dto_proveedor.setMostrarNumeroRegistros(false);
