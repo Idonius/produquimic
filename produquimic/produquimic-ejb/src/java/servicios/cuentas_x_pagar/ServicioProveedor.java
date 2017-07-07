@@ -414,4 +414,14 @@ public class ServicioProveedor {
                 + "where ide_geper in (" + ide_geper + ") order by nom_geper";
     }
 
+        /**
+     * Retorna el ide_geper de un Cliente por Identificación
+     *
+     * @param identificac_geper Cédula/Ruc/Pasaporte
+     * @return
+     */
+    public String getIdeProveedorporIdentificacion(String identificac_geper) {
+        return utilitario.consultar("select identificac_geper,ide_geper from gen_persona where es_proveedo_geper=true  and  identificac_geper='" + identificac_geper + "'").getValor("ide_geper");
+    }
+    
 }

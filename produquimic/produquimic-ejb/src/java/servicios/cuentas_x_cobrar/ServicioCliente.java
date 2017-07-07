@@ -24,10 +24,10 @@ public class ServicioCliente extends ServicioBase {
      * Codigo Padre de todos los clientes para el campo GEN_IDE_GEPER
      */
     public final static String P_PADRE_CLIENTES = "1";
-    
+
     @EJB
     private ServicioConfiguracion ser_configuracion;
-    
+
     @PostConstruct
     public void init() {
         //Recupera todos los parametros que se van a ocupar en el EJB
@@ -112,7 +112,7 @@ public class ServicioCliente extends ServicioBase {
      * @param tabla
      */
     public void configurarTablaCliente(Tabla tabla) {
-        
+
         tabla.setTabla("gen_persona", "ide_geper", -1);
         tabla.setCondicion("es_cliente_geper=true and ide_geper=-1");
         tabla.getColumna("es_cliente_geper").setValorDefecto("true");
@@ -277,9 +277,9 @@ public class ServicioCliente extends ServicioBase {
                 + "HAVING sum (dt.valor_ccdtr*tt.signo_ccttr) > 0 "
                 + "ORDER BY cf.fecha_emisi_cccfa ASC ,ct.fecha_trans_ccctr ASC,dt.ide_ccctr ASC";
     }
-    
+
     public String getSqlCuentasPorCobrar(String ide_geper) {
-        
+
         String str_sql_cxc = "select dt.ide_ccctr,"
                 + "dt.ide_cccfa,"
                 + "case when (cf.fecha_emisi_cccfa) is null then ct.fecha_trans_ccctr else cf.fecha_emisi_cccfa end,"
@@ -297,7 +297,7 @@ public class ServicioCliente extends ServicioBase {
                 + "cf.observacion_cccfa,ct.observacion_ccctr,cf.fecha_emisi_cccfa,ct.fecha_trans_ccctr,cf.total_cccfa "
                 + "HAVING sum (dt.valor_ccdtr*tt.signo_ccttr) > 0 "
                 + "ORDER BY cf.fecha_emisi_cccfa ASC ,ct.fecha_trans_ccctr ASC,dt.ide_ccctr ASC";
-        
+
         return str_sql_cxc;
     }
 
@@ -327,7 +327,7 @@ public class ServicioCliente extends ServicioBase {
      * @return
      */
     public String getSqlProductosVendidos(String ide_geper) {
-        
+
         return "select distinct a.ide_inarti,nombre_inarti,max(b.fecha_emisi_cccfa) as fecha_ultima_venta,\n"
                 + "(select precio_ccdfa from cxc_deta_factura  inner join cxc_cabece_factura  on cxc_deta_factura.ide_cccfa=cxc_cabece_factura.ide_cccfa where ide_ccefa=" + parametros.get("p_cxc_estado_factura_normal") + " and ide_geper=" + ide_geper + " and ide_inarti=a.ide_inarti order by fecha_emisi_cccfa desc limit 1) as ultimo_precio\n"
                 + "from cxc_deta_factura a \n"
@@ -364,12 +364,12 @@ public class ServicioCliente extends ServicioBase {
             utilitario.agregarMensajeError("Error no puede guardar", "Debe seleccionar el tipo de contribuyente");
             return false;
         }
-        
+
         if (tab_cliente.getValor("DIRECCION_GEPER") == null || tab_cliente.getValor("DIRECCION_GEPER").isEmpty()) {
             utilitario.agregarMensajeError("Error no puede guardar", "Debe ingresar la dirección");
             return false;
         }
-        
+
         if (tab_cliente.getValor("TELEFONO_GEPER") == null || tab_cliente.getValor("TELEFONO_GEPER").isEmpty()) {
             utilitario.agregarMensajeError("Error no puede guardar", "Debe ingresar un número de teléfono");
             return false;
@@ -377,7 +377,7 @@ public class ServicioCliente extends ServicioBase {
         //      }
         return true;
     }
-    
+
     public String getSqlComboFacturasPorCobrar(String ide_geper) {
         return "select dt.ide_ccctr,\n"
                 + "coalesce(nombre_cntdo,'Cuenta por Cobrar'),coalesce(cf.secuencial_cccfa,''),\n"
@@ -415,7 +415,7 @@ public class ServicioCliente extends ServicioBase {
      * @return
      */
     public String getIdeClienteporIdentificacion(String identificac_geper) {
-        return utilitario.consultar("select identificac_geper,ide_geper from gen_persona where identificac_geper='" + identificac_geper + "'").getValor("ide_geper");
+        return utilitario.consultar("select identificac_geper,ide_geper from gen_persona where es_cliente_geper=true  and  identificac_geper='" + identificac_geper + "'").getValor("ide_geper");
     }
 
     /**
@@ -427,5 +427,5 @@ public class ServicioCliente extends ServicioBase {
     public String getCodigoCliente(String ide_geper) {
         return utilitario.consultar("select codigo_geper,ide_geper from gen_persona where ide_geper=" + ide_geper).getValor("codigo_geper");
     }
-    
+
 }

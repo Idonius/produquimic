@@ -36,6 +36,7 @@ import servicios.contabilidad.ServicioComprobanteContabilidad;
 import servicios.contabilidad.ServicioConfiguracion;
 import servicios.cuentas_x_pagar.ServicioCuentasCxP;
 import servicios.cuentas_x_pagar.ServicioProveedor;
+import servicios.integracion.ServicioIntegracion;
 import servicios.inventario.ServicioInventario;
 import servicios.inventario.ServicioProducto;
 import sistema.aplicacion.Utilitario;
@@ -50,10 +51,10 @@ public class DocumentoCxP extends Dialogo {
     private final Tabulador tab_documenoCxP = new Tabulador();
     private Combo com_tipo_documento;
     private Combo com_anticipo;
-    private Etiqueta eti_anticipo = new Etiqueta();
+    private final Etiqueta eti_anticipo = new Etiqueta();
     private Tabla tab_cab_documento;
     private Tabla tab_det_documento;
-    private Map<String, String> parametros;
+    private final Map<String, String> parametros;
     private final AreaTexto ate_observacion = new AreaTexto();
     private final Texto tex_subtotal12 = new Texto();
     private final Texto tex_subtotal0 = new Texto();
@@ -76,6 +77,9 @@ public class DocumentoCxP extends Dialogo {
     private final ServicioConfiguracion ser_configuracion = (ServicioConfiguracion) utilitario.instanciarEJB(ServicioConfiguracion.class);
     @EJB
     private final ServicioProveedor ser_proveedor = (ServicioProveedor) utilitario.instanciarEJB(ServicioProveedor.class);
+    @EJB
+    private final ServicioIntegracion ser_integracion = (ServicioIntegracion) utilitario.instanciarEJB(ServicioIntegracion.class);
+
     private double tarifaIVA = 0;
     //CLIENTE
     private Tabla tab_creacion_cliente;
@@ -108,6 +112,9 @@ public class DocumentoCxP extends Dialogo {
 
     private Upload upl_cxp_xml;
     private Dialogo dia_cxp_xml;
+
+    private final Boton bot_limpiar_cliente = new Boton();
+    private final Boton bot_limpiar_producto = new Boton();
 
     public DocumentoCxP() {
         //utilitario.getConexion().setImprimirSqlConsola(true);
@@ -157,12 +164,21 @@ public class DocumentoCxP extends Dialogo {
         dia_creacion_producto.setWidth("40%");
         utilitario.getPantalla().getChildren().add(dia_creacion_producto);
 
+        bot_limpiar_cliente.setValue("Limpiar");
+        bot_limpiar_cliente.setIcon("ui-icon-cancel");
+        dia_creacion_cliente.getGru_botones().getChildren().add(bot_limpiar_cliente);
+
+        bot_limpiar_producto.setValue("Limpiar");
+        bot_limpiar_producto.setIcon("ui-icon-cancel");
+        dia_creacion_producto.getGru_botones().getChildren().add(bot_limpiar_producto);
+
         dia_cxp_xml = new Dialogo();
         dia_cxp_xml.setId("dia_cxp_xml");
         dia_cxp_xml.setTitle("SELECCIONAR FACTURA ELECTRÓNICA XML");
         dia_cxp_xml.setWidth("45%");
         dia_cxp_xml.setHeight("30%");
         utilitario.getPantalla().getChildren().add(dia_cxp_xml);
+
     }
 
     public void setDocumentoCxP(String titulo) {
@@ -523,7 +539,8 @@ public class DocumentoCxP extends Dialogo {
             gri_pto.getChildren().add(new Espacio("10", "1"));
             Boton botCrearCliente = new Boton();
             botCrearCliente.setId("botCrearCliente");
-            botCrearCliente.setValue("Crear Proveedor");
+            botCrearCliente.setValue("Proveedor");
+            botCrearCliente.setTitle("Crear-Modificar Proveedor");
             botCrearCliente.setIcon("ui-icon-person");
             botCrearCliente.setMetodoRuta("pre_index.clase." + getId() + ".abrirProveedor");
             gri_pto.getChildren().add(botCrearCliente);
@@ -532,12 +549,24 @@ public class DocumentoCxP extends Dialogo {
             Boton botCrearProducto = new Boton();
             botCrearProducto.setId("botCrearProducto");
             botCrearProducto.setValue("Crear Producto");
+            botCrearProducto.setTitle("Crear-Modificar Producto");
             botCrearProducto.setIcon("ui-icon-cart");
             botCrearProducto.setMetodoRuta("pre_index.clase." + getId() + ".abrirProducto");
             gri_pto.getChildren().add(botCrearProducto);
 
+            Boton botImportar = new Boton();
+            botImportar.setId("botImportar");
+            botImportar.setValue("Importar");
+            botImportar.setTitle("Importar Proveedores y Productos del Sistema de Facturación");
+            botImportar.setIcon("ui-icon-circle-arrow-n");
+            botImportar.setMetodoRuta("pre_index.clase." + getId() + ".importarProveedoresProductos");
+            gri_pto.getChildren().add(botImportar);
+
             dia_creacion_cliente.getBot_aceptar().setMetodoRuta("pre_index.clase." + getId() + ".guardarProveedor");
             dia_creacion_cliente.getBot_cancelar().setMetodoRuta("pre_index.clase." + getId() + ".cerrarDialogos");
+
+            bot_limpiar_producto.setMetodoRuta("pre_index.clase." + getId() + ".limpiarProducto");
+            bot_limpiar_cliente.setMetodoRuta("pre_index.clase." + getId() + ".limpiarCliente");
 
             tab_creacion_cliente = new Tabla();
             tab_creacion_cliente.setId("tab_creacion_cliente");
@@ -988,6 +1017,40 @@ public class DocumentoCxP extends Dialogo {
         grupo.setStyle("overflow:hidden;display:block;");
 
         return grupo;
+    }
+
+    public void importarProveedoresProductos() {
+        ser_integracion.importarClientes();
+        ser_integracion.importarProductos();
+        cargarProveedores();
+        utilitario.addUpdateTabla(tab_cab_documento, "ide_geper", "");
+        utilitario.addUpdateTabla(tab_det_documento, "ide_inuni", "");
+    }
+
+    /**
+     * Verifica si una identificación existe en la base de datos
+     */
+    public void buscarProveedor() {
+        if (tab_creacion_cliente.getValor("IDENTIFICAC_GEPER") != null) {
+            String ide_geper_busca = ser_proveedor.getIdeProveedorporIdentificacion(tab_creacion_cliente.getValor("IDENTIFICAC_GEPER"));
+            if (ide_geper_busca != null) {
+                tab_creacion_cliente.setCondicion("ide_geper=" + ide_geper_busca);
+                tab_creacion_cliente.ejecutarSql();
+                utilitario.addUpdate("tab_creacion_cliente");
+            }
+        }
+    }
+
+    public void limpiarProducto() {
+        tab_creacion_producto.limpiar();
+        tab_creacion_producto.insertar();
+        utilitario.addUpdate("tab_creacion_producto");
+    }
+
+    public void limpiarCliente() {
+        tab_creacion_cliente.limpiar();
+        tab_creacion_cliente.insertar();
+        utilitario.addUpdate("tab_creacion_cliente");
     }
 
     public void seleccionarArchivoXML(FileUploadEvent event) {
@@ -1803,8 +1866,14 @@ public class DocumentoCxP extends Dialogo {
 
     public void abrirProducto() {
         if (tab_cab_documento.getValor("ide_geper") != null) {
-            tab_creacion_producto.limpiar();
-            tab_creacion_producto.insertar();
+            if (tab_det_documento.getValor("ide_inarti") != null) {
+                tab_creacion_producto.setCondicion("ide_inarti=" + tab_det_documento.getValor("ide_inarti"));
+                tab_creacion_producto.ejecutarSql();
+            } else {
+                tab_creacion_producto.limpiar();
+                tab_creacion_producto.insertar();
+            }
+
             dia_creacion_producto.dibujar();
         } else {
             utilitario.agregarMensajeInfo("Seleccione un Proveedor", "");
@@ -1813,8 +1882,15 @@ public class DocumentoCxP extends Dialogo {
 
     public void abrirProveedor() {
         if (com_tipo_documento.getValue() != null) {
-            tab_creacion_cliente.limpiar();
-            tab_creacion_cliente.insertar();
+
+            if (tab_cab_documento.getValor("ide_geper") != null) {
+                tab_creacion_cliente.setCondicion("ide_geper=" + tab_cab_documento.getValor("ide_geper"));
+                tab_creacion_cliente.ejecutarSql();
+            } else {
+                tab_creacion_cliente.limpiar();
+                tab_creacion_cliente.insertar();
+            }
+
             dia_creacion_cliente.dibujar();
         } else {
             utilitario.agregarMensajeInfo("Seleccione un Tipo de Documento", "");
