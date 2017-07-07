@@ -417,4 +417,14 @@ public class ServicioCliente extends ServicioBase {
         return utilitario.consultar("select identificac_geper,ide_geper from gen_persona where identificac_geper='" + identificac_geper + "'").getValor("ide_geper");
     }
 
+    /**
+     * Retorna el codigo_geper de un Cliente
+     *
+     * @param ide_geper
+     * @return
+     */
+    public String getCodigoCliente(String ide_geper) {
+        return utilitario.consultar("select codigo_geper,ide_geper from gen_persona where ide_geper=" + ide_geper).getValor("codigo_geper");
+    }
+
 }

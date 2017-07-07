@@ -30,13 +30,23 @@ public class ServicioIntegracion extends ServicioBase {
     /**
      * Retorna sql de kardex de un cliente
      *
-     * @param identificacion
+     * @param codigo_geper
      * @return
      */
-    public String getSqlKardexCliente_Escritorio(String identificacion) {
-        return "SELECT CODIGOKC,a.COD_CLIE,DATE_FORMAT(fecha,'%d/%m/%Y') as FECHA_MOVI ,FACTURA,DETALLE,INGRESO,EGRESO,TOTAL FROM KARDEXCLIENTES a\n"
-                + "inner join CLIENTES B on a.COD_CLIE=B.COD_CLIE\n"
-                + "where CEDULA ='" + identificacion + "' ORDER BY CODIGOKC";
+    public String getSqlKardexCliente_Escritorio(String codigo_geper) {
+        return "SELECT CODIGOKC,COD_CLIE,DATE_FORMAT(fecha,'%d/%m/%Y') as FECHA_MOVI ,FACTURA,DETALLE,INGRESO,EGRESO,TOTAL FROM KARDEXCLIENTES a\n"
+                + "where COD_CLIE =" + codigo_geper + " ORDER BY CODIGOKC";
+    }
+
+    /**
+     * Retorna sql de kardex de un proveedor
+     *
+     * @param codigo_geper
+     * @return
+     */
+    public String getSqlKardexProveedor_Escritorio(String codigo_geper) {
+        return "SELECT CODIGOKPV,COD_PROVE,DATE_FORMAT(fecha,'%d/%m/%Y') as FECHA_MOVI ,FACTURA,DETALLE,INGRESO,EGRESO,TOTAL FROM KARDEXPROVEEDORES a\n"
+                + "where COD_PROVE =" + codigo_geper + " ORDER BY CODIGOKPV";
     }
 
     /**

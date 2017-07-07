@@ -390,4 +390,28 @@ public class ServicioProveedor {
         TablaGenerica tag = utilitario.consultar("select  ide_geper,identificac_geper from gen_persona where identificac_geper='" + identificac_geper + "'");
         return tag.getValor("ide_geper");
     }
+
+    /**
+     * Retorna el codigo_geper de un Proveedor
+     *
+     * @param ide_geper
+     * @return
+     */
+    public String getCodigoProveedor(String ide_geper) {
+        return utilitario.consultar("select codigo_geper,ide_geper from gen_persona where ide_geper=" + ide_geper).getValor("codigo_geper");
+    }
+
+    /**
+     * Retorna los datos principales de los proveedores
+     *
+     * @param ide_geper
+     * @return
+     */
+    public String getSqlDatosProveedores(String ide_geper) {
+        return "select ide_geper,nom_geper as NOMBRE,nombre_getid TIPO_IDENTIFICACION,identificac_geper IDENTIFICACION,direccion_geper DIRECCION,telefono_geper TELEFONO\n"
+                + "from gen_persona a\n"
+                + "left join gen_tipo_identifi b on a.ide_getid=b.ide_getid\n"
+                + "where ide_geper in (" + ide_geper + ") order by nom_geper";
+    }
+
 }
