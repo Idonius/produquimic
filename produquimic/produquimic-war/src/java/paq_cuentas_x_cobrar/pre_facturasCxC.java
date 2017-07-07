@@ -191,8 +191,6 @@ public class pre_facturasCxC extends Pantalla {
 
     public void dibujarUtilidadVentas() {
         Grupo gru = new Grupo();
-        gru.getChildren().add(new Etiqueta("<i class='fa fa-line-chart fa-2x'></i> &nbsp; <span style='font-size:14px; text-shadow: none;'>Utilidad en Ventas detallado por vendedor en un período determinado. </span>"));
-        gru.getChildren().add(new Separator());
 
         Grid gri = new Grid();
         gri.setColumns(6);
@@ -247,8 +245,7 @@ public class pre_facturasCxC extends Pantalla {
         PanelTabla pat_panel = new PanelTabla();
         pat_panel.setPanelTabla(tab_tabla);
         gru.getChildren().add(pat_panel);
-
-        mep_menu.dibujar(10, "", gru);
+        mep_menu.dibujar(10, "fa fa-line-chart", "Utilidad en Ventas detallado por vendedor en un período determinado.", gru, true);
     }
 
     public void actualizarUtilidad() {

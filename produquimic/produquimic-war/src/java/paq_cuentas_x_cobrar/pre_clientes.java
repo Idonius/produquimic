@@ -31,7 +31,6 @@ import servicios.contabilidad.ServicioContabilidadGeneral;
 import servicios.cuentas_x_cobrar.ServicioCliente;
 import servicios.cuentas_x_cobrar.ServicioCuentasCxC;
 import servicios.integracion.ServicioIntegracion;
-import servicios.prestamo.ServicioPrestamo;
 import sistema.aplicacion.Pantalla;
 
 /**
@@ -62,8 +61,6 @@ public class pre_clientes extends Pantalla {
     private AutoCompletar aut_cuentas;
 
     private AsientoContable asc_asiento = new AsientoContable();
-    @EJB
-    private final ServicioPrestamo ser_prestamo = (ServicioPrestamo) utilitario.instanciarEJB(ServicioPrestamo.class);
 
     @EJB
     private final ServicioComprobanteContabilidad ser_comp_conta = (ServicioComprobanteContabilidad) utilitario.instanciarEJB(ServicioComprobanteContabilidad.class);
@@ -200,7 +197,6 @@ public class pre_clientes extends Pantalla {
             gru_grupo.getChildren().add(pat_panel);
         }
         mep_menu.dibujar(13, "fa fa-list-alt", "Tarjeta Kardex con las transacciones del cliente.", gru_grupo, true);
-
     }
 
     public void dibujarImportar() {
@@ -244,8 +240,8 @@ public class pre_clientes extends Pantalla {
         PanelTabla pat_panel = new PanelTabla();
         pat_panel.setPanelTabla(tab_tabla);
         pat_panel.getMenuTabla().getItem_buscar().setRendered(false);
-        mep_menu.dibujar(12, "REPORTE  CUENTAS POR COBRAR", pat_panel);
 
+        mep_menu.dibujar(12, "fa fa-money", "Reporte de saldos por cobrar de los clientes.", pat_panel, true);
     }
 
     /**
@@ -335,7 +331,7 @@ public class pre_clientes extends Pantalla {
 
             gru_grupo.getChildren().add(pat_panel2);
         }
-        mep_menu.dibujar(10, "INGRESAR TRANSACCIÓN", gru_grupo);
+        mep_menu.dibujar(10, "fa fa-pencil-square-o", "Ingresar transacciones del cliente.", gru_grupo, true);
     }
 
     public void dibujarTransacciones() {
@@ -405,7 +401,8 @@ public class pre_clientes extends Pantalla {
 
             actualizarSaldoxCobrar();
         }
-        mep_menu.dibujar(2, "TRANSACCIONES DEL CLIENTE", gru_grupo);
+
+        mep_menu.dibujar(2, "fa fa-calculator", "Detalle de transacciones del cliente.", gru_grupo, true);
     }
 
     public void dibujarProductos() {
@@ -461,7 +458,7 @@ public class pre_clientes extends Pantalla {
             gru_grupo.getChildren().add(pat_panel);
         }
 
-        mep_menu.dibujar(3, "DETALLE DE PRODUCTOS VENDIDOS AL CLIENTE", gru_grupo);
+        mep_menu.dibujar(3, "fa fa-calendar-check-o", "Detalle de productos vendidos al cliente.", gru_grupo, true);
     }
 
     public void dibujarConfiguraCuenta() {
@@ -488,7 +485,8 @@ public class pre_clientes extends Pantalla {
             gru_grupo.getChildren().add(gri_contenido);
             gru_grupo.getChildren().add(new Etiqueta("<p style='padding-top:10px;'><strong >NOTA: </strong> La cuenta contable seleccionada se relacionará a los movimientos-transacciones que realice el Cliente, a partir que se <strong>guarde </strong> el cambio. </p>"));
         }
-        mep_menu.dibujar(4, "CONFIGURACIÓN DE CUENTA CONTABLE", gru_grupo);
+
+        mep_menu.dibujar(4, "fa fa-cogs", "Configurar cuenta contable del cliente.", gru_grupo, true);
     }
 
     public void dibujarMovimientos() {
@@ -552,7 +550,8 @@ public class pre_clientes extends Pantalla {
                 utilitario.agregarMensajeInfo("No se encontro Cuenta Contable", "El cliente seleccionado no tiene asociado una cuenta contable");
             }
         }
-        mep_menu.dibujar(5, "MOVIMIENTOS CONTABLES", gru_grupo);
+
+        mep_menu.dibujar(5, "fa fa-book", "Libro mayor de la cuenta contable del cliente.", gru_grupo, true);
     }
 
     /**
@@ -598,7 +597,7 @@ public class pre_clientes extends Pantalla {
                 tab_tabla.setEmptyMessage("El cliente no tiene facturas por pagar");
             }
         }
-        mep_menu.dibujar(6, "FACTURAS POR COBRAR AL CLIENTE", gru_grupo);
+        mep_menu.dibujar(6, "fa fa-clock-o", "Listado de facturas pendientes de pago del cliente.", gru_grupo, true);
     }
 
     public void dibujarEstructura() {
@@ -669,7 +668,7 @@ public class pre_clientes extends Pantalla {
             gru_grupo.getChildren().add(pat_panel);
             gru_grupo.getChildren().add(gca_grafico);
         }
-        mep_menu.dibujar(8, "GRAFICO DE VENTAS", gru_grupo);
+        mep_menu.dibujar(8, "fa fa-bar-chart", "Gráficos estadísticos de ventas del cliente.", gru_grupo, true);
     }
 
     public void dibujarProductosVendidos() {
@@ -697,7 +696,7 @@ public class pre_clientes extends Pantalla {
             gru_grupo.getChildren().add(pat_panel1);
 
         }
-        mep_menu.dibujar(9, "PRODUCTOS VENDIDOS", gru_grupo);
+        mep_menu.dibujar(9, "fa fa-cart-arrow-down", "Últimos precios de productos vendidos al cliente.", gru_grupo, true);
     }
 
     public void actualizarGrafico() {
