@@ -119,6 +119,8 @@ public class FacturaCxC extends Dialogo {
 
     private final Etiqueta eti_subtotal = new Etiqueta();
     private final Etiqueta eti_iva = new Etiqueta();
+    private final Boton bot_limpiar_cliente = new Boton();
+    private final Boton bot_limpiar_producto = new Boton();
 
     public FacturaCxC() {
         parametros = utilitario.getVariables("p_con_tipo_documento_factura",
@@ -163,17 +165,26 @@ public class FacturaCxC extends Dialogo {
         tarifaIVA = ser_configuracion.getPorcentajeIva(utilitario.getFechaActual());
         dia_creacion_cliente = new Dialogo();
         dia_creacion_cliente.setId("dia_creacion_cliente");
-        dia_creacion_cliente.setTitle("CREAR CLIENTE");
+        dia_creacion_cliente.setTitle("DATOS DEL CLIENTE");
         dia_creacion_cliente.setHeight("75%");
         dia_creacion_cliente.setWidth("55%");
         utilitario.getPantalla().getChildren().add(dia_creacion_cliente);
 
         dia_creacion_producto = new Dialogo();
         dia_creacion_producto.setId("dia_creacion_producto");
-        dia_creacion_producto.setTitle("CREAR PRODUCTO");
-        dia_creacion_producto.setHeight("65%");
-        dia_creacion_producto.setWidth("40%");
+        dia_creacion_producto.setTitle("DATOS DEL PRODUCTO");
+        dia_creacion_producto.setHeight("75%");
+        dia_creacion_producto.setWidth("50%");
         utilitario.getPantalla().getChildren().add(dia_creacion_producto);
+
+        bot_limpiar_cliente.setValue("Limpiar");
+        bot_limpiar_cliente.setIcon("ui-icon-cancel");
+        dia_creacion_cliente.getGru_botones().getChildren().add(bot_limpiar_cliente);
+
+        bot_limpiar_producto.setValue("Limpiar");
+        bot_limpiar_producto.setIcon("ui-icon-cancel");
+        dia_creacion_producto.getGru_botones().getChildren().add(bot_limpiar_producto);
+
         //Carga los clientes y productos 
         actualizarClientesProductos();
     }
@@ -482,7 +493,8 @@ public class FacturaCxC extends Dialogo {
             gri_pto.getChildren().add(new Espacio("10", "1"));
             Boton botCrearCliente = new Boton();
             botCrearCliente.setId("botCrearCliente");
-            botCrearCliente.setValue("Crear Cliente");
+            botCrearCliente.setValue("Cliente");
+            botCrearCliente.setTitle("Crear-Modificar Cliente");
             botCrearCliente.setIcon("ui-icon-person");
             botCrearCliente.setMetodoRuta("pre_index.clase." + getId() + ".abrirCliente");
             gri_pto.getChildren().add(botCrearCliente);
@@ -490,7 +502,8 @@ public class FacturaCxC extends Dialogo {
 
             Boton botCrearProducto = new Boton();
             botCrearProducto.setId("botCrearProducto");
-            botCrearProducto.setValue("Crear Producto");
+            botCrearProducto.setValue("Producto");
+            botCrearProducto.setTitle("Crear-Modificar Producto");
             botCrearProducto.setIcon("ui-icon-cart");
             botCrearProducto.setMetodoRuta("pre_index.clase." + getId() + ".abrirProducto");
             gri_pto.getChildren().add(botCrearProducto);
@@ -505,6 +518,8 @@ public class FacturaCxC extends Dialogo {
 
             dia_creacion_cliente.getBot_aceptar().setMetodoRuta("pre_index.clase." + getId() + ".guardarCliente");
             dia_creacion_cliente.getBot_cancelar().setMetodoRuta("pre_index.clase." + getId() + ".cerrarDialogos");
+            bot_limpiar_producto.setMetodoRuta("pre_index.clase." + getId() + ".limpiarProducto");
+            bot_limpiar_cliente.setMetodoRuta("pre_index.clase." + getId() + ".limpiarCliente");
 
             tab_creacion_cliente = new Tabla();
             tab_creacion_cliente.setId("tab_creacion_cliente");
@@ -527,6 +542,7 @@ public class FacturaCxC extends Dialogo {
             tab_creacion_cliente.getColumna("IDE_GETID").setOrden(1);
             tab_creacion_cliente.getColumna("IDENTIFICAC_GEPER").setNombreVisual("IDENTIFICACION");
             tab_creacion_cliente.getColumna("IDENTIFICAC_GEPER").setOrden(2);
+            tab_creacion_cliente.getColumna("IDENTIFICAC_GEPER").setMetodoChangeRuta("pre_index.clase." + getId() + ".buscarCliente");
             tab_creacion_cliente.getColumna("NOM_GEPER").setNombreVisual("NOMBRE");
             tab_creacion_cliente.getColumna("NOM_GEPER").setOrden(3);
             tab_creacion_cliente.getColumna("NOMBRE_COMPL_GEPER").setNombreVisual("NOMBRE COMERCIAL");
@@ -1113,6 +1129,11 @@ public class FacturaCxC extends Dialogo {
         if (tab_cab_factura.getValor("ide_geper") != null) {
             setCliente(tab_cab_factura.getValor("ide_geper"));
             asignarDatosGuia();
+        } else {
+            tab_cab_factura.setValor("direccion_cccfa", null);
+            tab_cab_factura.setValor("telefono_cccfa", null);
+            tab_cab_factura.setValor("correo_cccfa", null);
+            utilitario.addUpdateTabla(tab_cab_factura, "direccion_cccfa,telefono_cccfa,correo_cccfa", "");
         }
 
     }
@@ -1125,7 +1146,6 @@ public class FacturaCxC extends Dialogo {
                 tab_guia.setValor("fecha_emision_ccgui", tab_cab_factura.getValor("fecha_emisi_cccfa"));
                 utilitario.addUpdateTabla(tab_guia, "ide_geper,fecha_emision_ccgui,PUNTO_LLEGADA_CCGUI", "");
             }
-
         }
     }
 
@@ -1442,6 +1462,33 @@ public class FacturaCxC extends Dialogo {
         }
     }
 
+    /**
+     * Verifica si una identificación existe en la base de datos
+     */
+    public void buscarCliente() {
+        if (tab_creacion_cliente.getValor("IDENTIFICAC_GEPER") != null) {
+            String ide_geper_busca = ser_cliente.getIdeClienteporIdentificacion(tab_creacion_cliente.getValor("IDENTIFICAC_GEPER"));
+            if (ide_geper_busca != null) {
+                tab_creacion_cliente.setCondicion("ide_geper=" + ide_geper_busca);
+                tab_creacion_cliente.ejecutarSql();
+                utilitario.addUpdate("tab_creacion_cliente");
+            }
+        }
+
+    }
+
+    public void limpiarProducto() {
+        tab_creacion_producto.limpiar();
+        tab_creacion_producto.insertar();
+        utilitario.addUpdate("tab_creacion_producto");
+    }
+
+    public void limpiarCliente() {
+        tab_creacion_cliente.limpiar();
+        tab_creacion_cliente.insertar();
+        utilitario.addUpdate("tab_creacion_cliente");
+    }
+
     public void guardarCliente() {
         if (ser_cliente.validarCliente(tab_creacion_cliente)) {
             if (tab_creacion_cliente.guardar()) {
@@ -1593,14 +1640,24 @@ public class FacturaCxC extends Dialogo {
     }
 
     public void abrirProducto() {
-        tab_creacion_producto.limpiar();
-        tab_creacion_producto.insertar();
+        if (tab_deta_factura.getValor("ide_inarti") != null) {
+            tab_creacion_producto.setCondicion("ide_inarti=" + tab_deta_factura.getValor("ide_inarti"));
+            tab_creacion_producto.ejecutarSql();
+        } else {
+            tab_creacion_producto.limpiar();
+            tab_creacion_producto.insertar();
+        }
         dia_creacion_producto.dibujar();
     }
 
     public void abrirCliente() {
-        tab_creacion_cliente.limpiar();
-        tab_creacion_cliente.insertar();
+        if (tab_cab_factura.getValor("ide_geper") != null) {
+            tab_creacion_cliente.setCondicion("ide_geper=" + tab_cab_factura.getValor("ide_geper"));
+            tab_creacion_cliente.ejecutarSql();
+        } else {
+            tab_creacion_cliente.limpiar();
+            tab_creacion_cliente.insertar();
+        }
         dia_creacion_cliente.dibujar();
     }
 
@@ -1609,11 +1666,7 @@ public class FacturaCxC extends Dialogo {
         if (p_sri_activa_comp_elect == null) {
             return false;
         }
-        if (p_sri_activa_comp_elect.equalsIgnoreCase("true")) {
-            return true;
-        } else {
-            return false;
-        }
+        return p_sri_activa_comp_elect.equalsIgnoreCase("true");
     }
 
     public List getListaDiasCredito() {

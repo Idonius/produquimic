@@ -124,7 +124,7 @@ public class ServicioCliente extends ServicioBase {
         tabla.getColumna("ide_rhcon").setVisible(false);
         tabla.getColumna("ide_teban").setVisible(false);
         tabla.getColumna("ide_getid").setCombo("gen_tipo_identifi", "ide_getid", "nombre_getid", "");
-       // tabla.getColumna("ide_georg").setCombo("gen_organigrama", "ide_georg", "nombre_georg", "");
+        // tabla.getColumna("ide_georg").setCombo("gen_organigrama", "ide_georg", "nombre_georg", "");
         tabla.getColumna("identificac_geper").setUnico(true);
         tabla.getColumna("nivel_geper").setRequerida(true);
         tabla.getColumna("ide_rheem").setVisible(false);
@@ -405,6 +405,16 @@ public class ServicioCliente extends ServicioBase {
                 + "from gen_persona a\n"
                 + "left join gen_tipo_identifi b on a.ide_getid=b.ide_getid\n"
                 + "where ide_geper in (" + ide_geper + ") order by nom_geper";
+    }
+
+    /**
+     * Retorna el ide_geper de un Cliente por Identificación
+     *
+     * @param identificac_geper Cédula/Ruc/Pasaporte
+     * @return
+     */
+    public String getIdeClienteporIdentificacion(String identificac_geper) {
+        return utilitario.consultar("select identificac_geper,ide_geper from gen_persona where identificac_geper='" + identificac_geper + "'").getValor("ide_geper");
     }
 
 }
