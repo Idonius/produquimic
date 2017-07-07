@@ -35,7 +35,7 @@ public class ServicioIntegracion extends ServicioBase {
      */
     public String getSqlKardexCliente_Escritorio(String codigo_geper) {
         return "SELECT CODIGOKC,COD_CLIE,DATE_FORMAT(fecha,'%d/%m/%Y') as FECHA_MOVI ,FACTURA,DETALLE,INGRESO,EGRESO,TOTAL FROM KARDEXCLIENTES a\n"
-                + "where COD_CLIE =" + codigo_geper + " ORDER BY CODIGOKC";
+                + "where COD_CLIE ='" + codigo_geper + "' ORDER BY CODIGOKC";
     }
 
     /**
@@ -46,7 +46,7 @@ public class ServicioIntegracion extends ServicioBase {
      */
     public String getSqlKardexProveedor_Escritorio(String codigo_geper) {
         return "SELECT CODIGOKPV,COD_PROVE,DATE_FORMAT(fecha,'%d/%m/%Y') as FECHA_MOVI ,FACTURA,DETALLE,INGRESO,EGRESO,TOTAL FROM KARDEXPROVEEDORES a\n"
-                + "where COD_PROVE =" + codigo_geper + " ORDER BY CODIGOKPV";
+                + "where COD_PROVE ='" + codigo_geper + "' ORDER BY CODIGOKPV";
     }
 
     /**
@@ -150,7 +150,7 @@ public class ServicioIntegracion extends ServicioBase {
                 continue;
             }
             tab_cod.insertar();
-            tab_cod.setValor("codigo_geper", tab_clie.getValor(i, "cod_clie")); //!!!AUMENTAR codigo_geper
+            tab_cod.setValor("codigo_geper", tab_clie.getValor(i, "cod_clie")); 
             tab_cod.setValor("ide_geper", String.valueOf(int_maximo_cliente));
             if (str_ide_geper.isEmpty() == false) {
                 str_ide_geper += ",";
@@ -292,7 +292,7 @@ public class ServicioIntegracion extends ServicioBase {
                 continue;
             }
             tab_cod.insertar();
-            tab_cod.setValor("codigo_geper", tab_clie.getValor(i, "cod_prove")); //!!!AUMENTAR codigo_geper
+            tab_cod.setValor("codigo_geper", tab_clie.getValor(i, "cod_prove")); 
             tab_cod.setValor("ide_geper", String.valueOf(int_maximo_cliente));
             if (str_ide_geper.isEmpty() == false) {
                 str_ide_geper += ",";
