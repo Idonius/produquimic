@@ -71,6 +71,7 @@ public class pre_retenciones extends Pantalla {
 
         com_autoriza.setCombo(ser_retencion.getSqlPuntosEmision());
         com_autoriza.setMetodo("actualizarConsulta");
+        com_autoriza.eliminarVacio();
         bar_botones.agregarComponente(new Etiqueta("PUNTO DE EMISIÓN: "));
         bar_botones.agregarComponente(com_autoriza);
 
@@ -95,7 +96,7 @@ public class pre_retenciones extends Pantalla {
         mep_menu.agregarItem("Retenciones Anuladas", "dibujarAnuladas", "ui-icon-cancel");//2
         mep_menu.agregarSubMenu("REPORTES");
         mep_menu.agregarItem("Consulta por Impuesto", "dibujarConsulta", "ui-icon-bookmark");//4
-        mep_menu.agregarItem("Consulta Consolidada", "dibujarConsultaConsolidada", "ui-icon-calendar");//4
+        mep_menu.agregarItem("Consulta Consolidada", "dibujarConsultaConsolidada", "ui-icon-calendar");//5
 //        mep_menu.agregarSubMenu("COMPROBANTES RETENCIONES EN VENTAS");
 //        mep_menu.agregarItem("Listado de RetencionesVentas", "dibujarListadoVentas", "ui-icon-bookmark");//3
         agregarComponente(mep_menu);

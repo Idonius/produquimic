@@ -183,7 +183,7 @@ public class pre_clientes extends Pantalla {
             tab_tabla.setNumeroTabla(13);
             tab_tabla.setConexion(ser_integra.getConexionEscritorio());
             tab_tabla.setLectura(true);
-            tab_tabla.setSql(ser_integra.getSqlKardexCliente_Escritorio(aut_clientes.getValorArreglo(1)));
+            tab_tabla.setSql(ser_integra.getSqlKardexCliente_Escritorio(ser_cliente.getCodigoCliente(aut_clientes.getValor())));
             tab_tabla.setCampoPrimaria("CODIGOKC");
             tab_tabla.getColumna("CODIGOKC").setVisible(false);
             tab_tabla.getColumna("COD_CLIE").setVisible(false);
@@ -213,7 +213,7 @@ public class pre_clientes extends Pantalla {
         tab_tabla.setSql(ser_cliente.getSqlDatosClientes(strImporta));
         tab_tabla.setCampoPrimaria("ide_geper");
         tab_tabla.getColumna("ide_geper").setVisible(false);
-        tab_tabla.setEmptyMessage("El sistema tiene todos los clientes importados");
+        tab_tabla.setEmptyMessage("El sistema tiene todos los clientes.");
         tab_tabla.setLectura(true);
         tab_tabla.setRows(20);
         tab_tabla.dibujar();
@@ -223,8 +223,8 @@ public class pre_clientes extends Pantalla {
         PanelTabla pat_panel = new PanelTabla();
         pat_panel.setPanelTabla(tab_tabla);
         pat_panel.getMenuTabla().getItem_buscar().setRendered(false);
-        mep_menu.dibujar(13, "IMPORTAR CLIENTES DEL SISTEMA DE FACTURACIÓN", pat_panel);
 
+        mep_menu.dibujar(14, "fa fa-download", "Importar los clientes del sistema de facturación.", pat_panel, true);
     }
 
     public void dibujarReporteCxC() {

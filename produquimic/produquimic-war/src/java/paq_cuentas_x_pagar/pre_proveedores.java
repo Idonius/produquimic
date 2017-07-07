@@ -30,6 +30,7 @@ import servicios.contabilidad.ServicioComprobanteContabilidad;
 import servicios.contabilidad.ServicioContabilidadGeneral;
 import servicios.cuentas_x_pagar.ServicioCuentasCxP;
 import servicios.cuentas_x_pagar.ServicioProveedor;
+import servicios.integracion.ServicioIntegracion;
 import sistema.aplicacion.Pantalla;
 
 /**
@@ -62,6 +63,8 @@ public class pre_proveedores extends Pantalla {
 
     @EJB
     private final ServicioCuentasCxP ser_cuentaCXP = (ServicioCuentasCxP) utilitario.instanciarEJB(ServicioCuentasCxP.class);
+    @EJB
+    private final ServicioIntegracion ser_integra = (ServicioIntegracion) utilitario.instanciarEJB(ServicioIntegracion.class);
 
     /*INFOMRES*/
     private GraficoCartesiano gca_grafico;
@@ -90,6 +93,11 @@ public class pre_proveedores extends Pantalla {
         mep_menu.setMenuPanel("OPCIONES PROVEEDOR", "20%");
         mep_menu.agregarItem("Información Proveedor", "dibujarProveedor", "ui-icon-person");
         mep_menu.agregarItem("Clasificación Proveedores", "dibujarEstructura", "ui-icon-arrow-4-diag");
+
+        mep_menu.agregarSubMenu("SISTEMA DE FACTURACIÓN (ESCRITORIO)");
+        mep_menu.agregarItem("Tarjeta Kardex", "dibujarTarjetaKardex", "ui-icon-calculator"); //14
+        mep_menu.agregarItem("Importar Proveedores", "dibujarImportar", "ui-icon-circle-arrow-n");//13
+
         mep_menu.agregarSubMenu("TRANSACCIONES");
         mep_menu.agregarItem("Transacciones Proveedor", "dibujarTransacciones", "ui-icon-contact");
         mep_menu.agregarItem("Ingresar Transacción", "dibujarIngresarTransacciones", "ui-icon-contact");
@@ -193,7 +201,60 @@ public class pre_proveedores extends Pantalla {
         PanelTabla pat_panel = new PanelTabla();
         pat_panel.setPanelTabla(tab_tabla);
         pat_panel.getMenuTabla().getItem_buscar().setRendered(false);
-        mep_menu.dibujar(1, "DATOS DEL PROVEEDOR", pat_panel);
+
+        mep_menu.dibujar(1, "fa fa-user", "Datos generales del proveedor.", pat_panel, false);
+    }
+
+    public void dibujarTarjetaKardex() {
+        Grupo gru_grupo = new Grupo();
+        if (isProveedorSeleccionado()) {
+            tab_tabla = new Tabla();
+            tab_tabla.setId("tab_tabla");
+            tab_tabla.setNumeroTabla(13);
+            tab_tabla.setConexion(ser_integra.getConexionEscritorio());
+            tab_tabla.setLectura(true);
+            tab_tabla.setSql(ser_integra.getSqlKardexCliente_Escritorio(ser_proveedor.getCodigoProveedor(aut_proveedor.getValor())));
+            tab_tabla.setCampoPrimaria("CODIGOKPV");
+            tab_tabla.getColumna("CODIGOKPV").setVisible(false);
+            tab_tabla.getColumna("COD_PROVE").setVisible(false);
+            tab_tabla.getColumna("FECHA_MOVI").setNombreVisual("FECHA");
+            tab_tabla.getColumna("INGRESO").alinearDerecha();
+            tab_tabla.getColumna("EGRESO").alinearDerecha();
+            tab_tabla.getColumna("TOTAL").alinearDerecha();
+            tab_tabla.setOrdenar(false);
+            tab_tabla.setRows(25);
+            tab_tabla.dibujar();
+            tab_tabla.fin();
+            PanelTabla pat_panel = new PanelTabla();
+            pat_panel.setPanelTabla(tab_tabla);
+            gru_grupo.getChildren().add(pat_panel);
+        }
+        mep_menu.dibujar(13, "fa fa-list-alt", "Tarjeta Kardex con las transacciones del proveedor.", gru_grupo, true);
+
+    }
+
+    public void dibujarImportar() {
+        tab_tabla = new Tabla();
+        tab_tabla.setId("tab_tabla");
+        String strImporta = ser_integra.importarProveedores();
+        if (strImporta.isEmpty()) {
+            strImporta = "-1";
+        }
+        tab_tabla.setSql(ser_proveedor.getSqlDatosProveedores(strImporta));
+        tab_tabla.setCampoPrimaria("ide_geper");
+        tab_tabla.getColumna("ide_geper").setVisible(false);
+        tab_tabla.setEmptyMessage("El sistema tiene todos los proveedores.");
+        tab_tabla.setLectura(true);
+        tab_tabla.setRows(20);
+        tab_tabla.dibujar();
+        if (tab_tabla.getTotalFilas() > 0) {
+            aut_proveedor.actualizar();
+        }
+        PanelTabla pat_panel = new PanelTabla();
+        pat_panel.setPanelTabla(tab_tabla);
+        pat_panel.getMenuTabla().getItem_buscar().setRendered(false);
+        mep_menu.dibujar(14, "fa fa-download", "Importar los proveedores del sistema de facturación.", pat_panel, true);
+
     }
 
     public void dibujarIngresarTransacciones() {
