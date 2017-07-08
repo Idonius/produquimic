@@ -617,7 +617,7 @@ public class ServicioCuentasCxC extends ServicioBase {
                 + "FROM cxc_detall_transa a \n"
                 + "INNER JOIN cxc_tipo_transacc b on a.IDE_CCTTR =b.IDE_CCTTR \n"
                 + "INNER JOIN cxc_cabece_transa d on a.ide_ccctr=d.ide_ccctr \n"
-                + "INNER JOIN gen_persona e on d.ide_geper= e.ide_geper\n"
+                + "INNER JOIN gen_persona e on d.ide_geper= e.ide_geper and es_cliente_geper=true \n"
                 + "WHERE d.IDE_SUCU =" + utilitario.getVariable("IDE_SUCU") + " "
                 + "GROUP BY d.ide_geper,identificac_geper,nom_geper\n"
                 + "order by nom_geper";

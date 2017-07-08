@@ -537,6 +537,7 @@ public class FacturaCxC extends Dialogo {
             tab_creacion_cliente.getColumna("FAX_GEPER").setVisible(false);
             tab_creacion_cliente.getColumna("PAGINA_WEB_GEPER").setVisible(false);
             tab_creacion_cliente.getColumna("REPRE_LEGAL_GEPER").setVisible(false);
+            tab_creacion_cliente.getColumna("CODIGO_GEPER").setVisible(false);
             tab_creacion_cliente.getColumna("GEN_IDE_GEPER").setNombreVisual("GRUPO");
             tab_creacion_cliente.getColumna("IDE_GETID").setNombreVisual("TIPO DE IDENTIFICACION");
             tab_creacion_cliente.getColumna("IDE_GETID").setOrden(1);
@@ -570,7 +571,7 @@ public class FacturaCxC extends Dialogo {
             PanelTabla pat_panel = new PanelTabla();
             pat_panel.setPanelTabla(tab_creacion_cliente);
             pat_panel.getMenuTabla().setRendered(false);
-            pat_panel.setStyle("overflow:hiden");
+            pat_panel.setStyle("overflow:auto");
             dia_creacion_cliente.setDialogo(pat_panel);
 
             ///PRODUCTO 
@@ -674,7 +675,7 @@ public class FacturaCxC extends Dialogo {
         tab_cab_factura.getColumna("ide_geper").setNombreVisual("CLIENTE");
 
         tab_cab_factura.getColumna("orden_compra_cccfa").setNombreVisual("N. ORDEN COMPRA");
-        tab_cab_factura.getColumna("dias_credito_cccfa").setNombreVisual("DIAS CREDITO");
+        tab_cab_factura.getColumna("dias_credito_cccfa").setNombreVisual("DÍAS CREDITO");
         tab_cab_factura.getColumna("correo_cccfa").setNombreVisual("E-MAIL");
         tab_cab_factura.getColumna("correo_cccfa").setLectura(false);
 

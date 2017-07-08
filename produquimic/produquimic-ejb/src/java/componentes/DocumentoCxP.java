@@ -23,6 +23,7 @@ import framework.componentes.Texto;
 import framework.componentes.Upload;
 import java.io.File;
 import java.io.FileOutputStream;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.Scanner;
@@ -284,16 +285,16 @@ public class DocumentoCxP extends Dialogo {
                 pat_panel.getMenuTabla().getItem_eliminar().setDisabled(true);
             } catch (Exception e) {
             }
-            tab_det_documento.setScrollHeight(getAltoPanel() - 445);
+            tab_det_documento.setScrollHeight(getAltoPanel() - 475);
         } else {
             tab_com_reembolso.setRendered(false);
-            tab_det_documento.setScrollHeight(getAltoPanel() - 335);
+            tab_det_documento.setScrollHeight(getAltoPanel() - 365);
         }
 
         boolean bol_esnota = false;
         if (tab_cab_documento.getValor("ide_cntdo").equals(parametros.get("p_con_tipo_documento_nota_credito"))) {
             bol_esnota = true;
-            tab_det_documento.setScrollHeight(getAltoPanel() - 385);
+            tab_det_documento.setScrollHeight(getAltoPanel() - 415);
         }
         for (int i = 0; i < tab_cab_documento.getGrid().getChildren().size(); i++) {
             if (tab_cab_documento.getGrid().getChildren().get(i).getId() != null) {
@@ -696,16 +697,24 @@ public class DocumentoCxP extends Dialogo {
         tab_cab_documento.getColumna("ide_cpefa").setVisible(false);
         tab_cab_documento.getColumna("ide_cndfp").setCombo("con_deta_forma_pago", "ide_cndfp", "nombre_cndfp", "");
         tab_cab_documento.getColumna("ide_cndfp").setRequerida(true);
+
         tab_cab_documento.getColumna("TARIFA_IVA_CPCFA").setVisible(false);
         tab_cab_documento.getColumna("ide_cndfp").setNombreVisual("FORMA DE PAGO");
-        tab_cab_documento.getColumna("ide_cndfp").setOrden(0);
+
+        tab_cab_documento.getColumna("dias_credito_cpcfa").setNombreVisual("DÍAS CREDITO");
+
+        tab_cab_documento.getColumna("dias_credito_cpcfa").setCombo(getListaDiasCredito());
+        tab_cab_documento.getColumna("dias_credito_cpcfa").setRequerida(true);
+        tab_cab_documento.getColumna("dias_credito_cpcfa").setValorDefecto("0");
+
+        tab_cab_documento.getColumna("ide_cndfp").setOrden(5);
         tab_cab_documento.getColumna("ide_usua").setValorDefecto(utilitario.getVariable("ide_usua"));
         tab_cab_documento.getColumna("ide_usua").setVisible(false);
         tab_cab_documento.getColumna("fecha_trans_cpcfa").setValorDefecto(utilitario.getFechaActual());
         tab_cab_documento.getColumna("fecha_trans_cpcfa").setVisible(false);
         tab_cab_documento.getColumna("fecha_emisi_cpcfa").setValorDefecto(utilitario.getFechaActual());
         tab_cab_documento.getColumna("fecha_emisi_cpcfa").setNombreVisual("FECHA EMISIÓN");
-        tab_cab_documento.getColumna("fecha_emisi_cpcfa").setOrden(1);
+        tab_cab_documento.getColumna("fecha_emisi_cpcfa").setOrden(4);
         tab_cab_documento.getColumna("fecha_emisi_cpcfa").setMetodoChangeRuta(tab_cab_documento.getRuta() + ".cambioFecha");
         tab_cab_documento.getColumna("ide_geper").setCombo("gen_persona", "ide_geper", "nom_geper,identificac_geper", "ide_geper=-1"); //por defecto no carga los clientes
         tab_cab_documento.getColumna("ide_geper").setAutoCompletar();
@@ -714,7 +723,7 @@ public class DocumentoCxP extends Dialogo {
         tab_cab_documento.getColumna("ide_geper").setMetodoChangeRuta("pre_index.clase." + getId() + ".seleccionarProveedor");
         tab_cab_documento.getColumna("ide_geper").setOrden(3);
         tab_cab_documento.getColumna("autorizacio_cpcfa").setRequerida(true);
-        tab_cab_documento.getColumna("autorizacio_cpcfa").setOrden(5);
+        tab_cab_documento.getColumna("autorizacio_cpcfa").setOrden(1);
         tab_cab_documento.getColumna("autorizacio_cpcfa").setNombreVisual("NUM. AUTORIZACIÓN");
         tab_cab_documento.getColumna("autorizacio_cpcfa").setEstilo("font-weight: bold");
         tab_cab_documento.getColumna("autorizacio_cpcfa").setMetodoChangeRuta(tab_cab_documento.getRuta() + ".validarAutorizacion");
@@ -726,8 +735,7 @@ public class DocumentoCxP extends Dialogo {
         tab_cab_documento.getColumna("total_cpcfa").setValorDefecto("0");
         tab_cab_documento.getColumna("numero_cpcfa").setEstilo("font-size: 12px;font-weight: bold");
         tab_cab_documento.getColumna("numero_cpcfa").setNombreVisual("NÚMERO");
-        tab_cab_documento.getColumna("numero_cpcfa").setOrden(4);
-        tab_cab_documento.getColumna("numero_cpcfa").setAncho(10);
+        tab_cab_documento.getColumna("numero_cpcfa").setOrden(0);
         tab_cab_documento.getColumna("numero_cpcfa").setComentario("Debe ingresar el numero de serie - establecimiento y numero secuencial");
         tab_cab_documento.getColumna("numero_cpcfa").setMascara("999-999-999999999");
         tab_cab_documento.getColumna("numero_cpcfa").setQuitarCaracteresEspeciales(true);
@@ -822,6 +830,10 @@ public class DocumentoCxP extends Dialogo {
         tab_det_documento.getColumna("ide_inarti").setAutoCompletar();
         tab_det_documento.getColumna("ide_inarti").setNombreVisual("ARTICULO");
         tab_det_documento.getColumna("ide_inarti").setOrden(1);
+        tab_det_documento.getColumna("ide_inuni").setCombo("inv_unidad", "ide_inuni", "nombre_inuni", "");
+        tab_det_documento.getColumna("ide_inuni").setOrden(1);
+        tab_det_documento.getColumna("ide_inuni").setNombreVisual("UNIDAD");
+        tab_det_documento.getColumna("ide_inuni").setLongitud(-1);
         tab_det_documento.getColumna("cantidad_cpdfa").setOrden(2);
         tab_det_documento.getColumna("cantidad_cpdfa").setNombreVisual("CANTIDAD");
         tab_det_documento.getColumna("cantidad_cpdfa").setMetodoChangeRuta(tab_det_documento.getRuta() + ".cambioPrecioCantidadIva");
@@ -854,7 +866,7 @@ public class DocumentoCxP extends Dialogo {
         tab_det_documento.setRecuperarLectura(true);
         tab_det_documento.setScrollable(true);
         tab_det_documento.setScrollWidth(getAnchoPanel() - 15);
-        tab_det_documento.setScrollHeight(getAltoPanel() - 335); //300
+        tab_det_documento.setScrollHeight(getAltoPanel() - 365);
         tab_det_documento.setRows(100);
         tab_det_documento.dibujar();
 
@@ -1298,6 +1310,7 @@ public class DocumentoCxP extends Dialogo {
                                 ser_inventario.generarComprobanteTransaccionCompra(tab_cab_documento, tab_det_documento);
                             }
                             if (utilitario.getConexion().guardarPantalla().isEmpty()) {
+                                ser_integracion.guardarKardexCompras(tab_cab_documento.getValor("ide_cPcfa"));
                                 this.cerrar();
                             }
                         }
@@ -1305,6 +1318,28 @@ public class DocumentoCxP extends Dialogo {
                 }
             }
         }
+    }
+
+    public List getListaDiasCredito() {
+        //pARA USAR EN TODAS LAS TABLAS QUE SEAN RECURSIVAS
+        List lista = new ArrayList();
+        Object fila1[] = {
+            0, "CONTADO"
+        };
+        Object fila2[] = {
+            30, "CRÉDITO 30 DÍAS"
+        };
+        Object fila3[] = {
+            45, "CRÉDITO 45 DÍAS"
+        };
+        Object fila4[] = {
+            60, "CRÉDITO 60 DÍAS"
+        };
+        lista.add(fila1);
+        lista.add(fila2);
+        lista.add(fila3);
+        lista.add(fila4);
+        return lista;
     }
 
     /**
@@ -1635,9 +1670,9 @@ public class DocumentoCxP extends Dialogo {
         boolean bol_esnota = false;
         if (com_tipo_documento.getValue().equals(parametros.get("p_con_tipo_documento_nota_credito"))) {
             bol_esnota = true;
-            tab_det_documento.setScrollHeight(getAltoPanel() - 385);
+            tab_det_documento.setScrollHeight(getAltoPanel() - 415);
         } else {
-            tab_det_documento.setScrollHeight(getAltoPanel() - 335);
+            tab_det_documento.setScrollHeight(getAltoPanel() - 365);
         }
 
         for (int i = 0; i < tab_cab_documento.getGrid().getChildren().size(); i++) {
@@ -1667,7 +1702,7 @@ public class DocumentoCxP extends Dialogo {
             //Activa tabla  y disminuye tamaño del detalle
             tab_com_reembolso.setRendered(true);
             tab_com_reembolso.limpiar();
-            tab_det_documento.setScrollHeight(getAltoPanel() - 445);
+            tab_det_documento.setScrollHeight(getAltoPanel() - 475);
             try {
                 PanelTabla pat_panel = (PanelTabla) tab_com_reembolso.getParent();
                 pat_panel.getMenuTabla().getItem_insertar().setDisabled(false);

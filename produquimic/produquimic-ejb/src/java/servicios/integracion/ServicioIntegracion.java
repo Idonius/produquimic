@@ -149,8 +149,9 @@ public class ServicioIntegracion extends ServicioBase {
             if (tab_clie.getValor(i, "nom_clie") == null || tab_clie.getValor(i, "nom_clie").isEmpty()) {
                 continue;
             }
+
             tab_cod.insertar();
-            tab_cod.setValor("codigo_geper", tab_clie.getValor(i, "cod_clie")); 
+            tab_cod.setValor("codigo_geper", tab_clie.getValor(i, "cod_clie"));
             tab_cod.setValor("ide_geper", String.valueOf(int_maximo_cliente));
             if (str_ide_geper.isEmpty() == false) {
                 str_ide_geper += ",";
@@ -251,7 +252,7 @@ public class ServicioIntegracion extends ServicioBase {
         String str_ide_geper = "";
         TablaGenerica tab_cod = new TablaGenerica();
         tab_cod.setTabla("gen_persona", "ide_geper", -1);
-        tab_cod.setCondicion("es_proveedo_geper=true and gen_ide_geper=1234");
+        tab_cod.setCondicion("es_proveedo_geper=true and gen_ide_geper=438");
         tab_cod.getColumna("codigo_geper").setQuitarCaracteresEspeciales(true);
         tab_cod.setGenerarPrimaria(false);
         tab_cod.ejecutarSql();
@@ -291,14 +292,15 @@ public class ServicioIntegracion extends ServicioBase {
             if (tab_clie.getValor(i, "nom_prove") == null || tab_clie.getValor(i, "nom_prove").isEmpty()) {
                 continue;
             }
+
             tab_cod.insertar();
-            tab_cod.setValor("codigo_geper", tab_clie.getValor(i, "cod_prove")); 
+            tab_cod.setValor("codigo_geper", tab_clie.getValor(i, "cod_prove"));
             tab_cod.setValor("ide_geper", String.valueOf(int_maximo_cliente));
             if (str_ide_geper.isEmpty() == false) {
                 str_ide_geper += ",";
             }
             str_ide_geper += int_maximo_cliente;
-            tab_cod.setValor("gen_ide_geper", "1234");
+            tab_cod.setValor("gen_ide_geper", "438");
             tab_cod.setValor("ide_empr", "0");
             tab_cod.setValor("ide_sucu", "0");
             String ide_getid = tab_clie.getValor(i, "ruc_prove");
@@ -317,7 +319,6 @@ public class ServicioIntegracion extends ServicioBase {
             tab_cod.setValor("telefono_geper", tab_clie.getValor(i, "telef_prove"));
             tab_cod.setValor("fax_geper", tab_clie.getValor(i, "telef2"));
             tab_cod.setValor("contacto_geper", tab_clie.getValor(i, "contacto"));
-            tab_cod.setValor("correo_geper", tab_clie.getValor(i, "correo"));
             tab_cod.setValor("observacion_geper", tab_clie.getValor(i, "observaciones"));
             tab_cod.setValor("nivel_geper", "HIJO");
             tab_cod.setValor("es_proveedo_geper", "true");
@@ -695,6 +696,9 @@ public class ServicioIntegracion extends ServicioBase {
             // String ide_cntco = tab_factura.getValor("ide_cntco");
             double retFuente = 0, retIva = 0;
             String codClie = tab_factura.getValor("codigo_geper");
+            if (codClie == null) {
+                codClie = "";
+            }
             double saldoInicialClie = getSaldoCliente_Escritorio(codClie);
             double saldoNuevoClie = 0;
             double subtotal = Double.parseDouble(tab_factura.getValor("subtotal"));
@@ -784,6 +788,9 @@ public class ServicioIntegracion extends ServicioBase {
             for (int i = 0; i < tab_factura.getTotalFilas(); i++) {
                 ///Kardex Productos
                 String codProd = tab_factura.getValor(i, "codigo_inarti");
+                if (codProd == null) {
+                    codProd = "";
+                }
                 double vcant = Double.parseDouble(tab_factura.getValor(i, "cantidad_ccdfa"));
                 double vpre = Double.parseDouble(tab_factura.getValor(i, "precio_ccdfa"));
                 double exan = getExisteciaProducto_Escritorio(codProd);
@@ -844,6 +851,9 @@ public class ServicioIntegracion extends ServicioBase {
 
             //Guarda Kardex de proveedores
             String codProve = tab_factura.getValor("codigo_geper");
+            if (codProve == null) {
+                codProve = "";
+            }
             double saldoInicialClie = getSaldoProveedor_Escritorio(codProve);
             double saldoNuevoClie = 0;
             double subtotal = Double.parseDouble(tab_factura.getValor("subtotal"));
@@ -861,10 +871,10 @@ public class ServicioIntegracion extends ServicioBase {
             String sqlCabFactura = "INSERT INTO compras "
                     + "(COD_COMPRA,FACTURA,COD_PROVE,FECHA_COMPRA,"
                     + "SUBTOTAL,IVA,TOTAL,FORMA,"
-                    + ",DESCUENTO,AUTORIZACION,"
+                    + "DESCUENTO,AUTORIZACION,"
                     + "TARIFA0,TARIFA12)"
                     + "values "
-                    + "( " + codCompra + ", " + tab_factura.getValor("numfactura") + ",'" + codProve + "','" + fechae + "'," + utilitario.getFormatoNumero(subtotal) + ","
+                    + "( " + codCompra + ", '" + tab_factura.getValor("numfactura") + "','" + codProve + "','" + fechae + "'," + utilitario.getFormatoNumero(subtotal) + ","
                     + utilitario.getFormatoNumero(tiva) + "," + utilitario.getFormatoNumero(tab_factura.getValor("total_cpcfa")) + ",'" + tab_factura.getValor("nombre_cndfp") + "',0,'" + tab_factura.getValor("autorizacio_cpcfa") + "',"
                     + utilitario.getFormatoNumero(tab_factura.getValor("ventas0")) + "," + utilitario.getFormatoNumero(tab_factura.getValor("base_grabada_cpcfa")) + ")";
 
@@ -873,6 +883,9 @@ public class ServicioIntegracion extends ServicioBase {
             for (int i = 0; i < tab_factura.getTotalFilas(); i++) {
                 ///Kardex Productos
                 String codProd = tab_factura.getValor(i, "codigo_inarti");
+                if (codProd == null) {
+                    codProd = "";
+                }
                 double vcant = Double.parseDouble(tab_factura.getValor(i, "cantidad_cpdfa"));
                 double vpre = Double.parseDouble(tab_factura.getValor(i, "precio_cpdfa"));
                 double exan = getExisteciaProducto_Escritorio(codProd);
