@@ -213,7 +213,7 @@ public class pre_proveedores extends Pantalla {
             tab_tabla.setNumeroTabla(13);
             tab_tabla.setConexion(ser_integra.getConexionEscritorio());
             tab_tabla.setLectura(true);
-            tab_tabla.setSql(ser_integra.getSqlKardexCliente_Escritorio(ser_proveedor.getCodigoProveedor(aut_proveedor.getValor())));
+            tab_tabla.setSql(ser_integra.getSqlKardexProveedor_Escritorio(ser_proveedor.getCodigoProveedor(aut_proveedor.getValor())));
             tab_tabla.setCampoPrimaria("CODIGOKPV");
             tab_tabla.getColumna("CODIGOKPV").setVisible(false);
             tab_tabla.getColumna("COD_PROVE").setVisible(false);

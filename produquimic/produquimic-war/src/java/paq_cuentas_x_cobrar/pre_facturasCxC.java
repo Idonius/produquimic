@@ -659,7 +659,7 @@ public class pre_facturasCxC extends Pantalla {
         gru.getChildren().add(bar_menu);
         gru.getChildren().add(pat_panel);
 
-        mep_menu.dibujar(2, "fa fa-book", "Generar asiento contable de las facturas generadas.", gru, true);
+        mep_menu.dibujar(2, "fa fa-book", "Generar asiento contable de las facturas emitidas.", gru, true);
     }
 
     public void abrirGeneraAsiento() {
