@@ -26,6 +26,7 @@ import servicios.ceo.ServicioComprobanteElectronico;
 import servicios.contabilidad.ServicioRetenciones;
 import servicios.cuentas_x_cobrar.ServicioCuentasCxC;
 import servicios.cuentas_x_pagar.ServicioCuentasCxP;
+import servicios.integracion.ServicioIntegracion;
 import sistema.aplicacion.Utilitario;
 
 /**
@@ -49,6 +50,8 @@ public class Retencion extends Dialogo {
     private final ServicioCuentasCxC ser_cuentas_cxc = (ServicioCuentasCxC) utilitario.instanciarEJB(ServicioCuentasCxC.class);
     @EJB
     private final ServicioComprobanteElectronico ser_comprobante_electronico = (ServicioComprobanteElectronico) utilitario.instanciarEJB(ServicioComprobanteElectronico.class);
+    @EJB
+    private final ServicioIntegracion ser_integracion = (ServicioIntegracion) utilitario.instanciarEJB(ServicioIntegracion.class);
 
     private final AreaTexto ate_observacion = new AreaTexto();
     private final Texto tex_total = new Texto();
@@ -722,6 +725,7 @@ public class Retencion extends Dialogo {
                     }
                     if (utilitario.getConexion().guardarPantalla().isEmpty()) {
                         if (ide_cpcfa != null) {
+                            ser_integracion.guardarKardexRetencionCompras(ide_cpcfa);
                             if (isFacturaElectronica()) {
                                 //GENERA COMPROBANTE DE RETENCION ELECTRONICO
                                 String ide_srcom = ser_comprobante_electronico.generarRetencionElectronica(ide_cncre);
