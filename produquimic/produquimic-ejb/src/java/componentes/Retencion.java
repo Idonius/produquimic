@@ -916,3 +916,9 @@ public class Retencion extends Dialogo {
     }
 
 }
+//10%   9
+//20%   10
+//30%   1
+//50%   11
+//70%   2
+//100%  3
