@@ -829,7 +829,7 @@ public class ServicioIntegracion extends ServicioBase {
      */
     public void guardarKardexCompras(String ide_cpcfa) {
 
-        TablaGenerica tab_factura = utilitario.consultar("select codigo_inarti,cantidad_cpdfa,precio_cpdfa,valor_cpdfa,"
+        TablaGenerica tab_factura = utilitario.consultar("select fecha_emisi_cpcfa,codigo_inarti,cantidad_cpdfa,precio_cpdfa,valor_cpdfa,"
                 + "codigo_geper,nom_geper, numero_cpcfa as numfactura,autorizacio_cpcfa,\n"
                 + "base_grabada_cpcfa+base_tarifa0_cpcfa+base_no_objeto_iva_cpcfa as subtotal,valor_iva_cpcfa,total_cpcfa,"
                 + "a.ide_cpcfa,base_grabada_cpcfa,base_tarifa0_cpcfa+base_no_objeto_iva_cpcfa as ventas0,"
@@ -846,7 +846,7 @@ public class ServicioIntegracion extends ServicioBase {
 
         if (tab_factura.isEmpty() == false) {
             Conexion con_conecta = getConexionEscritorio();
-            String fechae = utilitario.getFormatoFecha(new Date(), "yyyy-MM-dd");
+            String fechae = tab_factura.getValor("fecha_emisi_cpcfa");
             String numFactura = tab_factura.getValor("numfactura");
 
             //Guarda Kardex de proveedores
@@ -912,6 +912,47 @@ public class ServicioIntegracion extends ServicioBase {
 
             if (con_conecta.ejecutarListaSql().isEmpty()) {
                 System.out.println("OK guardo Kardex");
+            }
+        }
+
+    }
+
+    /**
+     * Guarda en kardex de proveedores y de productos
+     *
+     * @param ide_cpcfa
+     */
+    public void guardarKardexRetencionCompras(String ide_cpcfa) {
+
+        TablaGenerica tab_factura = utilitario.consultar("select codigo_geper,fecha_emisi_cncre,numero_cpcfa,nombre_cncim,valor_cndre from con_detall_retenc a \n"
+                + "inner join con_cabece_retenc b on a.ide_cncre=b.ide_cncre\n"
+                + "inner join cxp_cabece_factur c on b.ide_cncre=c.ide_cncre\n"
+                + "inner join con_cabece_impues d on a.ide_cncim=d.ide_cncim\n"
+                + "inner join gen_persona e on c.ide_geper=e.ide_geper\n"
+                + "where ide_cpcfa=" + ide_cpcfa);
+        //Guarda Kardex de productos de todos detalles de la factura
+
+        if (tab_factura.isEmpty() == false) {
+            Conexion con_conecta = getConexionEscritorio();
+            String fechae = tab_factura.getValor("fecha_emisi_cncre");
+            String numFactura = tab_factura.getValor("numero_cpcfa");
+            String codProve = tab_factura.getValor("codigo_geper");
+            if (codProve == null) {
+                codProve = "";
+            }
+            double saldoNuevoClie = getSaldoProveedor_Escritorio(codProve);
+
+            //Guarda Kardex de proveedores
+            for (int i = 0; i < tab_factura.getTotalFilas(); i++) {
+                double valor = Double.parseDouble(tab_factura.getValor(i, "valor_cndre"));
+                String descripcion = tab_factura.getValor(i, "nombre_cncim");
+                saldoNuevoClie -= valor;
+                String sql = "INSERT INTO kardexproveedores VALUES((SELECT MAX(k.CODIGOKPV )+1 FROM kardexproveedores k where  k.COD_PROVE='" + codProve + " '),'" + codProve + "','" + fechae + "','" + numFactura + "','" + descripcion + "',0," + valor + "," + saldoNuevoClie + ")";
+                con_conecta.agregarSql(sql);
+            }
+
+            if (con_conecta.ejecutarListaSql().isEmpty()) {
+                System.out.println("OK guardo Retencion Kardex");
             }
         }
 
