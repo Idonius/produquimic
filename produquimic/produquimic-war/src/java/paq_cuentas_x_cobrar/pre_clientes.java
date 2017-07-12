@@ -21,6 +21,10 @@ import framework.componentes.PanelArbol;
 import framework.componentes.PanelTabla;
 import framework.componentes.Tabla;
 import framework.componentes.Texto;
+import framework.componentes.bootstrap.CajaBootstrap;
+import framework.componentes.bootstrap.ContenidoBootstrap;
+import framework.componentes.bootstrap.PanelBootstrap;
+import framework.componentes.bootstrap.RowBootstrap;
 import framework.componentes.graficos.GraficoCartesiano;
 import javax.ejb.EJB;
 import javax.faces.event.ActionEvent;
@@ -92,7 +96,7 @@ public class pre_clientes extends Pantalla {
         bar_botones.agregarBoton(bot_clean);
 
         mep_menu.setMenuPanel("OPCIONES CLIENTE", "20%");
-        mep_menu.agregarItem("Información Cliente", "dibujarCliente", "ui-icon-person");
+        mep_menu.agregarItem("Datos Cliente", "dibujarCliente", "ui-icon-person");
         mep_menu.agregarItem("Clasificación Clientes", "dibujarEstructura", "ui-icon-arrow-4-diag");
         mep_menu.agregarSubMenu("SISTEMA DE FACTURACIÓN (ESCRITORIO)");
         mep_menu.agregarItem("Tarjeta Kardex", "dibujarTarjetaKardex", "ui-icon-calculator"); //14
@@ -114,6 +118,7 @@ public class pre_clientes extends Pantalla {
         agregarComponente(mep_menu);
         asc_asiento.setId("asc_asiento");
         agregarComponente(asc_asiento);
+        dibujarDashBoard();
     }
 
     /**
@@ -170,6 +175,65 @@ public class pre_clientes extends Pantalla {
         } else {
             limpiar();
         }
+    }
+
+    public void dibujarDashBoard() {
+        Grupo grupo = new Grupo();
+        grupo.setStyle("width: 100%;overflow-x: hidden;overflow-y: auto;");
+        int numClientes = ser_cliente.getTotalClientes();
+        int numClientesEscritorio = ser_integra.getTotalClientesEscritorio();
+
+        RowBootstrap row_cajas = new RowBootstrap();
+        ContenidoBootstrap c1 = new ContenidoBootstrap("col-md-3");
+        row_cajas.getChildren().add(c1);
+
+        org.primefaces.component.panel.Panel p1 = new org.primefaces.component.panel.Panel();
+        p1.setStyle("margin-left: 2px; margin-bottom:4px;");
+        Grid g1 = new Grid();
+        g1.setColumns(2);
+        g1.setHeader(new Etiqueta("<span style='font-size:11px;' >NÚMERO DE CLIENTES </span>"));
+        g1.getChildren().add(new Etiqueta("<i class='fa fa-users fa-4x text-aqua'></i>"));
+        g1.getChildren().add(new Etiqueta("<span style='font-size:20px; text-align: left;'>" + numClientes + "</span>"));
+        p1.getChildren().add(g1);
+        c1.agregarComponente(p1);
+
+        ContenidoBootstrap c2 = new ContenidoBootstrap("col-md-3");
+        row_cajas.getChildren().add(c2);
+
+        org.primefaces.component.panel.Panel p2 = new org.primefaces.component.panel.Panel();
+        p2.setStyle("margin-left: 2px;margin-bottom:4px;");
+        Grid g2 = new Grid();
+        g2.setColumns(2);
+        g2.setHeader(new Etiqueta("<span style='font-size:11px;' >CLIENTES POR IMPORTAR</span>"));
+        g2.getChildren().add(new Etiqueta("<i class='fa fa-exchange fa-4x text-red'></i>"));
+        g2.getChildren().add(new Etiqueta("<span style='font-size:20px; text-align: left;'>" + (numClientes - numClientesEscritorio) + "</span>"));
+        p2.getChildren().add(g2);
+        c2.getChildren().add(p2);
+
+        tab_tabla = new Tabla();
+        tab_tabla.setId("tab_tabla");
+        tab_tabla.setNumeroTabla(15);
+        tab_tabla.setConexion(ser_integra.getConexionEscritorio());
+        tab_tabla.setLectura(true);
+        tab_tabla.setSql(ser_integra.getSqlMejoresClientes(20));
+        tab_tabla.setCampoPrimaria("COD_CLIE");
+        tab_tabla.getColumna("COD_CLIE").setVisible(false);
+        tab_tabla.getColumna("NUM_FACTURAS").setNombreVisual("N. FACTURAS");
+        tab_tabla.getColumna("NOM_CLIE").setNombreVisual("CLIENTE");
+        tab_tabla.getColumna("TOTAL").alinearDerecha();
+        tab_tabla.setOrdenar(false);
+        tab_tabla.setRows(25);
+        tab_tabla.dibujar();
+
+        PanelBootstrap pb_empresa = new PanelBootstrap();
+        ContenidoBootstrap c3 = new ContenidoBootstrap("col-md-6");
+        row_cajas.getChildren().add(c3);
+        pb_empresa.setPanelAzul();
+        pb_empresa.setTitulo("MEJORES 20 CLIENTES");
+        pb_empresa.agregarComponenteContenido(tab_tabla);
+        c3.getChildren().add(pb_empresa);
+        grupo.getChildren().add(row_cajas);
+        mep_menu.dibujar(15, "", grupo);
     }
 
     public void dibujarTarjetaKardex() {

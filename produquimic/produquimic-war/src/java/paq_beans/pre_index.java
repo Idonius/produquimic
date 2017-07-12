@@ -28,7 +28,6 @@ import framework.componentes.bootstrap.Alerta;
 import framework.componentes.bootstrap.BotonBootstrap;
 import framework.componentes.bootstrap.CajaBootstrap;
 import framework.componentes.bootstrap.ContenidoBootstrap;
-import framework.componentes.bootstrap.GrupoBootstrap;
 import framework.componentes.bootstrap.ListaBootstrap;
 import framework.componentes.bootstrap.PanelBootstrap;
 import framework.componentes.bootstrap.RowBootstrap;
