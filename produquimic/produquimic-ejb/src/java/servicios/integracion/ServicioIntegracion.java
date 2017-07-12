@@ -1187,4 +1187,25 @@ public class ServicioIntegracion extends ServicioBase {
                 + "group by facturas.COD_CLIE ,NOM_CLIE HAVING COUNT(facturas.COD_CLIE)>0 AND  SUM(TOTAL) IS NOT NULL\n"
                 + "ORDER BY 4 DESC,2 LIMIT " + limite;
     }
+
+    /**
+     * Retorna el total de clientes creados
+     *
+     * @return
+     */
+    public int getTotalClientesEscritorio() {
+        TablaGenerica tab = new TablaGenerica();
+        String sql = "select count(1) as NUMERO, 'total' as TOTAL from clientes";
+        Conexion con_conecta = getConexionEscritorio();
+        tab.setConexion(con_conecta);
+        tab.setSql(sql);
+        tab.ejecutarSql();
+        int total = 0;
+        try {
+            total = Integer.parseInt(tab.getValor("NUMERO"));
+        } catch (Exception e) {
+        }
+        return total;
+    }
+
 }
