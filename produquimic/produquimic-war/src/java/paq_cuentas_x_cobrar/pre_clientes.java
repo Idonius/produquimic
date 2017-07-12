@@ -21,7 +21,6 @@ import framework.componentes.PanelArbol;
 import framework.componentes.PanelTabla;
 import framework.componentes.Tabla;
 import framework.componentes.Texto;
-import framework.componentes.bootstrap.CajaBootstrap;
 import framework.componentes.bootstrap.ContenidoBootstrap;
 import framework.componentes.bootstrap.PanelBootstrap;
 import framework.componentes.bootstrap.RowBootstrap;
@@ -96,6 +95,7 @@ public class pre_clientes extends Pantalla {
         bar_botones.agregarBoton(bot_clean);
 
         mep_menu.setMenuPanel("OPCIONES CLIENTE", "20%");
+        mep_menu.agregarItem("Principal", "dibujarDashBoard", "ui-icon-home");//15
         mep_menu.agregarItem("Datos Cliente", "dibujarCliente", "ui-icon-person");
         mep_menu.agregarItem("Clasificación Clientes", "dibujarEstructura", "ui-icon-arrow-4-diag");
         mep_menu.agregarSubMenu("SISTEMA DE FACTURACIÓN (ESCRITORIO)");
@@ -946,6 +946,7 @@ public class pre_clientes extends Pantalla {
     public void limpiar() {
         aut_clientes.limpiar();
         mep_menu.limpiar();
+        dibujarDashBoard();
     }
 
     @Override
