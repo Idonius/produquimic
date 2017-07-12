@@ -158,8 +158,9 @@ public class ServicioIntegracion extends ServicioBase {
             }
             str_ide_geper += int_maximo_cliente;
             tab_cod.setValor("gen_ide_geper", "572");
-            tab_cod.setValor("ide_empr", "0");
-            tab_cod.setValor("ide_sucu", "0");
+            tab_cod.setValor("ide_empr", utilitario.getVariable("ide_empr"));
+            tab_cod.setValor("ide_sucu", utilitario.getVariable("ide_sucu"));
+            tab_cod.setValor("ide_usua", utilitario.getVariable("ide_usua"));
             String ide_getid = tab_clie.getValor(i, "cedula");
             if (ide_getid != null) {
                 if (ide_getid.length() > 10) {
@@ -180,6 +181,7 @@ public class ServicioIntegracion extends ServicioBase {
             tab_cod.setValor("observacion_geper", tab_clie.getValor(i, "observaciones"));
             tab_cod.setValor("nivel_geper", "HIJO");
             tab_cod.setValor("es_cliente_geper", "true");
+            tab_cod.setValor("fecha_ingre_geper", utilitario.getFechaActual());
 
             String ide_cntco = tab_clie.getValor(i, "tipo");
             if (ide_cntco != null) {
@@ -301,8 +303,9 @@ public class ServicioIntegracion extends ServicioBase {
             }
             str_ide_geper += int_maximo_cliente;
             tab_cod.setValor("gen_ide_geper", "438");
-            tab_cod.setValor("ide_empr", "0");
-            tab_cod.setValor("ide_sucu", "0");
+            tab_cod.setValor("ide_empr", utilitario.getVariable("ide_empr"));
+            tab_cod.setValor("ide_sucu", utilitario.getVariable("ide_sucu"));
+            tab_cod.setValor("ide_usua", utilitario.getVariable("ide_usua"));
             String ide_getid = tab_clie.getValor(i, "ruc_prove");
             if (ide_getid != null) {
                 if (ide_getid.length() > 10) {
@@ -598,8 +601,9 @@ public class ServicioIntegracion extends ServicioBase {
             str_ide_inarti += int_maximo_articulo;
             tab_cod.setValor("ide_inarti", String.valueOf(int_maximo_articulo));
             tab_cod.setValor("inv_ide_inarti", "46");
-            tab_cod.setValor("ide_empr", "0");
-            tab_cod.setValor("ide_sucu", "0");
+            tab_cod.setValor("ide_empr", utilitario.getVariable("ide_empr"));
+            tab_cod.setValor("ide_sucu", utilitario.getVariable("ide_sucu"));
+
             String str_presentacion = tab_quimi.getValor(i, "presentacion");
             if (str_presentacion != null) {
                 str_presentacion = str_presentacion.toUpperCase();
@@ -1167,5 +1171,20 @@ public class ServicioIntegracion extends ServicioBase {
      */
     public String getSqlListaProductos() {
         return "";
+    }
+
+    /**
+     * Retorna los mejores clientes segun parámetro
+     *
+     * @param limite numero de clientes
+     * @return
+     */
+    public String getSqlMejoresClientes(int limite) {
+        return "SELECT facturas.COD_CLIE ,NOM_CLIE AS CLIENTE,COUNT(facturas.COD_CLIE) AS NUM_FACTURAS, SUM(TOTAL) AS TOTAL \n"
+                + "from facturas,clientes \n"
+                + "where  facturas.COD_CLIE=clientes.COD_CLIE \n"
+                + "and anulada=false\n"
+                + "group by facturas.COD_CLIE ,NOM_CLIE HAVING COUNT(facturas.COD_CLIE)>0 AND  SUM(TOTAL) IS NOT NULL\n"
+                + "ORDER BY 4 DESC,2 LIMIT " + limite;
     }
 }

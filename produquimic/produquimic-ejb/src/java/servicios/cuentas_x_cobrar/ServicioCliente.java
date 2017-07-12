@@ -428,4 +428,19 @@ public class ServicioCliente extends ServicioBase {
         return utilitario.consultar("select codigo_geper,ide_geper from gen_persona where ide_geper=" + ide_geper).getValor("codigo_geper");
     }
 
+    /**
+     * Retorna el total de clientes creados
+     *
+     * @return
+     */
+    public int getTotalClientes() {
+        TablaGenerica tag = utilitario.consultar("select count(1) as NUMERO, 'total' as TOTAL from gen_persona where es_cliente_geper is TRUE and identificac_geper is not null");
+        int total = 0;
+        try {
+            total = Integer.parseInt(tag.getValor("NUMERO"));
+        } catch (Exception e) {
+        }
+        return total;
+    }
+
 }
