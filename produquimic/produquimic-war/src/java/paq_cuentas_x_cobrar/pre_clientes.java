@@ -169,6 +169,9 @@ public class pre_clientes extends Pantalla {
                 case 14:
                     dibujarTarjetaKardex();
                     break;
+                case 15:
+                    dibujarDashBoard();
+                    break;
                 default:
                     dibujarCliente();
             }
