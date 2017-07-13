@@ -443,4 +443,18 @@ public class ServicioCliente extends ServicioBase {
         return total;
     }
 
+    /**
+     * Retorna el total de clientes creados
+     *
+     * @return
+     */
+    public String getSqlTotalClientesporTipoContribuyente() {
+        return "select a.ide_cntco,nombre_cntco,count(1) as TOTAL\n"
+                + "from gen_persona a\n"
+                + "left join con_tipo_contribu b on a.ide_cntco = b.ide_cntco\n"
+                + "where es_cliente_geper is TRUE and identificac_geper is not null\n"
+                + "group by a.ide_cntco,nombre_cntco\n"
+                + "ORDER BY 2";
+    }
+
 }
