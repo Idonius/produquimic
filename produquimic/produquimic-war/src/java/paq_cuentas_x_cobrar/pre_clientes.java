@@ -73,7 +73,7 @@ public class pre_clientes extends Pantalla {
 
     /*INFOMRES*/
     private GraficoCartesiano gca_grafico;
-    private GraficoPastel gpa_pastel;
+
     private Combo com_periodo;
 
     private Combo com_fac_pendientes;
@@ -181,7 +181,7 @@ public class pre_clientes extends Pantalla {
 
     public void dibujarDashBoard() {
 
-        gpa_pastel = new GraficoPastel();
+        GraficoPastel gpa_pastel = new GraficoPastel();
         gpa_pastel.setId("gpa_pastel");
         gpa_pastel.setShowDataLabels(true);
         gpa_pastel.setStyle("width:350px;");
@@ -245,7 +245,7 @@ public class pre_clientes extends Pantalla {
         tab_tabla.getColumna("NOM_CLIE").setNombreVisual("CLIENTE");
         tab_tabla.getColumna("TOTAL").alinearDerecha();
         tab_tabla.setOrdenar(false);
-        tab_tabla.setRows(25);
+        tab_tabla.setRows(20);
         tab_tabla.dibujar();
 
         PanelBootstrap pb_empresa = new PanelBootstrap();

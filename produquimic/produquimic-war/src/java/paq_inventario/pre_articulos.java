@@ -19,7 +19,11 @@ import framework.componentes.PanelArbol;
 import framework.componentes.PanelTabla;
 import framework.componentes.Tabla;
 import framework.componentes.Tabulador;
+import framework.componentes.bootstrap.ContenidoBootstrap;
+import framework.componentes.bootstrap.PanelBootstrap;
+import framework.componentes.bootstrap.RowBootstrap;
 import framework.componentes.graficos.GraficoCartesiano;
+import framework.componentes.graficos.GraficoPastel;
 import java.util.List;
 import javax.ejb.EJB;
 import org.primefaces.component.fieldset.Fieldset;
@@ -89,7 +93,8 @@ public class pre_articulos extends Pantalla {
         bar_botones.agregarBoton(bot_clean);
 
         mep_menu.setMenuPanel("OPCIONES PRODUCTO", "20%");
-        mep_menu.agregarItem("Información Producto", "dibujarProducto", "ui-icon-cart");
+        mep_menu.agregarItem("Principal", "dibujarDashBoard", "ui-icon-home");//15
+        mep_menu.agregarItem("Datos del Producto", "dibujarProducto", "ui-icon-cart");
         mep_menu.agregarItem("Clasificación Productos", "dibujarEstructura", "ui-icon-arrow-4-diag");
         mep_menu.agregarSubMenu("SISTEMA DE FACTURACIÓN (ESCRITORIO)");
         mep_menu.agregarItem("Tarjeta Kardex", "dibujarTarjetaKardex", "ui-icon-calculator"); //14
@@ -108,7 +113,86 @@ public class pre_articulos extends Pantalla {
         mep_menu.agregarItem("Últimos Precios", "dibujarPrecios", "ui-icon-cart");
 
         agregarComponente(mep_menu);
+        dibujarDashBoard();
+    }
 
+    public void dibujarDashBoard() {
+
+        GraficoPastel gpa_pastel = new GraficoPastel();
+        gpa_pastel.setId("gpa_pastel");
+        gpa_pastel.setShowDataLabels(true);
+        gpa_pastel.setStyle("width:350px;");
+        gpa_pastel.setShowDataLabels(true);
+
+        PanelBootstrap gri = new PanelBootstrap();
+        gri.setStyle("width: 100%;margin-top:5px;");
+        gri.setPanelAzul();
+        gri.setTitulo("PRODUCTOS POR ÁREAS");
+//        TablaGenerica tag_grafico = utilitario.consultar(ser_cliente.getSqlTotalClientesporTipoContribuyente());
+//        gpa_pastel.agregarSerie(tag_grafico, "nombre_cntco", "TOTAL");
+//        gri.agregarComponenteContenido(gpa_pastel);
+
+        Grupo grupo = new Grupo();
+        grupo.setStyle("width: 100%;overflow-x: hidden;overflow-y: auto;");
+        int numClientes = ser_producto.getTotalProductos();
+        int numClientesEscritorio = ser_integra.getTotalProductosEscritorio();
+
+        Grid gri_iz = new Grid();
+        gri_iz.setWidth("100%");
+        gri_iz.setColumns(2);
+        RowBootstrap row_cajas = new RowBootstrap();
+        ContenidoBootstrap c1 = new ContenidoBootstrap("col-md-6");
+        row_cajas.getChildren().add(c1);
+
+        org.primefaces.component.panel.Panel p1 = new org.primefaces.component.panel.Panel();
+        p1.setStyle("margin-left: 2px; margin-bottom:4px;");
+        Grid g1 = new Grid();
+        g1.setColumns(2);
+        g1.setHeader(new Etiqueta("<span style='font-size:11px;' >NÚMERO DE PRODUCTOS </span>"));
+        g1.getChildren().add(new Etiqueta("<i class='fa fa-cart-plus fa-4x text-green'></i>"));
+        g1.getChildren().add(new Etiqueta("<span style='font-size:22px; text-align: left;'>" + numClientes + "</span>"));
+        p1.getChildren().add(g1);
+        gri_iz.getChildren().add(p1);
+
+//        ContenidoBootstrap c2 = new ContenidoBootstrap("col-md-3");
+//        row_cajas.getChildren().add(c2);
+        org.primefaces.component.panel.Panel p2 = new org.primefaces.component.panel.Panel();
+        p2.setStyle("margin-left: 2px;margin-bottom:4px;");
+        Grid g2 = new Grid();
+        g2.setColumns(2);
+        g2.setHeader(new Etiqueta("<span style='font-size:11px;' >PRODUCTOS POR IMPORTAR</span>"));
+        g2.getChildren().add(new Etiqueta("<i class='fa fa-refresh fa-spin fa-4x fa-fw text-red'></i>"));
+        g2.getChildren().add(new Etiqueta("<span style='font-size:22px; text-align: left;'>" + (numClientes - numClientesEscritorio) + "</span>"));
+        p2.getChildren().add(g2);
+        gri_iz.getChildren().add(p2);
+
+        gri_iz.setFooter(gri);
+
+        c1.getChildren().add(gri_iz);
+
+        tab_tabla = new Tabla();
+        tab_tabla.setId("tab_tabla");
+        tab_tabla.setNumeroTabla(15);
+        tab_tabla.setConexion(ser_integra.getConexionEscritorio());
+        tab_tabla.setLectura(true);
+        tab_tabla.setSql(ser_integra.getSqlProductosMasVendidos(20));
+        tab_tabla.setCampoPrimaria("COD_PROD");
+        tab_tabla.getColumna("COD_PROD").setVisible(false);
+        tab_tabla.getColumna("nom_prod").setNombreVisual("PRODUCTO");
+        tab_tabla.getColumna("CANTIDAD").alinearDerecha();
+        tab_tabla.setOrdenar(false);
+        tab_tabla.setRows(20);
+        tab_tabla.dibujar();
+
+        PanelBootstrap pb_empresa = new PanelBootstrap();
+        ContenidoBootstrap c3 = new ContenidoBootstrap("col-md-6");
+        row_cajas.getChildren().add(c3);
+        pb_empresa.setPanelNaranja();
+        pb_empresa.setTitulo("20 PRODUCTOS MÁS VENDIDOS");
+        pb_empresa.agregarComponenteContenido(tab_tabla);
+        c3.getChildren().add(pb_empresa);
+        grupo.getChildren().add(row_cajas);
+        mep_menu.dibujar(15, "", grupo);
     }
 
     public void dibujarTarjetaKardex() {
@@ -930,7 +1014,6 @@ public class pre_articulos extends Pantalla {
      * Actualiza los solados que se visualizan en pantalla
      */
     private void actualizarSaldosContable() {
-
         double saldo_anterior = ser_contabilidad.getSaldoInicialCuenta(ser_producto.getCuentaProducto(aut_productos.getValor()), cal_fecha_inicio.getFecha());
         double dou_saldo_inicial = saldo_anterior;
         double dou_saldo_actual = 0;
@@ -975,6 +1058,7 @@ public class pre_articulos extends Pantalla {
     public void limpiar() {
         aut_productos.limpiar();
         mep_menu.limpiar();
+        dibujarDashBoard();
     }
 
     /**
