@@ -25,6 +25,7 @@ import framework.componentes.bootstrap.ContenidoBootstrap;
 import framework.componentes.bootstrap.PanelBootstrap;
 import framework.componentes.bootstrap.RowBootstrap;
 import framework.componentes.graficos.GraficoCartesiano;
+import framework.componentes.graficos.GraficoPastel;
 import javax.ejb.EJB;
 import javax.faces.event.ActionEvent;
 import org.primefaces.component.fieldset.Fieldset;
@@ -72,6 +73,7 @@ public class pre_clientes extends Pantalla {
 
     /*INFOMRES*/
     private GraficoCartesiano gca_grafico;
+    private GraficoPastel gpa_pastel;
     private Combo com_periodo;
 
     private Combo com_fac_pendientes;
@@ -85,7 +87,7 @@ public class pre_clientes extends Pantalla {
         aut_clientes.setAutoCompletar(ser_cliente.getSqlComboClientes());
         aut_clientes.setSize(75);
         aut_clientes.setAutocompletarContenido(); // no startWith para la busqueda
-        aut_clientes.setMetodoChangeRuta("pre_index.clase.seleccionarCliente");
+        aut_clientes.setMetodoChange("seleccionarCliente");
 
         bar_botones.agregarComponente(aut_clientes);
         Boton bot_clean = new Boton();
@@ -94,7 +96,7 @@ public class pre_clientes extends Pantalla {
         bot_clean.setMetodo("limpiar");
         bar_botones.agregarBoton(bot_clean);
 
-        mep_menu.setMenuPanel("OPCIONES CLIENTE", "20%");
+        mep_menu.setMenuPanel("OPCIONES CLIENTE", "22%");
         mep_menu.agregarItem("Principal", "dibujarDashBoard", "ui-icon-home");//15
         mep_menu.agregarItem("Datos Cliente", "dibujarCliente", "ui-icon-person");
         mep_menu.agregarItem("Clasificación Clientes", "dibujarEstructura", "ui-icon-arrow-4-diag");
@@ -169,9 +171,6 @@ public class pre_clientes extends Pantalla {
                 case 14:
                     dibujarTarjetaKardex();
                     break;
-                case 15:
-                    dibujarDashBoard();
-                    break;
                 default:
                     dibujarCliente();
             }
@@ -181,13 +180,31 @@ public class pre_clientes extends Pantalla {
     }
 
     public void dibujarDashBoard() {
+
+        gpa_pastel = new GraficoPastel();
+        gpa_pastel.setId("gpa_pastel");
+        gpa_pastel.setShowDataLabels(true);
+        gpa_pastel.setStyle("width:350px;");
+        gpa_pastel.setShowDataLabels(true);
+
+        PanelBootstrap gri = new PanelBootstrap();
+        gri.setStyle("width: 100%;margin-top:5px;");
+        gri.setPanelVerde();
+        gri.setTitulo("CLIENTES POR TIPO DE CONTIBUYENTE");
+        TablaGenerica tag_grafico = utilitario.consultar(ser_cliente.getSqlTotalClientesporTipoContribuyente());
+        gpa_pastel.agregarSerie(tag_grafico, "nombre_cntco", "TOTAL");
+        gri.agregarComponenteContenido(gpa_pastel);
+
         Grupo grupo = new Grupo();
         grupo.setStyle("width: 100%;overflow-x: hidden;overflow-y: auto;");
         int numClientes = ser_cliente.getTotalClientes();
         int numClientesEscritorio = ser_integra.getTotalClientesEscritorio();
 
+        Grid gri_iz = new Grid();
+        gri_iz.setWidth("100%");
+        gri_iz.setColumns(2);
         RowBootstrap row_cajas = new RowBootstrap();
-        ContenidoBootstrap c1 = new ContenidoBootstrap("col-md-3");
+        ContenidoBootstrap c1 = new ContenidoBootstrap("col-md-6");
         row_cajas.getChildren().add(c1);
 
         org.primefaces.component.panel.Panel p1 = new org.primefaces.component.panel.Panel();
@@ -196,22 +213,25 @@ public class pre_clientes extends Pantalla {
         g1.setColumns(2);
         g1.setHeader(new Etiqueta("<span style='font-size:11px;' >NÚMERO DE CLIENTES </span>"));
         g1.getChildren().add(new Etiqueta("<i class='fa fa-users fa-4x text-aqua'></i>"));
-        g1.getChildren().add(new Etiqueta("<span style='font-size:20px; text-align: left;'>" + numClientes + "</span>"));
+        g1.getChildren().add(new Etiqueta("<span style='font-size:22px; text-align: left;'>" + numClientes + "</span>"));
         p1.getChildren().add(g1);
-        c1.agregarComponente(p1);
+        gri_iz.getChildren().add(p1);
 
-        ContenidoBootstrap c2 = new ContenidoBootstrap("col-md-3");
-        row_cajas.getChildren().add(c2);
-
+//        ContenidoBootstrap c2 = new ContenidoBootstrap("col-md-3");
+//        row_cajas.getChildren().add(c2);
         org.primefaces.component.panel.Panel p2 = new org.primefaces.component.panel.Panel();
         p2.setStyle("margin-left: 2px;margin-bottom:4px;");
         Grid g2 = new Grid();
         g2.setColumns(2);
         g2.setHeader(new Etiqueta("<span style='font-size:11px;' >CLIENTES POR IMPORTAR</span>"));
-        g2.getChildren().add(new Etiqueta("<i class='fa fa-exchange fa-4x text-red'></i>"));
-        g2.getChildren().add(new Etiqueta("<span style='font-size:20px; text-align: left;'>" + (numClientes - numClientesEscritorio) + "</span>"));
+        g2.getChildren().add(new Etiqueta("<i class='fa fa-refresh fa-spin fa-4x fa-fw text-red'></i>"));
+        g2.getChildren().add(new Etiqueta("<span style='font-size:22px; text-align: left;'>" + (numClientes - numClientesEscritorio) + "</span>"));
         p2.getChildren().add(g2);
-        c2.getChildren().add(p2);
+        gri_iz.getChildren().add(p2);
+
+        gri_iz.setFooter(gri);
+
+        c1.getChildren().add(gri_iz);
 
         tab_tabla = new Tabla();
         tab_tabla.setId("tab_tabla");
