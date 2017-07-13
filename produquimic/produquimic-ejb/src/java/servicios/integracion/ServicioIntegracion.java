@@ -1208,4 +1208,39 @@ public class ServicioIntegracion extends ServicioBase {
         return total;
     }
 
+    /**
+     * Retorna el total de productos creados
+     *
+     * @return
+     */
+    public int getTotalProductosEscritorio() {
+        TablaGenerica tab = new TablaGenerica();
+        String sql = "select count(1) as NUMERO, 'total' as TOTAL from productos";
+        Conexion con_conecta = getConexionEscritorio();
+        tab.setConexion(con_conecta);
+        tab.setSql(sql);
+        tab.ejecutarSql();
+        int total = 0;
+        try {
+            total = Integer.parseInt(tab.getValor("NUMERO"));
+        } catch (Exception e) {
+        }
+        return total;
+    }
+
+    /**
+     * Retorna los mejores clientes segun parámetro
+     *
+     * @param limite numero de clientes
+     * @return
+     */
+    public String getSqlProductosMasVendidos(int limite) {
+        return "SELECT productos.COD_PROD,nom_prod,sum(CANTIDAD) as CANTIDAD,presentacion from  detalle_facturas,productos,facturas "
+                + "where detalle_facturas.COD_PROD=productos.COD_PROD "
+                + "and facturas.NUM_FACTURA =detalle_facturas.NUM_FACTURA "
+                + "and anulada=false "
+                + "GROUP BY  productos.COD_PROD,nom_prod,presentacion HAVING sum(CANTIDAD) IS NOT NULL "
+                + "order by 3 DESC,2  LIMIT " + limite;
+    }
+
 }

@@ -103,7 +103,8 @@ public class ServicioProducto {
         tabla.getColumna("INV_IDE_INARTI").setCombo("select ide_inarti,nombre_inarti from inv_articulo where nivel_inarti ='PADRE' order by nombre_inarti");
         tabla.setTipoFormulario(true);
         tabla.getGrid().setColumns(4);
-        tabla.getColumna("ide_georg").setCombo("gen_organigrama", "ide_georg", "nombre_georg", "");// cargar un combo de una con el ide, nombre
+        tabla.getColumna("ide_georg").setVisible(false);
+        tabla.getColumna("es_combo_inarti").setVisible(false);
     }
 
     /**
@@ -670,6 +671,21 @@ public class ServicioProducto {
                 + "from inv_articulo a\n"
                 + "left join inv_unidad b on a.ide_inuni= b.ide_inuni\n"
                 + "where ide_inarti in (" + ide_inarti + ") order by nombre_inarti";
+    }
+
+    /**
+     * Retorna el total de productos creados
+     *
+     * @return
+     */
+    public int getTotalProductos() {
+        TablaGenerica tag = utilitario.consultar("select count(1) as NUMERO, 'total' as TOTAL from inv_articulo where  nivel_inarti='HIJO'");
+        int total = 0;
+        try {
+            total = Integer.parseInt(tag.getValor("NUMERO"));
+        } catch (Exception e) {
+        }
+        return total;
     }
 
 }
