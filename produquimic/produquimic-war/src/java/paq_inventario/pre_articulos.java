@@ -19,11 +19,11 @@ import framework.componentes.PanelArbol;
 import framework.componentes.PanelTabla;
 import framework.componentes.Tabla;
 import framework.componentes.Tabulador;
+import framework.componentes.bootstrap.BotonBootstrap;
 import framework.componentes.bootstrap.ContenidoBootstrap;
 import framework.componentes.bootstrap.PanelBootstrap;
 import framework.componentes.bootstrap.RowBootstrap;
 import framework.componentes.graficos.GraficoCartesiano;
-import framework.componentes.graficos.GraficoPastel;
 import java.util.List;
 import javax.ejb.EJB;
 import org.primefaces.component.fieldset.Fieldset;
@@ -118,20 +118,6 @@ public class pre_articulos extends Pantalla {
 
     public void dibujarDashBoard() {
 
-        GraficoPastel gpa_pastel = new GraficoPastel();
-        gpa_pastel.setId("gpa_pastel");
-        gpa_pastel.setShowDataLabels(true);
-        gpa_pastel.setStyle("width:350px;");
-        gpa_pastel.setShowDataLabels(true);
-
-        PanelBootstrap gri = new PanelBootstrap();
-        gri.setStyle("width: 100%;margin-top:5px;");
-        gri.setPanelAzul();
-        gri.setTitulo("PRODUCTOS POR ÁREAS");
-//        TablaGenerica tag_grafico = utilitario.consultar(ser_cliente.getSqlTotalClientesporTipoContribuyente());
-//        gpa_pastel.agregarSerie(tag_grafico, "nombre_cntco", "TOTAL");
-//        gri.agregarComponenteContenido(gpa_pastel);
-
         Grupo grupo = new Grupo();
         grupo.setStyle("width: 100%;overflow-x: hidden;overflow-y: auto;");
         int numClientes = ser_producto.getTotalProductos();
@@ -141,7 +127,7 @@ public class pre_articulos extends Pantalla {
         gri_iz.setWidth("100%");
         gri_iz.setColumns(2);
         RowBootstrap row_cajas = new RowBootstrap();
-        ContenidoBootstrap c1 = new ContenidoBootstrap("col-md-6");
+        ContenidoBootstrap c1 = new ContenidoBootstrap("col-md-12");
         row_cajas.getChildren().add(c1);
 
         org.primefaces.component.panel.Panel p1 = new org.primefaces.component.panel.Panel();
@@ -149,13 +135,11 @@ public class pre_articulos extends Pantalla {
         Grid g1 = new Grid();
         g1.setColumns(2);
         g1.setHeader(new Etiqueta("<span style='font-size:11px;' >NÚMERO DE PRODUCTOS </span>"));
-        g1.getChildren().add(new Etiqueta("<i class='fa fa-cart-plus fa-4x text-green'></i>"));
+        g1.getChildren().add(new Etiqueta("<i class='fa fa-database fa-4x text-blue'></i>"));
         g1.getChildren().add(new Etiqueta("<span style='font-size:22px; text-align: left;'>" + numClientes + "</span>"));
         p1.getChildren().add(g1);
         gri_iz.getChildren().add(p1);
 
-//        ContenidoBootstrap c2 = new ContenidoBootstrap("col-md-3");
-//        row_cajas.getChildren().add(c2);
         org.primefaces.component.panel.Panel p2 = new org.primefaces.component.panel.Panel();
         p2.setStyle("margin-left: 2px;margin-bottom:4px;");
         Grid g2 = new Grid();
@@ -166,8 +150,6 @@ public class pre_articulos extends Pantalla {
         p2.getChildren().add(g2);
         gri_iz.getChildren().add(p2);
 
-        gri_iz.setFooter(gri);
-
         c1.getChildren().add(gri_iz);
 
         tab_tabla = new Tabla();
@@ -175,24 +157,67 @@ public class pre_articulos extends Pantalla {
         tab_tabla.setNumeroTabla(15);
         tab_tabla.setConexion(ser_integra.getConexionEscritorio());
         tab_tabla.setLectura(true);
-        tab_tabla.setSql(ser_integra.getSqlProductosMasVendidos(20));
+        tab_tabla.setSql(ser_integra.getSqlProductosMasVendidos(20, null));
         tab_tabla.setCampoPrimaria("COD_PROD");
         tab_tabla.getColumna("COD_PROD").setVisible(false);
         tab_tabla.getColumna("nom_prod").setNombreVisual("PRODUCTO");
         tab_tabla.getColumna("CANTIDAD").alinearDerecha();
+        tab_tabla.getColumna("CANTIDAD").setDecimales(2);
         tab_tabla.setOrdenar(false);
         tab_tabla.setRows(20);
         tab_tabla.dibujar();
-
-        PanelBootstrap pb_empresa = new PanelBootstrap();
+        PanelBootstrap pb_pvendido = new PanelBootstrap();
         ContenidoBootstrap c3 = new ContenidoBootstrap("col-md-6");
         row_cajas.getChildren().add(c3);
-        pb_empresa.setPanelNaranja();
-        pb_empresa.setTitulo("20 PRODUCTOS MÁS VENDIDOS");
-        pb_empresa.agregarComponenteContenido(tab_tabla);
-        c3.getChildren().add(pb_empresa);
+        pb_pvendido.setPanelNaranja();
+        pb_pvendido.setTitulo("20 PRODUCTOS MÁS VENDIDOS");
+        pb_pvendido.agregarComponenteContenido(tab_tabla);
+
+        BotonBootstrap bb_ver = new BotonBootstrap();
+        bb_ver.setValue("Ver Todos");
+        bb_ver.setBotonNaranja();
+        bb_ver.setMetodo("dibujarTodosMasVendidos");
+        pb_pvendido.agregarComponenteFooter(bb_ver);
+
+        tab_asiento_tipo = new Tabla();
+        tab_asiento_tipo.setId("tab_asiento_tipo");
+        tab_asiento_tipo.setNumeroTabla(15);
+        tab_asiento_tipo.setConexion(ser_integra.getConexionEscritorio());
+        tab_asiento_tipo.setLectura(true);
+        tab_asiento_tipo.setSql(ser_integra.getSqlProductosMasComprados(20, null));
+        tab_asiento_tipo.setCampoPrimaria("COD_PROD");
+        tab_asiento_tipo.getColumna("COD_PROD").setVisible(false);
+        tab_asiento_tipo.getColumna("nom_prod").setNombreVisual("PRODUCTO");
+        tab_asiento_tipo.getColumna("CANTIDAD").alinearDerecha();
+        tab_asiento_tipo.getColumna("CANTIDAD").setDecimales(2);
+        tab_asiento_tipo.setOrdenar(false);
+        tab_asiento_tipo.setRows(20);
+        tab_asiento_tipo.dibujar();
+        PanelBootstrap pb_pcomprado = new PanelBootstrap();
+        ContenidoBootstrap c4 = new ContenidoBootstrap("col-md-6");
+        row_cajas.getChildren().add(c4);
+        pb_pcomprado.setPanelVerde();
+        pb_pcomprado.setTitulo("20 PRODUCTOS MÁS COMPRADOS");
+        pb_pcomprado.agregarComponenteContenido(tab_asiento_tipo);
+
+        BotonBootstrap bb_ver1 = new BotonBootstrap();
+        bb_ver1.setValue("Ver Todos");
+        bb_ver1.setBotonVerde();
+        bb_ver1.setMetodo("dibujarTodosMasComprados");
+        pb_pcomprado.agregarComponenteFooter(bb_ver1);
+
+        c3.getChildren().add(pb_pvendido);
+        c4.getChildren().add(pb_pcomprado);
         grupo.getChildren().add(row_cajas);
         mep_menu.dibujar(15, "", grupo);
+    }
+
+    public void dibujarTodosMasComprados() {
+
+    }
+
+    public void dibujarTodosMasVendidos() {
+
     }
 
     public void dibujarTarjetaKardex() {
