@@ -1174,18 +1174,35 @@ public class ServicioIntegracion extends ServicioBase {
     }
 
     /**
-     * Retorna los mejores clientes segun parámetro
+     * Retorna los mejores clientes segun parámetros
      *
      * @param limite numero de clientes
+     * @param anio
      * @return
      */
-    public String getSqlMejoresClientes(int limite) {
+    public String getSqlMejoresClientes(Integer limite, String anio) {
+        String lim = "";
+        String conAnio = "";
+        if (limite == null) {
+            limite = 0;
+        }
+        if (limite > 0) {
+            lim = "LIMIT " + limite;
+        }
+        if (anio == null) {
+            anio = "";
+        }
+        if (anio.isEmpty() == false) {
+            conAnio = " and YEAR(fecha) = " + anio + " \n";
+        }
+
         return "SELECT facturas.COD_CLIE ,NOM_CLIE AS CLIENTE,COUNT(facturas.COD_CLIE) AS NUM_FACTURAS, SUM(TOTAL) AS TOTAL \n"
                 + "from facturas,clientes \n"
                 + "where  facturas.COD_CLIE=clientes.COD_CLIE \n"
                 + "and anulada=false\n"
+                + conAnio
                 + "group by facturas.COD_CLIE ,NOM_CLIE HAVING COUNT(facturas.COD_CLIE)>0 AND  SUM(TOTAL) IS NOT NULL\n"
-                + "ORDER BY 4 DESC,2 LIMIT " + limite;
+                + "ORDER BY 4 DESC  " + lim;
     }
 
     /**
@@ -1229,18 +1246,116 @@ public class ServicioIntegracion extends ServicioBase {
     }
 
     /**
-     * Retorna los mejores clientes segun parámetro
+     * Retorna los productos mas vendidos
      *
      * @param limite numero de clientes
+     * @param anio
      * @return
      */
-    public String getSqlProductosMasVendidos(int limite) {
+    public String getSqlProductosMasVendidos(Integer limite, String anio) {
+        String lim = "";
+        String conAnio = "";
+        if (limite == null) {
+            limite = 0;
+        }
+        if (limite > 0) {
+            lim = "LIMIT " + limite;
+        }
+        if (anio == null) {
+            anio = "";
+        }
+        if (anio.isEmpty() == false) {
+            conAnio = " and YEAR(fecha) = " + anio + " \n";
+        }
         return "SELECT productos.COD_PROD,nom_prod,sum(CANTIDAD) as CANTIDAD,presentacion from  detalle_facturas,productos,facturas "
                 + "where detalle_facturas.COD_PROD=productos.COD_PROD "
                 + "and facturas.NUM_FACTURA =detalle_facturas.NUM_FACTURA "
                 + "and anulada=false "
+                + conAnio
                 + "GROUP BY  productos.COD_PROD,nom_prod,presentacion HAVING sum(CANTIDAD) IS NOT NULL "
-                + "order by 3 DESC,2  LIMIT " + limite;
+                + "order by 3 DESC,2   " + lim;
+    }
+
+    /**
+     * Retorna los productos mas comprados
+     *
+     * @param limite numero de clientes
+     * @param anio
+     * @return
+     */
+    public String getSqlProductosMasComprados(Integer limite, String anio) {
+        String lim = "";
+        String conAnio = "";
+        if (limite == null) {
+            limite = 0;
+        }
+        if (limite > 0) {
+            lim = "LIMIT " + limite;
+        }
+        if (anio == null) {
+            anio = "";
+        }
+        if (anio.isEmpty() == false) {
+            conAnio = " and YEAR(fecha) = " + anio + " \n";
+        }
+        return "SELECT productos.COD_PROD,nom_prod,sum(CANT) as CANTIDAD,presentacion from  detalle_compras,productos,compras "
+                + "where detalle_compras.COD_PROD=productos.COD_PROD "
+                + "and compras.COD_COMPRA =detalle_compras.COD_COMPRA "
+                + conAnio
+                + "GROUP BY  productos.COD_PROD,nom_prod,presentacion HAVING sum(CANT) IS NOT NULL "
+                + "order by 3 DESC,2  " + lim;
+    }
+
+    /**
+     * Retorna el total de proveedores creados
+     *
+     * @return
+     */
+    public int getTotalProveedoresEscritorio() {
+        TablaGenerica tab = new TablaGenerica();
+        String sql = "select count(1) as NUMERO, 'total' as TOTAL from proveedores";
+        Conexion con_conecta = getConexionEscritorio();
+        tab.setConexion(con_conecta);
+        tab.setSql(sql);
+        tab.ejecutarSql();
+        int total = 0;
+        try {
+            total = Integer.parseInt(tab.getValor("NUMERO"));
+        } catch (Exception e) {
+        }
+        return total;
+    }
+
+    /**
+     * Retorna los mejores proveedores segun parámetros
+     *
+     * @param limite numero de clientes
+     * @param anio
+     * @return
+     */
+    public String getSqlMejoresProveedores(Integer limite, String anio) {
+        String lim = "";
+        String conAnio = "";
+        if (limite == null) {
+            limite = 0;
+        }
+        if (limite > 0) {
+            lim = "LIMIT " + limite;
+        }
+        if (anio == null) {
+            anio = "";
+        }
+        if (anio.isEmpty() == false) {
+            conAnio = " and YEAR(fecha) = " + anio + " \n";
+        }
+
+        return "SELECT compras.COD_PROVE ,NOM_PROVE AS PROVEEDOR,COUNT(compras.COD_PROVE) AS NUM_FACTURAS, SUM(TOTAL) AS TOTAL \n"
+                + "from compras,proveedores \n"
+                + "where  compras.COD_PROVE=proveedores.COD_PROVE \n"
+                + "and anulada=false\n"
+                + conAnio
+                + "group by compras.COD_PROVE ,NOM_PROVE HAVING COUNT(compras.COD_PROVE)>0 AND  SUM(TOTAL) IS NOT NULL\n"
+                + "ORDER BY 4 DESC  " + lim;
     }
 
 }
