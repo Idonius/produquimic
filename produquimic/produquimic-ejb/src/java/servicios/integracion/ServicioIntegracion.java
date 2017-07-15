@@ -195,7 +195,7 @@ public class ServicioIntegracion extends ServicioBase {
                 } else if (ide_cntco.startsWith("ESPECIALES-EXPORTADORES")) {
                     ide_cntco = "6";
                 } else {
-                    ide_cntco = "2";
+                    ide_cntco = "2"; 
                 }
             }
             tab_cod.setValor("ide_cntco", ide_cntco);
