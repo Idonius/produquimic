@@ -49,6 +49,7 @@ public class pre_articulos extends Pantalla {
     private AutoCompletar aut_productos = new AutoCompletar();
     //opcion 1
     private Tabla tab_tabla;
+    private Tabla tab_tabla1;
     //opcion 2
     private Arbol arb_estructura;// Estructura Gerarquica de Productos
     //Kardex opcion 7    
@@ -92,7 +93,7 @@ public class pre_articulos extends Pantalla {
         bot_clean.setMetodo("limpiar");
         bar_botones.agregarBoton(bot_clean);
 
-        mep_menu.setMenuPanel("OPCIONES PRODUCTO", "20%");
+        mep_menu.setMenuPanel("OPCIONES PRODUCTO", "21%");
         mep_menu.agregarItem("Principal", "dibujarDashBoard", "ui-icon-home");//15
         mep_menu.agregarItem("Datos del Producto", "dibujarProducto", "ui-icon-cart");
         mep_menu.agregarItem("Clasificación Productos", "dibujarEstructura", "ui-icon-arrow-4-diag");
@@ -328,6 +329,7 @@ public class pre_articulos extends Pantalla {
      * Dibuja el formulario de datos del Producto, opcion 1
      */
     public void dibujarProducto() {
+        Grupo gru = new Grupo();
         tab_tabla = new Tabla();
         tab_tabla.setId("tab_tabla");
         ser_producto.configurarTablaProducto(tab_tabla);
@@ -339,7 +341,27 @@ public class pre_articulos extends Pantalla {
         PanelTabla pat_panel = new PanelTabla();
         pat_panel.setPanelTabla(tab_tabla);
         pat_panel.getMenuTabla().getItem_buscar().setRendered(false);
-        mep_menu.dibujar(1, "DATOS DEL PRODUCTO", pat_panel);
+        gru.getChildren().add(pat_panel);
+        tab_tabla1 = new Tabla();
+        tab_tabla1.setId("tab_tabla1");
+        tab_tabla1.setTabla("inv_articulo_carac", "ide_inarc", 2);
+        tab_tabla1.setCondicion("ide_inarti=" + aut_productos.getValor());
+        tab_tabla1.setHeader("CARACTERÍSTICAS Y ÁREAS DE APLICACIÓN");
+        tab_tabla1.getColumna("ide_inarc").setVisible(false);
+        tab_tabla1.getColumna("ide_inarti").setVisible(false);
+        tab_tabla1.getColumna("ide_incar").setCombo("inv_caracteristica", "ide_incar", "nombre_incar", "");
+        tab_tabla1.getColumna("ide_incar").setLongitud(-1);
+        tab_tabla1.getColumna("ide_inare").setCombo("inv_area", "ide_inare", "nombre_inare", "");
+        tab_tabla1.getColumna("ide_inare").setLongitud(-1);
+        tab_tabla1.setRows(50);
+        tab_tabla1.setScrollable(true);
+        tab_tabla1.setScrollHeight(200);
+        tab_tabla1.dibujar();
+        PanelTabla pat_panel1 = new PanelTabla();
+        pat_panel1.setPanelTabla(tab_tabla1);
+        pat_panel1.getMenuTabla().getItem_buscar().setRendered(false);
+        gru.getChildren().add(pat_panel1);
+        mep_menu.dibujar(1, "fa fa-database", "Datos del producto, características y áreas de aplicación.", gru, false);
     }
 
     /**
@@ -1101,11 +1123,22 @@ public class pre_articulos extends Pantalla {
 
     @Override
     public void insertar() {
-        aut_productos.limpiar();
+
         if (mep_menu.getOpcion() == 1) {
             //FORMULARIO PRODUCTO
-            tab_tabla.limpiar();
-            tab_tabla.insertar();
+            if (tab_tabla1.isFocus()) {
+                if (aut_productos.getValor() == null) {
+                    utilitario.agregarMensajeInfo("Debe guardar los datos del Producto", "");
+                } else {
+                    tab_tabla1.insertar();
+                    tab_tabla1.setValor("ide_inarti", aut_productos.getValor());
+                }
+            } else {
+                aut_productos.limpiar();
+                tab_tabla.limpiar();
+                tab_tabla.insertar();
+                tab_tabla1.limpiar();
+            }
         } else if (mep_menu.getOpcion() == 4) {
             tab_detalle_asiento.insertar();
         } else {
@@ -1119,13 +1152,15 @@ public class pre_articulos extends Pantalla {
         if (mep_menu.getOpcion() == 1) {
             //FORMULARIO PRODUCTO
             if (true) { //!!!!!!!!******Validar Datos Producto
-                tab_tabla.guardar();
-                if (guardarPantalla().isEmpty()) {
-                    //Actualiza el autocompletar
-                    aut_productos.actualizar();
-                    aut_productos.setSize(75);
-                    aut_productos.setValor(tab_tabla.getValorSeleccionado());
-                    utilitario.addUpdate("aut_productos");
+                if (tab_tabla.guardar()) {
+                    tab_tabla1.guardar();
+                    if (guardarPantalla().isEmpty()) {
+                        //Actualiza el autocompletar
+                        aut_productos.actualizar();
+                        aut_productos.setSize(75);
+                        aut_productos.setValor(tab_tabla.getValorSeleccionado());
+                        utilitario.addUpdate("aut_productos");
+                    }
                 }
             }
         } else if (mep_menu.getOpcion() == 4) {
@@ -1144,7 +1179,11 @@ public class pre_articulos extends Pantalla {
     public void eliminar() {
         if (mep_menu.getOpcion() == 1) {
             //FORMULARIO PRODUCTO
-            tab_tabla.eliminar();
+            if (tab_tabla.isFocus()) {
+                tab_tabla.eliminar();
+            } else if (tab_tabla1.isFocus()) {
+                tab_tabla1.eliminar();
+            }
         }
     }
 
@@ -1202,6 +1241,14 @@ public class pre_articulos extends Pantalla {
 
     public void setTab_detalle_asiento(Tabla tab_detalle_asiento) {
         this.tab_detalle_asiento = tab_detalle_asiento;
+    }
+
+    public Tabla getTab_tabla1() {
+        return tab_tabla1;
+    }
+
+    public void setTab_tabla1(Tabla tab_tabla1) {
+        this.tab_tabla1 = tab_tabla1;
     }
 
 }
