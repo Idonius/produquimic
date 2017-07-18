@@ -245,7 +245,7 @@ public class pre_articulos extends Pantalla {
             pat_panel.setPanelTabla(tab_tabla);
             gru_grupo.getChildren().add(pat_panel);
         }
-        mep_menu.dibujar(14, "TARJETA KARDEX", gru_grupo);
+        mep_menu.dibujar(14, "fa fa-list-alt", "Tarjeta Kardex con las transacciones del producto.", gru_grupo, true);
     }
 
     public void dibujarImportar() {
@@ -268,8 +268,7 @@ public class pre_articulos extends Pantalla {
         PanelTabla pat_panel = new PanelTabla();
         pat_panel.setPanelTabla(tab_tabla);
         pat_panel.getMenuTabla().getItem_buscar().setRendered(false);
-        mep_menu.dibujar(13, "IMPORTAR PRODUCTOS DEL SISTEMA DE FACTURACIÓN", pat_panel);
-
+        mep_menu.dibujar(13, "fa fa-download", "Importar los productos del sistema de facturación.", pat_panel, true);
     }
 
     /**
@@ -337,7 +336,11 @@ public class pre_articulos extends Pantalla {
         tab_tabla.setCondicion("ide_inarti=" + aut_productos.getValor());
         tab_tabla.setMostrarNumeroRegistros(false);
         tab_tabla.getColumna("INV_IDE_INARTI").setRequerida(true);
+        tab_tabla.getColumna("nivel_inarti").setVisible(false);
         tab_tabla.dibujar();
+        if (tab_tabla.isEmpty()) {
+            tab_tabla.insertar();
+        }
         PanelTabla pat_panel = new PanelTabla();
         pat_panel.setPanelTabla(tab_tabla);
         pat_panel.getMenuTabla().getItem_buscar().setRendered(false);
@@ -384,7 +387,7 @@ public class pre_articulos extends Pantalla {
         PanelArbol paa_panel = new PanelArbol();
         paa_panel.setPanelArbol(arb_estructura);
         gru_grupo.getChildren().add(paa_panel);
-        mep_menu.dibujar(7, "CLASIFICACIÓN DE PRODUCTOS", gru_grupo);
+        mep_menu.dibujar(7, "fa fa-cubes", "Clasificación de grupo de productos.", gru_grupo, true);
     }
 
     /**
@@ -479,7 +482,7 @@ public class pre_articulos extends Pantalla {
 
             //actualizarSaldoxCobrar();
         }
-        mep_menu.dibujar(2, "KARDEX", gru_grupo);
+        mep_menu.dibujar(2, "fa fa-list-alt", "Kardex del producto.", gru_grupo, true);
         calculaKardex();
     }
 
@@ -619,7 +622,8 @@ public class pre_articulos extends Pantalla {
                 utilitario.agregarMensajeInfo("No se encontro Cuenta Contable", "El Producto seleccionado no tiene asociado una cuenta contable");
             }
         }
-        mep_menu.dibujar(5, "MOVIMIENTOS CONTABLES", gru_grupo);
+
+        mep_menu.dibujar(5, "fa fa-book", "Libro mayor de la cuenta contable del producto.", gru_grupo, true);
     }
 
     public void dibujarConfiguraCuenta() {
@@ -692,7 +696,7 @@ public class pre_articulos extends Pantalla {
             gru_grupo.getChildren().add(pat_panel2);
 
         }
-        mep_menu.dibujar(4, "CONFIGURACIÓN DE CUENTA CONTABLE", gru_grupo);
+        mep_menu.dibujar(4, "fa fa-cogs", "Configurar cuenta contable del producto.", gru_grupo, true);
     }
 
     public void dibujarVentas() {
@@ -747,7 +751,7 @@ public class pre_articulos extends Pantalla {
             gru_grupo.getChildren().add(pat_panel);
         }
 
-        mep_menu.dibujar(3, "DETALLE DE VENTAS DEL PRODUCTO", gru_grupo);
+        mep_menu.dibujar(3, "fa fa-list-ul", "Detalle de ventas del producto.", gru_grupo, true);
     }
 
     public void dibujarCompras() {
@@ -800,7 +804,8 @@ public class pre_articulos extends Pantalla {
             gru_grupo.getChildren().add(pat_panel);
         }
 
-        mep_menu.dibujar(6, "DETALLE DE COMPRAS DEL PRODUCTO", gru_grupo);
+        mep_menu.dibujar(6, "fa fa-list-ul", "Detalle de compras del producto.", gru_grupo, true);
+
     }
 
     public void dibujarGraficoVentas() {
@@ -839,7 +844,7 @@ public class pre_articulos extends Pantalla {
             gru_grupo.getChildren().add(pat_panel);
             gru_grupo.getChildren().add(gca_grafico);
         }
-        mep_menu.dibujar(8, "GRAFICO DE VENTAS", gru_grupo);
+        mep_menu.dibujar(8, "fa fa-bar-chart", "Gráficos estadísticos de ventas del producto.", gru_grupo, true);
     }
 
     public void dibujarGraficoCompras() {
@@ -878,7 +883,8 @@ public class pre_articulos extends Pantalla {
             gru_grupo.getChildren().add(pat_panel);
             gru_grupo.getChildren().add(gca_grafico);
         }
-        mep_menu.dibujar(9, "GRAFICO DE COMPRAS", gru_grupo);
+
+        mep_menu.dibujar(9, "fa fa-bar-chart", "Gráficos estadísticos de compras del producto.", gru_grupo, true);
     }
 
     public void dibujarPrecios() {
@@ -962,7 +968,8 @@ public class pre_articulos extends Pantalla {
             gru_grupo.getChildren().add(tab_tabulador);
 
         }
-        mep_menu.dibujar(10, "ÚLTIMOS PRECIOS", gru_grupo);
+
+        mep_menu.dibujar(10, "fa fa-sort-numeric-asc", "Últimos precios de ventas y compras del producto.", gru_grupo, true);
     }
 
     public void actualizarGraficoVentas() {
