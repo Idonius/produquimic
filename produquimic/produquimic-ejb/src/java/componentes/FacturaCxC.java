@@ -5,6 +5,7 @@
  */
 package componentes;
 
+import dj.comprobantes.offline.enums.EstadoComprobanteEnum;
 import framework.aplicacion.TablaGenerica;
 import framework.componentes.AreaTexto;
 import framework.componentes.Boton;
@@ -271,6 +272,7 @@ public class FacturaCxC extends Dialogo {
             if (isFacturaElectronica()) {
                 tab_electronica.setCondicion("IDE_SRCOM=" + tab_cab_factura.getValor("IDE_SRCOM"));
                 tab_electronica.ejecutarSql();
+                tab_deta_factura.setScrollHeight(getAltoPanel() - 390);
             }
 
             tab_factura.getTab(1).getChildren().add(dibujarDetallePago());
@@ -283,7 +285,9 @@ public class FacturaCxC extends Dialogo {
 
             tab_factura.getTab(4).getChildren().add(dibujarGuiaRemision());
 
-            tab_factura.getTab(5).getChildren().add(dibujarXmlFactura());
+            if (isFacturaElectronica()) {
+                tab_factura.getTab(5).getChildren().add(dibujarXmlFactura());
+            }
 
             com_pto_emision.setValue(tab_cab_factura.getValor("ide_ccdaf"));
             tab_deta_factura.setCondicion("ide_cccfa=" + tab_cab_factura.getValorSeleccionado());
@@ -450,6 +454,12 @@ public class FacturaCxC extends Dialogo {
             a1.setValue(tag.getValor("msg_recepcion_srxmc"));
             a1.setReadonly(true);
             gri_m.getChildren().add(a1);
+
+            Boton bot_cambia_estado = new Boton();
+            bot_cambia_estado.setValue("Cambiar de estado a RECIBIDA");
+            bot_cambia_estado.setIcon("ui-icon-refresh");
+            bot_cambia_estado.setMetodoRuta("pre_index.clase." + getId() + ".cambiaRecibida");;
+            gri_m.setFooter(bot_cambia_estado);
             AreaTexto a2 = new AreaTexto();
             a2.setStyle("width:97%;height:50px");
             a2.setValue(tag.getValor("msg_autoriza_srxmc"));
@@ -460,13 +470,24 @@ public class FacturaCxC extends Dialogo {
             grupo.getChildren().add(new Etiqueta("<strong>XML :</strong> </br>"));
 
             AreaTexto ax = new AreaTexto();
-            ax.setStyle("width:98%;overflow:auto;height:" + (utilitario.getAltoPantalla() - 210) + "px;");
+            ax.setStyle("width:98%;overflow:auto;height:" + (utilitario.getAltoPantalla() - 230) + "px;");
             ax.setValue(tag.getValor("xml_srxmc"));
             ax.setReadonly(true);
             grupo.getChildren().add(ax);
 
         }
         return grupo;
+    }
+
+    public void cambiaRecibida() {
+        if ((tab_electronica.getValor("ide_sresc")) != null && (tab_electronica.getValor("ide_sresc").equals(EstadoComprobanteEnum.RECHAZADO.getCodigo())) || tab_electronica.getValor("ide_sresc").equals(EstadoComprobanteEnum.DEVUELTA.getCodigo())) {
+            utilitario.getConexion().ejecutarSql("UPDATE sri_comprobante SET ide_sresc=" + EstadoComprobanteEnum.RECIBIDA.getCodigo() + " where ide_srcom=" + tab_electronica.getValor("ide_srcom"));
+            tab_electronica.actualizar();
+            utilitario.agregarMensaje("La factura electrónica se cambio a estado RECIBIDA", "");
+            utilitario.addUpdate("tab_factura:0:tab_electronica");
+        } else {
+            utilitario.agregarMensajeInfo("No se puede cambiar a estado RECIBIDA", "");
+        }
     }
 
     /**
