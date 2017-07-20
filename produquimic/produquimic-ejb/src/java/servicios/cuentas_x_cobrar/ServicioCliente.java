@@ -444,6 +444,21 @@ public class ServicioCliente extends ServicioBase {
     }
 
     /**
+     * Retorna el número de clientes Nuevos en el año
+     *
+     * @return
+     */
+    public int getTotalClientesNuevos() {
+        TablaGenerica tag = utilitario.consultar("select count(1) as NUMERO, 'total' as TOTAL from gen_persona where es_cliente_geper is TRUE and identificac_geper is not null and  EXTRACT(YEAR FROM fecha_ingre_geper) = " + utilitario.getAnio(utilitario.getFechaActual()));
+        int total = 0;
+        try {
+            total = Integer.parseInt(tag.getValor("NUMERO"));
+        } catch (Exception e) {
+        }
+        return total;
+    }
+
+    /**
      * Retorna el total de clientes creados
      *
      * @return
