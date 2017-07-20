@@ -1352,7 +1352,6 @@ public class ServicioIntegracion extends ServicioBase {
         return "SELECT compras.COD_PROVE ,NOM_PROVE AS PROVEEDOR,COUNT(compras.COD_PROVE) AS NUM_FACTURAS, SUM(TOTAL) AS TOTAL \n"
                 + "from compras,proveedores \n"
                 + "where  compras.COD_PROVE=proveedores.COD_PROVE \n"
-                + "and anulada=false\n"
                 + conAnio
                 + "group by compras.COD_PROVE ,NOM_PROVE HAVING COUNT(compras.COD_PROVE)>0 AND  SUM(TOTAL) IS NOT NULL\n"
                 + "ORDER BY 4 DESC  " + lim;
