@@ -21,10 +21,16 @@ import framework.componentes.PanelArbol;
 import framework.componentes.PanelTabla;
 import framework.componentes.Tabla;
 import framework.componentes.Texto;
+import framework.componentes.bootstrap.BotonBootstrap;
+import framework.componentes.bootstrap.ContenidoBootstrap;
+import framework.componentes.bootstrap.PanelBootstrap;
+import framework.componentes.bootstrap.RowBootstrap;
 import framework.componentes.graficos.GraficoCartesiano;
+import framework.componentes.graficos.GraficoPastel;
 import javax.ejb.EJB;
 import javax.faces.event.ActionEvent;
 import org.primefaces.component.fieldset.Fieldset;
+import org.primefaces.component.panelgrid.PanelGrid;
 import org.primefaces.event.SelectEvent;
 import servicios.contabilidad.ServicioComprobanteContabilidad;
 import servicios.contabilidad.ServicioContabilidadGeneral;
@@ -90,7 +96,8 @@ public class pre_proveedores extends Pantalla {
         bot_clean.setMetodo("limpiar");
         bar_botones.agregarBoton(bot_clean);
 
-        mep_menu.setMenuPanel("OPCIONES PROVEEDOR", "20%");
+        mep_menu.setMenuPanel("OPCIONES PROVEEDOR", "22%");
+        mep_menu.agregarItem("Principal", "dibujarDashBoard", "ui-icon-home");//15
         mep_menu.agregarItem("Información Proveedor", "dibujarProveedor", "ui-icon-person");
         mep_menu.agregarItem("Clasificación Proveedores", "dibujarEstructura", "ui-icon-arrow-4-diag");
 
@@ -114,6 +121,7 @@ public class pre_proveedores extends Pantalla {
         agregarComponente(mep_menu);
         asc_asiento.setId("asc_asiento");
         agregarComponente(asc_asiento);
+        dibujarDashBoard();
     }
 
     /**
@@ -164,6 +172,152 @@ public class pre_proveedores extends Pantalla {
         } else {
             limpiar();
         }
+    }
+
+    public void dibujarDashBoard() {
+
+//        GraficoPastel gpa_pastel = new GraficoPastel();
+//        gpa_pastel.setId("gpa_pastel");
+//        gpa_pastel.setShowDataLabels(true);
+//        gpa_pastel.setStyle("width:350px;");
+//        gpa_pastel.setShowDataLabels(true);
+//        PanelBootstrap gri = new PanelBootstrap();
+//        gri.setStyle("width: 100%;margin-top:5px;");
+//        gri.setPanelVerde();
+//        gri.setTitulo("CLIENTES POR TIPO DE CONTIBUYENTE");
+//        TablaGenerica tag_grafico = utilitario.consultar(ser_proveedor.getSqlTotalClientesporTipoContribuyente());
+//        gpa_pastel.agregarSerie(tag_grafico, "nombre_cntco", "TOTAL");
+//        gri.agregarComponenteContenido(gpa_pastel);
+
+        Grupo grupo = new Grupo();
+        grupo.setStyle("width: 100%;overflow-x: hidden;overflow-y: auto;");
+        int numClientes = ser_proveedor.getTotalProveedores();
+        int numClientesEscritorio = ser_integra.getTotalClientesEscritorio();
+
+        Grid gri_iz = new Grid();
+        gri_iz.setWidth("100%");
+        gri_iz.setColumns(3);
+        RowBootstrap row_cajas = new RowBootstrap();
+        ContenidoBootstrap c1 = new ContenidoBootstrap("col-md-6");
+        row_cajas.getChildren().add(c1);
+
+        org.primefaces.component.panel.Panel p1 = new org.primefaces.component.panel.Panel();
+        p1.setStyle("margin-left: 2px; margin-bottom:4px;");
+        Grid g1 = new Grid();
+        g1.setColumns(2);
+        g1.setHeader(new Etiqueta("<span style='font-size:11px;' >NÚMERO DE PROVEEDORES </span>"));
+        g1.getChildren().add(new Etiqueta("<i class='fa fa-users fa-4x text-aqua'></i>"));
+        g1.getChildren().add(new Etiqueta("<span style='font-size:22px; text-align: left;'>" + numClientes + "</span>"));
+        p1.getChildren().add(g1);
+        gri_iz.getChildren().add(p1);
+
+//        ContenidoBootstrap c2 = new ContenidoBootstrap("col-md-3");
+//        row_cajas.getChildren().add(c2);
+        org.primefaces.component.panel.Panel p2 = new org.primefaces.component.panel.Panel();
+        p2.setStyle("margin-left: 2px;margin-bottom:4px;");
+        int diferencia = (numClientes - numClientesEscritorio);
+        if (diferencia < 0) {
+            diferencia = 0;
+        }
+        Grid g2 = new Grid();
+        g2.setColumns(2);
+        g2.setHeader(new Etiqueta("<span style='font-size:11px;' >PROVEEDORES POR IMPORTAR</span>"));
+        g2.getChildren().add(new Etiqueta("<i class='fa fa-refresh fa-spin fa-4x fa-fw text-red'></i>"));
+        g2.getChildren().add(new Etiqueta("<span style='font-size:22px; text-align: left;'>" + (diferencia) + "</span>"));
+        p2.getChildren().add(g2);
+        gri_iz.getChildren().add(p2);
+//        gri_iz.setFooter(gri);
+
+        org.primefaces.component.panel.Panel p3 = new org.primefaces.component.panel.Panel();
+        p3.setStyle("margin-left: 2px; margin-bottom:4px;");
+        Grid g3 = new Grid();
+        g3.setColumns(2);
+        g3.setHeader(new Etiqueta("<span style='font-size:11px;' >PROVEEDORES NUEVOS </span>"));
+        g3.getChildren().add(new Etiqueta("<i class='fa fa-user-plus fa-4x text-green'></i>"));
+        g3.getChildren().add(new Etiqueta("<span style='font-size:22px; text-align: left;'>" + ser_proveedor.getTotalProveedoresNuevos() + "</span>"));
+        p3.getChildren().add(g3);
+        gri_iz.getChildren().add(p3);
+
+        c1.getChildren().add(gri_iz);
+
+        tab_tabla = new Tabla();
+        tab_tabla.setId("tab_tabla");
+        tab_tabla.setNumeroTabla(15);
+        tab_tabla.setConexion(ser_integra.getConexionEscritorio());
+        tab_tabla.setLectura(true);
+        tab_tabla.setSql(ser_integra.getSqlMejoresProveedores(20, null));
+        tab_tabla.setCampoPrimaria("COD_PROVE");
+        tab_tabla.getColumna("COD_PROVE").setVisible(false);
+        tab_tabla.getColumna("NUM_FACTURAS").setNombreVisual("N. FACTURAS");
+        tab_tabla.getColumna("NOM_PROVE").setNombreVisual("PROVEEDOR");
+        tab_tabla.getColumna("TOTAL").alinearDerecha();
+        tab_tabla.setCampoOrden("TOTAL");
+        tab_tabla.setOrdenar(false);
+        tab_tabla.setRows(20);
+        tab_tabla.dibujar();
+
+        PanelBootstrap pb_mejores = new PanelBootstrap();
+        ContenidoBootstrap c3 = new ContenidoBootstrap("col-md-6");
+        row_cajas.getChildren().add(c3);
+        pb_mejores.setPanelAzul();
+        pb_mejores.setTitulo("MEJORES 20 PROVEEDORES");
+        pb_mejores.agregarComponenteContenido(tab_tabla);
+
+        BotonBootstrap bb_ver = new BotonBootstrap();
+        bb_ver.setValue("Ver Todos");
+        bb_ver.setBotonAzul();
+        bb_ver.setMetodo("dibujarTodosMejoresProveedores");
+        pb_mejores.agregarComponenteFooter(bb_ver);
+
+        c3.getChildren().add(pb_mejores);
+        grupo.getChildren().add(row_cajas);
+        mep_menu.dibujar(15, "", grupo);
+    }
+
+    public void dibujarTodosMejoresProveedores() {
+        Grupo gru_grupo = new Grupo();
+        tex_num_asiento = new Texto(); //Año
+        tex_num_asiento.setSize(5);
+        tex_num_asiento.setTitle("AÑO");
+        tex_num_asiento.setMaxlength(4);
+        tex_num_asiento.setSoloEnteros();
+
+        PanelGrid pg = new PanelGrid();
+        pg.setColumns(3);
+        pg.getChildren().add(new Etiqueta("PERÍODO :"));
+        pg.getChildren().add(tex_num_asiento);
+        Boton bot = new Boton();
+        bot.setTitle("Actualizar");
+        bot.setIcon("ui-icon-search");
+        bot.setMetodo("actualizarMejoresProveedores");
+        pg.getChildren().add(bot);
+        gru_grupo.getChildren().add(pg);
+
+        tab_tabla = new Tabla();
+        tab_tabla.setId("tab_tabla");
+        tab_tabla.setNumeroTabla(15);
+        tab_tabla.setConexion(ser_integra.getConexionEscritorio());
+        tab_tabla.setLectura(true);
+        tab_tabla.setSql(ser_integra.getSqlMejoresProveedores(null, null));
+        tab_tabla.setCampoPrimaria("COD_PROVE");
+        tab_tabla.getColumna("COD_PROVE").setVisible(false);
+        tab_tabla.getColumna("NUM_FACTURAS").setNombreVisual("N. FACTURAS");
+        tab_tabla.getColumna("NOM_PROVE").setNombreVisual("PROVEEDOR");
+        tab_tabla.getColumna("TOTAL").alinearDerecha();
+        tab_tabla.setCampoOrden("TOTAL");
+        tab_tabla.setRows(20);
+        tab_tabla.dibujar();
+        PanelTabla pat_panel = new PanelTabla();
+        pat_panel.setPanelTabla(tab_tabla);
+        gru_grupo.getChildren().add(pat_panel);
+
+        mep_menu.dibujar(16, "fa fa-sort-numeric-asc", "Cuadro estadístico de Mejores Proveedores.", gru_grupo, true);
+    }
+
+    public void actualizarMejoresProveedores() {
+        tab_tabla.setSql(ser_integra.getSqlMejoresProveedores(null, String.valueOf(tex_num_asiento.getValue())));
+        tab_tabla.ejecutarSql();
+
     }
 
     public void dibujarReporteCxP() {
@@ -867,6 +1021,7 @@ public class pre_proveedores extends Pantalla {
     public void limpiar() {
         aut_proveedor.limpiar();
         mep_menu.limpiar();
+        dibujarDashBoard();
     }
 
     @Override
