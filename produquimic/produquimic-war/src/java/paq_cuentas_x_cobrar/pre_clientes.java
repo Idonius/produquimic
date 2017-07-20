@@ -116,8 +116,8 @@ public class pre_clientes extends Pantalla {
         mep_menu.agregarItem("Movimientos Contables", "dibujarMovimientos", "ui-icon-note");
         mep_menu.agregarSubMenu("INFORMES");
         mep_menu.agregarItem("Gráfico de Ventas", "dibujarGrafico", "ui-icon-bookmark");
-        mep_menu.agregarItem("Reporte Cuentas por Cobrar", "dibujarReporteCxC", "ui-icon-bookmark");
         mep_menu.agregarItem("Productos Vendidos", "dibujarProductosVendidos", "ui-icon-cart");
+        mep_menu.agregarItem("Reporte Cuentas por Cobrar", "dibujarReporteCxC", "ui-icon-bookmark");
 
         agregarComponente(mep_menu);
         asc_asiento.setId("asc_asiento");
@@ -204,7 +204,7 @@ public class pre_clientes extends Pantalla {
 
         Grid gri_iz = new Grid();
         gri_iz.setWidth("100%");
-        gri_iz.setColumns(2);
+        gri_iz.setColumns(3);
         RowBootstrap row_cajas = new RowBootstrap();
         ContenidoBootstrap c1 = new ContenidoBootstrap("col-md-6");
         row_cajas.getChildren().add(c1);
@@ -235,6 +235,16 @@ public class pre_clientes extends Pantalla {
         p2.getChildren().add(g2);
         gri_iz.getChildren().add(p2);
         gri_iz.setFooter(gri);
+
+        org.primefaces.component.panel.Panel p3 = new org.primefaces.component.panel.Panel();
+        p3.setStyle("margin-left: 2px; margin-bottom:4px;");
+        Grid g3 = new Grid();
+        g3.setColumns(2);
+        g3.setHeader(new Etiqueta("<span style='font-size:11px;' >CLIENTES NUEVOS </span>"));
+        g3.getChildren().add(new Etiqueta("<i class='fa fa-user-plus fa-4x text-green'></i>"));
+        g3.getChildren().add(new Etiqueta("<span style='font-size:22px; text-align: left;'>" + ser_cliente.getTotalClientesNuevos() + "</span>"));
+        p3.getChildren().add(g3);
+        gri_iz.getChildren().add(p3);
 
         c1.getChildren().add(gri_iz);
 
