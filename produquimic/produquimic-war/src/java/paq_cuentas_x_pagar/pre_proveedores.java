@@ -26,7 +26,6 @@ import framework.componentes.bootstrap.ContenidoBootstrap;
 import framework.componentes.bootstrap.PanelBootstrap;
 import framework.componentes.bootstrap.RowBootstrap;
 import framework.componentes.graficos.GraficoCartesiano;
-import framework.componentes.graficos.GraficoPastel;
 import javax.ejb.EJB;
 import javax.faces.event.ActionEvent;
 import org.primefaces.component.fieldset.Fieldset;
@@ -188,11 +187,10 @@ public class pre_proveedores extends Pantalla {
 //        TablaGenerica tag_grafico = utilitario.consultar(ser_proveedor.getSqlTotalClientesporTipoContribuyente());
 //        gpa_pastel.agregarSerie(tag_grafico, "nombre_cntco", "TOTAL");
 //        gri.agregarComponenteContenido(gpa_pastel);
-
         Grupo grupo = new Grupo();
         grupo.setStyle("width: 100%;overflow-x: hidden;overflow-y: auto;");
         int numClientes = ser_proveedor.getTotalProveedores();
-        int numClientesEscritorio = ser_integra.getTotalClientesEscritorio();
+        int numClientesEscritorio = ser_integra.getTotalProveedoresEscritorio();
 
         Grid gri_iz = new Grid();
         gri_iz.setWidth("100%");
@@ -216,6 +214,7 @@ public class pre_proveedores extends Pantalla {
         org.primefaces.component.panel.Panel p2 = new org.primefaces.component.panel.Panel();
         p2.setStyle("margin-left: 2px;margin-bottom:4px;");
         int diferencia = (numClientes - numClientesEscritorio);
+        System.out.println(numClientes + " *-**** " + numClientesEscritorio);
         if (diferencia < 0) {
             diferencia = 0;
         }
