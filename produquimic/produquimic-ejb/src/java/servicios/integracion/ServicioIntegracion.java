@@ -1346,7 +1346,7 @@ public class ServicioIntegracion extends ServicioBase {
             anio = "";
         }
         if (anio.isEmpty() == false) {
-            conAnio = " and YEAR(fecha) = " + anio + " \n";
+            conAnio = " and YEAR(fecha_compra) = " + anio + " \n";
         }
 
         return "SELECT compras.COD_PROVE ,NOM_PROVE AS PROVEEDOR,COUNT(compras.COD_PROVE) AS NUM_FACTURAS, SUM(TOTAL) AS TOTAL \n"
