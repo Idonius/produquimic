@@ -23,6 +23,7 @@ import javax.faces.event.AjaxBehaviorEvent;
 import org.primefaces.component.separator.Separator;
 import org.primefaces.event.SelectEvent;
 import servicios.ceo.ServicioComprobanteElectronico;
+import servicios.contabilidad.ServicioConfiguracion;
 import servicios.contabilidad.ServicioRetenciones;
 import servicios.cuentas_x_cobrar.ServicioCuentasCxC;
 import servicios.cuentas_x_pagar.ServicioCuentasCxP;
@@ -52,6 +53,8 @@ public class Retencion extends Dialogo {
     private final ServicioComprobanteElectronico ser_comprobante_electronico = (ServicioComprobanteElectronico) utilitario.instanciarEJB(ServicioComprobanteElectronico.class);
     @EJB
     private final ServicioIntegracion ser_integracion = (ServicioIntegracion) utilitario.instanciarEJB(ServicioIntegracion.class);
+    @EJB
+    private final ServicioConfiguracion ser_configuracion = (ServicioConfiguracion) utilitario.instanciarEJB(ServicioConfiguracion.class);
 
     private final AreaTexto ate_observacion = new AreaTexto();
     private final Texto tex_total = new Texto();
@@ -547,8 +550,8 @@ public class Retencion extends Dialogo {
         String p_iva30 = parametros.get("p_con_impuesto_iva30");
         String p_iva70 = parametros.get("p_con_impuesto_iva70");
         String p_iva100 = parametros.get("p_con_impuesto_iva100");
-        List porcen_iva_sql = utilitario.getConexion().consultar("select porcentaje_cnpim from con_porcen_impues where ide_cnpim=" + parametros.get("p_con_porcentaje_imp_iva"));
-        double p_porcentaje_iva = Double.parseDouble(porcen_iva_sql.get(0).toString());
+        //List porcen_iva_sql = utilitario.getConexion().consultar("select porcentaje_cnpim from con_porcen_impues where ide_cnpim=" + parametros.get("p_con_porcentaje_imp_iva"));
+        double p_porcentaje_iva = ser_configuracion.getPorcentajeIva(utilitario.getFechaActual());
 
         cls_retenciones retenciones = new cls_retenciones();
 
