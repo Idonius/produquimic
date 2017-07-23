@@ -214,7 +214,7 @@ public class pre_proveedores extends Pantalla {
         org.primefaces.component.panel.Panel p2 = new org.primefaces.component.panel.Panel();
         p2.setStyle("margin-left: 2px;margin-bottom:4px;");
         int diferencia = (numClientes - numClientesEscritorio);
-        System.out.println(numClientes + " *-**** " + numClientesEscritorio);
+        // System.out.println(numClientes + " *-**** " + numClientesEscritorio);
         if (diferencia < 0) {
             diferencia = 0;
         }
