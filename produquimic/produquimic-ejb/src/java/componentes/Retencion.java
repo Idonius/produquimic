@@ -186,12 +186,12 @@ public class Retencion extends Dialogo {
         tab_cb_retencion.getColumna("numero_cncre").setQuitarCaracteresEspeciales(true);
         tab_cb_retencion.getColumna("OBSERVACION_CNCRE").setVisible(false);
         tab_cb_retencion.getColumna("FECHA_EMISI_CNCRE").setNombreVisual("FECHA EMISIÓN");
+        tab_cb_retencion.getColumna("correo_cncre").setVisible(false);
         tab_cb_retencion.setTipoFormulario(true);
         tab_cb_retencion.getGrid().setColumns(6);
         tab_cb_retencion.setMostrarNumeroRegistros(false);
         tab_cb_retencion.dibujar();
         tab_cb_retencion.insertar();
-
         tab_dt_retencion.setId("tab_dt_retencion");
         tab_dt_retencion.setRuta("pre_index.clase." + getId());
         tab_dt_retencion.setTabla("con_detall_retenc", "ide_cndre", 999);
@@ -423,14 +423,15 @@ public class Retencion extends Dialogo {
         tab_dto_proveedor.setRuta("pre_index.clase." + getId());
         tab_dto_proveedor.setId("tab_dto_proveedor");
         tab_dto_proveedor.setTabla("gen_persona", "ide_geper", 997);
+        tab_dto_proveedor.setRecuperarLectura(true);
         tab_dto_proveedor.setCondicion("ide_geper=" + tab_cab_documento.getValor("ide_geper"));
         //OCULTA TODAS LAS COLUMNAS
         for (int i = 0; i < tab_dto_proveedor.getTotalColumnas(); i++) {
             tab_dto_proveedor.getColumnas()[i].setVisible(false);
         }
-        tab_dto_proveedor.getColumna("correo_geper").setVisible(true);
-        tab_dto_proveedor.getColumna("correo_geper").setNombreVisual("E-MAIL");
-        tab_dto_proveedor.getColumna("correo_geper").setOrden(4);
+        tab_dto_proveedor.getColumna("correo_geper").setVisible(false);
+        //tab_dto_proveedor.getColumna("correo_geper").setNombreVisual("E-MAIL");
+        //tab_dto_proveedor.getColumna("correo_geper").setOrden(4);
         tab_dto_proveedor.getColumna("identificac_geper").setEtiqueta();
         tab_dto_proveedor.getColumna("identificac_geper").setVisible(true);
         tab_dto_proveedor.getColumna("identificac_geper").setNombreVisual("IDENTIFICACIÓN");
@@ -440,11 +441,12 @@ public class Retencion extends Dialogo {
         tab_dto_proveedor.getColumna("nom_geper").setNombreVisual("PROVEEDOR");
         tab_dto_proveedor.getColumna("nom_geper").setEtiqueta();
         tab_dto_proveedor.getColumna("direccion_geper").setNombreVisual("DIRECCIÓN");
+        tab_dto_proveedor.getColumna("direccion_geper").setEtiqueta();
         tab_dto_proveedor.getColumna("direccion_geper").setOrden(3);
         tab_dto_proveedor.getColumna("direccion_geper").setVisible(true);
         tab_dto_proveedor.getColumna("ide_geper").setVisible(false);
         tab_dto_proveedor.setTipoFormulario(true);
-        tab_dto_proveedor.getGrid().setColumns(4);
+        tab_dto_proveedor.getGrid().setColumns(6);
         tab_dto_proveedor.setMostrarNumeroRegistros(false);
         tab_dto_proveedor.dibujar();
 
@@ -476,9 +478,13 @@ public class Retencion extends Dialogo {
             tab_cb_retencion.getColumna("numero_cncre").setLectura(true);
             tab_cb_retencion.getColumna("autorizacion_cncre").setRequerida(false);
             tab_cb_retencion.getColumna("numero_cncre").setRequerida(false);
+            tab_cb_retencion.getColumna("correo_cncre").setNombreVisual("E-MAIL");
+            tab_cb_retencion.getColumna("correo_cncre").setVisible(true);
+            tab_cb_retencion.getColumna("correo_cncre").setOrden(4);
         } else {
             tab_cb_retencion.getColumna("autorizacion_cncre").setRequerida(true);
             tab_cb_retencion.getColumna("numero_cncre").setRequerida(true);
+            tab_cb_retencion.getColumna("correo_cncre").setVisible(false);
         }
         tab_cb_retencion.getColumna("OBSERVACION_CNCRE").setVisible(false);
         tab_cb_retencion.getColumna("FECHA_EMISI_CNCRE").setNombreVisual("FECHA EMISIÓN");
@@ -659,8 +665,8 @@ public class Retencion extends Dialogo {
 
         calculaTotales();
 
-        grupo.getChildren().add(tab_cb_retencion);
         grupo.getChildren().add(tab_dto_proveedor);
+        grupo.getChildren().add(tab_cb_retencion);
         grupo.getChildren().add(new Separator());
 
         Grid gri_td = new Grid();
