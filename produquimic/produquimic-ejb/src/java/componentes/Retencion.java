@@ -450,6 +450,11 @@ public class Retencion extends Dialogo {
         tab_dto_proveedor.setMostrarNumeroRegistros(false);
         tab_dto_proveedor.dibujar();
 
+        String correo_ret = ser_retencion.getCorreoRetencion(tab_cab_documento.getValor("ide_geper"));
+        if (correo_ret == null) {
+            correo_ret = tab_dto_proveedor.getValor("correo_geper");
+        }
+
         tab_cb_retencion = new Tabla();
         tab_dt_retencion = new Tabla();
         tab_cb_retencion.setId("tab_cb_retencion");
@@ -481,6 +486,7 @@ public class Retencion extends Dialogo {
             tab_cb_retencion.getColumna("correo_cncre").setNombreVisual("E-MAIL");
             tab_cb_retencion.getColumna("correo_cncre").setVisible(true);
             tab_cb_retencion.getColumna("correo_cncre").setOrden(4);
+            tab_cb_retencion.getColumna("correo_cncre").setRequerida(true);
         } else {
             tab_cb_retencion.getColumna("autorizacion_cncre").setRequerida(true);
             tab_cb_retencion.getColumna("numero_cncre").setRequerida(true);
@@ -494,6 +500,7 @@ public class Retencion extends Dialogo {
         tab_cb_retencion.setMostrarNumeroRegistros(false);
         tab_cb_retencion.dibujar();
         tab_cb_retencion.insertar();
+        tab_cb_retencion.setValor("correo_cncre", correo_ret);
 
         tab_dt_retencion.setId("tab_dt_retencion");
         tab_dt_retencion.setRuta("pre_index.clase." + getId());
@@ -789,6 +796,15 @@ public class Retencion extends Dialogo {
             } catch (Exception e) {
                 utilitario.agregarMensajeError("Error al guardar el Comprobante", "El número de retención no es válido");
                 return false;
+            }
+        }
+        if (isFacturaElectronica() && ide_cpcfa != null) {
+            //valida que se ingrese un correo 
+            if (tab_cb_retencion.getValor("correo_cncre") != null || tab_cb_retencion.getValor("correo_cncre").isEmpty() == false) {
+                if (utilitario.isCorreoValido(tab_cb_retencion.getValor("correo_cncre")) == false) {
+                    utilitario.agregarMensajeError("No se puede guardar el Comprobante", "El correo electrónico ingresado no es válido");
+                    return false;
+                }
             }
         }
 

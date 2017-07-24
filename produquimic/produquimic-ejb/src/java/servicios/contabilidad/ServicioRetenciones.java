@@ -232,4 +232,12 @@ public class ServicioRetenciones extends ServicioBase {
         return "SELECT ide_cncim, nombre_cncim,casillero_cncim FROM con_cabece_impues order by ide_cnimp,casillero_cncim";
     }
 
+    //Retorna el último correo de las retenciones realizadas
+    public String getCorreoRetencion(String ide_geper) {
+        return utilitario.consultar("select ide_cpcfa,correo_cncre from con_cabece_retenc a\n"
+                + "inner join cxp_cabece_factur b on a.ide_cncre=b.ide_cncre\n"
+                + "where ide_geper=" + ide_geper + "\n"
+                + "order by ide_cpcfa desc limit 1").getValor("correo_cncre");
+    }
+
 }

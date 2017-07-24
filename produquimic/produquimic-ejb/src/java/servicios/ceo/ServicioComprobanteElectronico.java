@@ -66,7 +66,7 @@ public class ServicioComprobanteElectronico extends ServicioBase {
 
         TablaGenerica tab_factura = utilitario.consultar("select a.ide_cccfa,secuencial_cccfa,fecha_emisi_cccfa,serie_ccdaf,base_grabada_cccfa\n"
                 + ",base_tarifa0_cccfa,valor_iva_cccfa,total_cccfa,alterno_ats,identificac_geper\n"
-                + ",a.ide_geper,ide_cntdo,ide_srcom,dias_credito_cccfa,orden_compra_cccfa \n"
+                + ",a.ide_geper,ide_cntdo,ide_srcom,dias_credito_cccfa,orden_compra_cccfa,correo_cccfa \n"
                 + "from cxc_cabece_factura a \n"
                 + "inner join gen_persona b on a.ide_geper = b.ide_geper  \n"
                 + "inner join cxc_datos_fac d on a.ide_ccdaf=d.ide_ccdaf\n"
@@ -129,6 +129,7 @@ public class ServicioComprobanteElectronico extends ServicioBase {
             tab_cabecara.setValor("forma_cobro_srcom", tab_factura.getValor("alterno_ats"));
             tab_cabecara.setValor("ide_empr", utilitario.getVariable("ide_empr"));
             tab_cabecara.setValor("ide_sucu", utilitario.getVariable("ide_sucu"));
+            tab_cabecara.setValor("correo_srcom", tab_factura.getValor("correo_cccfa"));
 
             tab_cabecara.guardar();
             ide_srcom = tab_cabecara.getValor("ide_srcom");
@@ -211,7 +212,7 @@ public class ServicioComprobanteElectronico extends ServicioBase {
 
         TablaGenerica tab_factura = utilitario.consultar("select a.ide_cpcno,numero_cpcno,fecha_emisi_cpcno,serie_ccdaf,base_grabada_cpcno\n"
                 + ",base_tarifa0_cpcno,valor_iva_cpcno,total_cpcno,alterno_ats,identificac_geper,\n"
-                + "a.ide_geper,ide_cntdo,ide_srcom,nombre_cpmno,num_doc_mod_cpcno,fecha_emision_mod_cpcno,valor_mod_cpcno \n"
+                + "a.ide_geper,ide_cntdo,ide_srcom,nombre_cpmno,num_doc_mod_cpcno,fecha_emision_mod_cpcno,valor_mod_cpcno,correo_geper \n"
                 + "from cxp_cabecera_nota  a \n"
                 + "inner join gen_persona b on a.ide_geper = b.ide_geper  \n"
                 + "inner join cxc_datos_fac d on a.ide_ccdaf=d.ide_ccdaf\n"
@@ -280,6 +281,7 @@ public class ServicioComprobanteElectronico extends ServicioBase {
             tab_cabecara.setValor("ide_empr", utilitario.getVariable("ide_empr"));
             tab_cabecara.setValor("ide_sucu", utilitario.getVariable("ide_sucu"));
             //tab_cabecara.setValor("numero_cpcno", tab_factura.getValor("secuencial_cccfa")); !!!!!SOLO PARA PRUEBAS COMENTADO
+            tab_cabecara.setValor("correo_srcom", tab_factura.getValor("correo_geper"));
 
             tab_cabecara.guardar();
             ide_srcom = tab_cabecara.getValor("ide_srcom");
@@ -345,7 +347,7 @@ public class ServicioComprobanteElectronico extends ServicioBase {
         String ide_srcom = "-1";
 
         TablaGenerica tab_guia = utilitario.consultar("select serie_ccdaf,fecha_emision_ccgui,identificac_geper,\n"
-                + "g.ide_geper,ide_cntdo,a.ide_srcom, e.ide_srcom as ide_srcom_factura,g.placa_gecam,fecha_ini_trasla_ccgui,fecha_fin_trasla_ccgui,punto_partida_ccgui \n"
+                + "g.ide_geper,ide_cntdo,a.ide_srcom, e.ide_srcom as ide_srcom_factura,g.placa_gecam,fecha_ini_trasla_ccgui,fecha_fin_trasla_ccgui,punto_partida_ccgui,correo_cccfa \n"
                 + "from cxc_guia a\n"
                 + "inner join gen_camion g on g.placa_gecam=a.placa_gecam \n"
                 + "inner join gen_persona b on g.ide_geper = b.ide_geper  \n"
@@ -389,6 +391,7 @@ public class ServicioComprobanteElectronico extends ServicioBase {
             tab_cabecara.setValor("ide_cntdo", "7"); //Guia de Remisión
             tab_cabecara.setValor("ide_empr", utilitario.getVariable("ide_empr"));
             tab_cabecara.setValor("ide_sucu", utilitario.getVariable("ide_sucu"));
+            tab_cabecara.setValor("correo_srcom", tab_guia.getValor("correo_cccfa"));
 
             if (tab_cabecara.guardar()) {
                 ide_srcom = tab_cabecara.getValor("ide_srcom");
@@ -429,7 +432,7 @@ public class ServicioComprobanteElectronico extends ServicioBase {
         String ide_srcom = "-1";
 
         TablaGenerica tab_factura = utilitario.consultar("select serie_ccdaf,fecha_emisi_cncre,identificac_geper"
-                + ",e.ide_geper,a.ide_srcom  from con_cabece_retenc a "
+                + ",e.ide_geper,a.ide_srcom,correo_cncre  from con_cabece_retenc a "
                 + "inner join cxp_cabece_factur e on a.ide_cncre=e.ide_cncre\n"
                 + "inner join gen_persona b on e.ide_geper = b.ide_geper  \n"
                 + "inner join cxc_datos_fac d on a.ide_ccdaf=d.ide_ccdaf\n"
@@ -458,6 +461,8 @@ public class ServicioComprobanteElectronico extends ServicioBase {
             tab_cabecara.setValor("reutiliza_srcom", "false");//no reutiliza por defecto
             tab_cabecara.setValor("fecha_sistema_srcom", utilitario.getFechaActual());
             tab_cabecara.setValor("ip_genera_srcom", utilitario.getIp());
+            tab_cabecara.setValor("correo_srcom", tab_factura.getValor("correo_cncre"));
+
             tab_cabecara.setValor("identificacion_srcom", tab_factura.getValor("identificac_geper"));
             tab_cabecara.setValor("en_nube_srcom", "false");
             tab_cabecara.setValor("ide_geper", tab_factura.getValor("ide_geper"));
