@@ -72,10 +72,10 @@ public class RetencionServiceImp implements RetencionService {
             }
             str_xml.append("		</impuestos> \n")
                     .append("		<infoAdicional> \n");
-            if (comprobante.getCliente().getCorreo() != null && utilitario.isCorreoValido(comprobante.getCliente().getCorreo())) {
-                str_xml.append("      		<campoAdicional nombre=\"Email\">").append(comprobante.getCliente().getCorreo()).append("</campoAdicional> \n");
+            if (comprobante.getCliente().getCorreo() != null && utilitario.isCorreoValido(comprobante.getCorreo())) {
+                str_xml.append("      		<campoAdicional nombre=\"Email\">").append(comprobante.getCorreo()).append("</campoAdicional> \n");
             } else {
-                str_xml.append("      		<campoAdicional nombre=\"Email\">").append("nodispone@banecuador.fin.ec").append("</campoAdicional> \n");
+                str_xml.append("      		<campoAdicional nombre=\"Email\">").append("ventas@produquimic.com.ec").append("</campoAdicional> \n");
             }
             if (comprobante.getCliente().getTelefono() != null) {
                 str_xml.append("      		<campoAdicional nombre=\"Teléfono\">").append(comprobante.getCliente().getTelefono()).append("</campoAdicional> \n");

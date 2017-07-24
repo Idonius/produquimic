@@ -64,6 +64,8 @@ public final class Comprobante implements Serializable {
     private int diasCredito;
     private String numOrdenCompra;
 
+    private String correo;
+
     //Campos para guias de remisión
     private String dirPartida;
     private Date fechaIniTransporte;
@@ -101,6 +103,7 @@ public final class Comprobante implements Serializable {
             this.fechaemisiondocsustento = resultado.getDate("fecha_emision_mod_srcom");
             this.valormodificacion = resultado.getBigDecimal("valor_mod_srcom");
             this.numAutorizacion = resultado.getString("autorizacion_srcomn");
+            this.correo = resultado.getString("correo_srcom");
 
             this.diasCredito = resultado.getInt("dias_credito_srcom");
             this.numOrdenCompra = resultado.getString("orden_compra_srcom");
@@ -623,4 +626,13 @@ public final class Comprobante implements Serializable {
     public void setCodigoComprobanteFactura(Long codigoComprobanteFactura) {
         this.codigoComprobanteFactura = codigoComprobanteFactura;
     }
+
+    public String getCorreo() {
+        return correo;
+    }
+
+    public void setCorreo(String correo) {
+        this.correo = correo;
+    }
+
 }

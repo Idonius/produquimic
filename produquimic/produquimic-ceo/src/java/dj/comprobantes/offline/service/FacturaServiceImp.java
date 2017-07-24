@@ -140,7 +140,7 @@ public class FacturaServiceImp implements FacturaService {
             if (comprobante.getCliente().getCorreo() != null && utilitario.isCorreoValido(comprobante.getCliente().getCorreo())) {
                 str_xml.append("      		<campoAdicional nombre=\"Email\">").append(comprobante.getCliente().getCorreo()).append("</campoAdicional> \n");
             } else {
-                str_xml.append("      		<campoAdicional nombre=\"Email\">").append("nodispone@produquimic.com.ec").append("</campoAdicional> \n");
+                str_xml.append("      		<campoAdicional nombre=\"Email\">").append("ventas@produquimic.com.ec").append("</campoAdicional> \n");
             }
             if (comprobante.getCliente().getTelefono() != null) {
                 str_xml.append("      		<campoAdicional nombre=\"Teléfono\">").append(comprobante.getCliente().getTelefono()).append("</campoAdicional> \n");
