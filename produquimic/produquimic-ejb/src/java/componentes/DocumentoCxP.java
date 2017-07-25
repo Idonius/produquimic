@@ -349,26 +349,18 @@ public class DocumentoCxP extends Dialogo {
         tab_dto_prove.setRuta("pre_index.clase." + getId());
         tab_dto_prove.setId("tab_dto_prove");
         tab_dto_prove.setIdCompleto("tab_documenoCxP:tab_dto_prove");
-        tab_dto_prove.setSql("select ide_geper,nom_geper,direccion_geper,ti.nombre_getid,identificac_geper "
-                + "from gen_persona gp,gen_tipo_identifi ti "
-                + "where ti.ide_getid=gp.ide_getid and ide_geper=" + tab_cab_documento.getValor("ide_geper"));
+        tab_dto_prove.setSql("select ide_geper,nom_geper,identificac_geper,direccion_geper "
+                + "from gen_persona "
+                + "where ide_geper=" + tab_cab_documento.getValor("ide_geper"));
         tab_dto_prove.setNumeroTabla(999);
         tab_dto_prove.setCampoPrimaria("ide_geper");
-        tab_dto_prove.getColumna("nombre_getid").setEtiqueta();
-        tab_dto_prove.getColumna("nombre_getid").setNombreVisual("TIPO DE IDENTIFICACIÓN");
-        tab_dto_prove.getColumna("nombre_getid").setEtiqueta();
-        tab_dto_prove.getColumna("nombre_getid").setOrden(3);
         tab_dto_prove.getColumna("identificac_geper").setEtiqueta();
         tab_dto_prove.getColumna("identificac_geper").setNombreVisual("IDENTIFICACIÓN");
-        tab_dto_prove.getColumna("identificac_geper").setOrden(4);
-        tab_dto_prove.getColumna("nom_geper").setOrden(1);
         tab_dto_prove.getColumna("nom_geper").setNombreVisual("PROVEEDOR");
         tab_dto_prove.getColumna("nom_geper").setEtiqueta();
         tab_dto_prove.getColumna("direccion_geper").setNombreVisual("DIRECCIÓN");
         tab_dto_prove.getColumna("direccion_geper").setEtiqueta();
-        tab_dto_prove.getColumna("direccion_geper").setOrden(2);
         tab_dto_prove.getColumna("ide_geper").setVisible(false);
-
         tab_dto_prove.setNumeroTabla(-1);
         tab_dto_prove.setTipoFormulario(true);
         tab_dto_prove.getGrid().setColumns(4);
@@ -404,8 +396,10 @@ public class DocumentoCxP extends Dialogo {
         tab_cb_rete.getColumna("IDE_SRCOM").setVisible(false);
         tab_cb_rete.getColumna("FECHA_EMISI_CNCRE").setNombreVisual("FECHA EMISIÓN");
         tab_cb_rete.getColumna("FECHA_EMISI_CNCRE").setEtiqueta();
+        tab_cb_rete.getColumna("correo_cncre").setNombreVisual("E-MAIL");
+        tab_cb_rete.getColumna("correo_cncre").setEtiqueta();
         tab_cb_rete.setTipoFormulario(true);
-        tab_cb_rete.getGrid().setColumns(6);
+        tab_cb_rete.getGrid().setColumns(4);
         tab_cb_rete.setMostrarNumeroRegistros(false);
         tab_cb_rete.dibujar();
 
@@ -446,37 +440,27 @@ public class DocumentoCxP extends Dialogo {
             tab_electronica.setId("tab_electronica");
             tab_electronica.setIdCompleto("tab_documenoCxP:tab_electronica");
             tab_electronica.setRuta("pre_index.clase." + getId());
-            tab_electronica.setTabla("sri_comprobante", "ide_srcom", 990);
-            tab_electronica.getGrid().setColumns(8);
-            tab_electronica.setTipoFormulario(true);
-
             if (tab_cb_rete.getValor("ide_srcom") != null) {
-                tab_electronica.setCondicion("ide_srcom=" + tab_cb_rete.getValor("ide_srcom"));
+                tab_electronica.setSql("select ide_srcom,nombre_sresc,fechaautoriza_srcom from sri_comprobante a inner join sri_estado_comprobante b on a.ide_sresc=b.ide_sresc where ide_srcom=" + tab_cb_rete.getValor("ide_srcom"));
             } else {
-                tab_electronica.setCondicion("ide_srcom=-1");
+                tab_electronica.setSql("select ide_srcom,nombre_sresc,fechaautoriza_srcom from sri_comprobante a inner join sri_estado_comprobante b on a.ide_sresc=b.ide_sresc where ide_srcom=-1");
             }
-
-            //OCULTA TODAS LAS COLUMNAS
-            for (int i = 0; i < tab_electronica.getTotalColumnas(); i++) {
-                tab_electronica.getColumnas()[i].setVisible(false);
-                tab_electronica.getColumnas()[i].setLectura(true);
-            }
-            tab_electronica.getColumna("ide_sresc").setVisible(true);
-            tab_electronica.getColumna("ide_sresc").setCombo("sri_estado_comprobante", "ide_sresc", "nombre_sresc", "");
-            tab_electronica.getColumna("ide_sresc").setNombreVisual("ESTADO");
-            tab_electronica.getColumna("ide_sresc").setOrden(1);
-            tab_electronica.getColumna("ide_sresc").setAutoCompletar();
-            tab_electronica.getColumna("fechaautoriza_srcom").setVisible(true);
+            tab_electronica.setNumeroTabla(990);
+            tab_electronica.getGrid().setColumns(4);
+            tab_electronica.setTipoFormulario(true);
+            tab_electronica.getColumna("ide_srcom").setVisible(false);
+            tab_electronica.getColumna("nombre_sresc").setNombreVisual("ESTADO");
+            tab_electronica.getColumna("nombre_sresc").setEtiqueta();
+            tab_electronica.getColumna("nombre_sresc").setEstilo("font-size: 14px;font-weight: bold");
             tab_electronica.getColumna("fechaautoriza_srcom").setNombreVisual("FECHA AUTORIZACIÓN");
-            tab_electronica.getColumna("fechaautoriza_srcom").setOrden(3);
-            tab_electronica.getColumna("autorizacion_srcomn").setVisible(false);
+            tab_electronica.getColumna("fechaautoriza_srcom").setEtiqueta();
             tab_electronica.setMostrarNumeroRegistros(false);
             tab_electronica.dibujar();
 
         }
 
-        grupo.getChildren().add(tab_cb_rete);
         grupo.getChildren().add(tab_dto_prove);
+        grupo.getChildren().add(tab_cb_rete);
         grupo.getChildren().add(tab_electronica);
         grupo.getChildren().add(new Separator());
 
