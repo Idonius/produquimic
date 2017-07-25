@@ -6,6 +6,7 @@
 package dj.comprobantes.offline.service;
 
 import dj.comprobantes.offline.dto.Comprobante;
+import dj.comprobantes.offline.dto.DetalleComprobante;
 import dj.comprobantes.offline.exception.GenericException;
 import javax.ejb.Local;
 
@@ -17,7 +18,7 @@ import javax.ejb.Local;
 public interface CPanelService {
 
     /**
-     * Guarda un comprbante en la nube CPanel
+     * Guarda un comprbante en la nube CPanel, y su pdf 
      *
      * @param comprobante
      * @return
@@ -40,4 +41,12 @@ public interface CPanelService {
      * @throws dj.comprobantes.offline.exception.GenericException
      */
     public void reenviarComprobante(String correo, Long id) throws GenericException;
+
+    /**
+     * Guarda los detalles de un comprobante en la nube
+     *
+     * @param detalleComprobante
+     * @throws GenericException
+     */
+    public void guardarDetalleComprobanteNube(DetalleComprobante detalleComprobante) throws GenericException;
 }
