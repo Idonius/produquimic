@@ -219,6 +219,7 @@ public class ComprobanteServiceImp implements ComprobanteService {
 
         Comprobante comprobanteActual = getComprobantePorClaveAcceso(claveAcceso);
         Comprobante comprobanteGuia = null;
+        boolean envioPendiente = false;
         if (comprobanteActual == null) {
             throw new GenericException("ERROR. No existe el comprobante " + claveAcceso);
         }
@@ -238,23 +239,23 @@ public class ComprobanteServiceImp implements ComprobanteService {
             recepcionService.enviarRecepcionOfflineSRI(comprobanteActual, xml);
             //verifica que se encuentre en estado RECIBIDA
             comprobanteActual = getComprobantePorId(comprobanteActual.getCodigocomprobante());
-
-            //Si es factura envia la guia de remision
-            if (comprobanteActual.getCoddoc().equals(TipoComprobanteEnum.FACTURA.getCodigo())) {
-                comprobanteGuia = getComprobanteGuia(comprobanteActual);
-            }
-
             if (comprobanteActual.getCodigoestado() != EstadoComprobanteEnum.RECIBIDA.getCodigo()) {
                 throw new GenericException("ERROR. El Comprobante " + claveAcceso + " no pudo ser enviado al SRI");
-            } else {
+            }
+            envioPendiente = true;
+        }
 
-                if (comprobanteGuia != null && comprobanteGuia.getCodigoestado() == EstadoComprobanteEnum.PENDIENTE.getCodigo()) {
-                    //Envia la guia
-                    String xmlGuia = guiaRemisionService.getXmlGuiaRemision(comprobanteGuia);
-                    xmlGuia = utilitario.reemplazarCaracteresEspeciales(xmlGuia);
-                    recepcionService.enviarRecepcionOfflineSRI(comprobanteGuia, xmlGuia);
-                    comprobanteGuia = getComprobantePorId(comprobanteGuia.getCodigocomprobante());
-                } else {
+        //Si es factura envia la guia de remision
+        if (comprobanteActual.getCoddoc().equals(TipoComprobanteEnum.FACTURA.getCodigo())) {
+            comprobanteGuia = getComprobanteGuia(comprobanteActual);
+            if (comprobanteGuia != null && comprobanteGuia.getCodigoestado() == EstadoComprobanteEnum.PENDIENTE.getCodigo()) {
+                //Envia la guia
+                String xmlGuia = guiaRemisionService.getXmlGuiaRemision(comprobanteGuia);
+                xmlGuia = utilitario.reemplazarCaracteresEspeciales(xmlGuia);
+                recepcionService.enviarRecepcionOfflineSRI(comprobanteGuia, xmlGuia);
+                comprobanteGuia = getComprobantePorId(comprobanteGuia.getCodigocomprobante());
+            } else {
+                if (envioPendiente) {
                     try {
                         //Esperamos 6 segundos por recomendacion del SRI
                         Thread.sleep(6 * 1000);
@@ -264,6 +265,7 @@ public class ComprobanteServiceImp implements ComprobanteService {
 
             }
         }
+        
         if (comprobanteActual.getCodigoestado() == EstadoComprobanteEnum.RECIBIDA.getCodigo()) {
             autorizacionService.enviarRecibidosOfflineSRI(comprobanteActual);
             if (comprobanteGuia != null) {
