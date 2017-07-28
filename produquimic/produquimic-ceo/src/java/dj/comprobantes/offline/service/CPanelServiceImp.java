@@ -11,6 +11,7 @@ import dj.comprobantes.offline.dto.DetalleComprobante;
 import dj.comprobantes.offline.enums.EstadoComprobanteEnum;
 import dj.comprobantes.offline.enums.EstadoUsuarioEnum;
 import dj.comprobantes.offline.enums.ParametrosSistemaEnum;
+import dj.comprobantes.offline.enums.TipoComprobanteEnum;
 import dj.comprobantes.offline.exception.GenericException;
 import dj.comprobantes.offline.util.UtilitarioCeo;
 import java.io.BufferedReader;
@@ -38,16 +39,16 @@ import org.apache.commons.codec.binary.Base64;
  */
 @Stateless
 public class CPanelServiceImp implements CPanelService {
-    
+
     @EJB
     private ArchivoService archivoService;
-    
+
     @EJB
     private ComprobanteDAO comprobanteDAO;
-    
+
     @Override
     public boolean guardarComprobanteNube(Comprobante comprobante) throws GenericException {
-        boolean guardo = false;
+        boolean guardo = true;
         UtilitarioCeo utilitario = new UtilitarioCeo();
         Map<String, Object> params = new LinkedHashMap<>();
         params.put("NOMBRE_USUARIO", comprobante.getCliente().getNombreCliente());
@@ -106,7 +107,7 @@ public class CPanelServiceImp implements CPanelService {
             } catch (Exception e) {
                 e.printStackTrace();
             }
-            
+
             FileInputStream fileInputStream = new FileInputStream(file);
             URL url = new URL(ParametrosSistemaEnum.CPANEL_WEB_COMPROBANTE.getCodigo());
             connection = (HttpURLConnection) url.openConnection();
@@ -122,11 +123,11 @@ public class CPanelServiceImp implements CPanelService {
             outputStream.writeBytes("Content-Type: " + fileMimeType + lineEnd);
             outputStream.writeBytes("Content-Transfer-Encoding: binary" + lineEnd);
             outputStream.writeBytes(lineEnd);
-            
+
             bytesAvailable = fileInputStream.available();
             bufferSize = Math.min(bytesAvailable, maxBufferSize);
             buffer = new byte[bufferSize];
-            
+
             bytesRead = fileInputStream.read(buffer, 0, bufferSize);
             while (bytesRead > 0) {
                 outputStream.write(buffer, 0, bufferSize);
@@ -148,15 +149,15 @@ public class CPanelServiceImp implements CPanelService {
                 outputStream.writeBytes(lineEnd);
             }
             outputStream.writeBytes(twoHyphens + boundary + twoHyphens + lineEnd);
-            
+
             if (200 != connection.getResponseCode()) {
                 throw new Exception("Failed to upload code:" + connection.getResponseCode() + " " + connection.getResponseMessage());
             }
-            
+
             inputStream = connection.getInputStream();
             BufferedReader br = new BufferedReader(new InputStreamReader(
                     (inputStream)));
-            
+
             String output;
             while ((output = br.readLine()) != null) {
                 result += output;
@@ -169,21 +170,22 @@ public class CPanelServiceImp implements CPanelService {
             //CAMBIA DE ESTADO A GUARDDADO EN LA NUBE
             comprobante.setEnNube(true);
             comprobanteDAO.actualizar(comprobante);
-            
+
         } catch (Exception e) {
             guardo = false;
             throw new GenericException(e);
         }
         if (guardo) {
             //Guarda el detalle de la factura
-            for (DetalleComprobante detActual : comprobante.getDetalle()) {
-                guardarDetalleComprobanteNube(detActual);
+            if (comprobante.getCoddoc().equals(TipoComprobanteEnum.FACTURA.getCodigo())) {
+                for (DetalleComprobante detActual : comprobante.getDetalle()) {
+                    guardarDetalleComprobanteNube(detActual);
+                }
             }
         }
-        
         return guardo;
     }
-    
+
     @Override
     public void subirComprobantesPendientes() throws GenericException {
         List<Comprobante> lisCompPendientes = comprobanteDAO.getComprobantesAutorizadosNoNube();
@@ -191,7 +193,7 @@ public class CPanelServiceImp implements CPanelService {
             guardarComprobanteNube(comprobanteActual);
         }
     }
-    
+
     @Override
     public void reenviarComprobante(String correo, Long id) throws GenericException {
         Map<String, Object> params = new LinkedHashMap<>();
@@ -233,9 +235,9 @@ public class CPanelServiceImp implements CPanelService {
         } catch (IOException | RuntimeException e) {
             throw new GenericException(e);
         }
-        
+
     }
-    
+
     @Override
     public void guardarDetalleComprobanteNube(DetalleComprobante detalleComprobante) throws GenericException {
         Map<String, Object> params = new LinkedHashMap<>();
@@ -285,5 +287,5 @@ public class CPanelServiceImp implements CPanelService {
             throw new GenericException(e);
         }
     }
-    
+
 }
