@@ -84,22 +84,24 @@ public class ServicioProducto {
     public void configurarTablaProducto(Tabla tabla) {
         tabla.setTabla("inv_articulo", "ide_inarti", -1);
         tabla.getColumna("nivel_inarti").setCombo(utilitario.getListaNiveles());
-        tabla.getColumna("ide_infab").setCombo("inv_fabricante", "ide_infab", "nombre_infab", "");
-        tabla.getColumna("ide_inmar").setCombo("inv_marca", "ide_inmar", "nombre_invmar", "");
+        //tabla.getColumna("ide_infab").setCombo("inv_fabricante", "ide_infab", "nombre_infab", "");
+        //tabla.getColumna("ide_inmar").setCombo("inv_marca", "ide_inmar", "nombre_invmar", "");
+        tabla.getColumna("ide_infab").setVisible(false);
+        tabla.getColumna("ide_inmar").setVisible(false);
         tabla.getColumna("ide_inuni").setCombo("inv_unidad", "ide_inuni", "nombre_inuni", "");
         tabla.getColumna("ide_intpr").setCombo("inv_tipo_producto", "ide_intpr", "nombre_intpr", "");
         tabla.getColumna("ide_intpr").setRequerida(true);
-        tabla.getColumna("ide_inepr").setCombo("inv_estado_produc", "ide_inepr", "nombre_inepr", "");
+        //tabla.getColumna("ide_inepr").setCombo("inv_estado_produc", "ide_inepr", "nombre_inepr", "");
+        tabla.getColumna("ide_inepr").setVisible(false);
         tabla.getColumna("nivel_inarti").setValorDefecto("HIJO");
         tabla.getColumna("hace_kardex_inarti").setValorDefecto("true");
         tabla.getColumna("es_combo_inarti").setValorDefecto("false");
         tabla.getColumna("nombre_inarti").setRequerida(true);
-
         tabla.getColumna("nombre_inarti").setRequerida(true);
-
         tabla.getColumna("iva_inarti").setRadio(getListaTipoIVA(), "1");
         tabla.getColumna("iva_inarti").setRadioVertical(true);
         tabla.getColumna("INV_IDE_INARTI").setVisible(true);
+        tabla.getColumna("ice_inarti").setVisible(false);
         tabla.getColumna("INV_IDE_INARTI").setCombo("select ide_inarti,nombre_inarti from inv_articulo where nivel_inarti ='PADRE' order by nombre_inarti");
         tabla.setTipoFormulario(true);
         tabla.getGrid().setColumns(4);

@@ -56,7 +56,7 @@ public class ServicioIntegracion extends ServicioBase {
      * @return
      */
     public String getSqlKardexProducto_Escritorio(String codigoProducto) {
-        return "SELECT CODIGOKP,COD_PROD,DATE_FORMAT(fecha,'%d/%m/%Y')as FECHA_MOVI,FACTURA,DETALLE,INGRESO,EGRESO,TOTAL FROM KARDEXPRODUCTOS where COD_PROD ='" + codigoProducto + "' ORDER BY CODIGOKP";
+        return "SELECT CODIGOKP,COD_PROD,DATE_FORMAT(fecha,'%d/%m/%Y')as FECHA_MOVI,FACTURA,DETALLE,COSTO,INGRESO,EGRESO,TOTAL FROM KARDEXPRODUCTOS where COD_PROD ='" + codigoProducto + "' ORDER BY CODIGOKP";
     }
 
     /**

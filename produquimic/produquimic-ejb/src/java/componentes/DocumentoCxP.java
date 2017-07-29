@@ -428,7 +428,7 @@ public class DocumentoCxP extends Dialogo {
         tab_dt_rete.getColumna("ide_cncre").setVisible(false);
         tab_dt_rete.setScrollable(true);
 
-        tab_dt_rete.setScrollHeight(getAltoPanel() - 240);
+        tab_dt_rete.setScrollHeight(getAltoPanel() - 300);
         tab_dt_rete.setRows(100);
         tab_dt_rete.setLectura(true);
         tab_dt_rete.dibujar();
