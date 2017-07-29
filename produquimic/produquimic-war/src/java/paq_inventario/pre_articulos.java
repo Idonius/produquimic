@@ -234,6 +234,7 @@ public class pre_articulos extends Pantalla {
             tab_tabla.getColumna("CODIGOKP").setVisible(false);
             tab_tabla.getColumna("COD_PROD").setVisible(false);
             tab_tabla.getColumna("FECHA_MOVI").setNombreVisual("FECHA");
+            tab_tabla.getColumna("DETALLE").setFiltroContenido();
             tab_tabla.getColumna("INGRESO").alinearDerecha();
             tab_tabla.getColumna("EGRESO").alinearDerecha();
             tab_tabla.getColumna("TOTAL").alinearDerecha();
