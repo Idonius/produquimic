@@ -432,7 +432,9 @@ public class ServicioComprobanteElectronico extends ServicioBase {
         String ide_srcom = "-1";
 
         TablaGenerica tab_factura = utilitario.consultar("select serie_ccdaf,fecha_emisi_cncre,identificac_geper"
-                + ",e.ide_geper,a.ide_srcom,correo_cncre  from con_cabece_retenc a "
+                + ",e.ide_geper,a.ide_srcom,correo_cncre,"
+                + "(select sum(valor_cndre) from con_detall_retenc where ide_cncre=a.ide_cncre ) as valor_cndre "
+                + "from con_cabece_retenc a "
                 + "inner join cxp_cabece_factur e on a.ide_cncre=e.ide_cncre\n"
                 + "inner join gen_persona b on e.ide_geper = b.ide_geper  \n"
                 + "inner join cxc_datos_fac d on a.ide_ccdaf=d.ide_ccdaf\n"
@@ -469,8 +471,8 @@ public class ServicioComprobanteElectronico extends ServicioBase {
             tab_cabecara.setValor("ide_cntdo", "8");  // tipo retención ---PONER PARÁMETRO 
             tab_cabecara.setValor("ide_empr", utilitario.getVariable("ide_empr"));
             tab_cabecara.setValor("ide_sucu", utilitario.getVariable("ide_sucu"));
-            tab_cabecara.setValor("periodo_fiscal_srcom", utilitario.getMes(tab_factura.getValor("fecha_emisi_cncre")) + "/" + utilitario.getAnio(tab_factura.getValor("fecha_emisi_cncre")));
-            tab_cabecara.setValor("total_srcom", "0.00");
+            tab_cabecara.setValor("periodo_fiscal_srcom", utilitario.getMes(tab_factura.getValor("fecha_emisi_cncre")) < 10 ? "0" + utilitario.getMes(tab_factura.getValor("fecha_emisi_cncre")) + "/" + utilitario.getAnio(tab_factura.getValor("fecha_emisi_cncre")) : utilitario.getMes(tab_factura.getValor("fecha_emisi_cncre")) + "/" + utilitario.getAnio(tab_factura.getValor("fecha_emisi_cncre")));
+            tab_cabecara.setValor("total_srcom", utilitario.getFormatoNumero(tab_factura.getValor("valor_cndre")));
             tab_cabecara.guardar();
             ide_srcom = tab_cabecara.getValor("ide_srcom");
 

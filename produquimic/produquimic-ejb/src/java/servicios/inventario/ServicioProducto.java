@@ -91,6 +91,7 @@ public class ServicioProducto {
         tabla.getColumna("ide_inuni").setCombo("inv_unidad", "ide_inuni", "nombre_inuni", "");
         tabla.getColumna("ide_intpr").setCombo("inv_tipo_producto", "ide_intpr", "nombre_intpr", "");
         tabla.getColumna("ide_intpr").setRequerida(true);
+        tabla.getColumna("ide_intpr").setValorDefecto("1");
         //tabla.getColumna("ide_inepr").setCombo("inv_estado_produc", "ide_inepr", "nombre_inepr", "");
         tabla.getColumna("ide_inepr").setVisible(false);
         tabla.getColumna("nivel_inarti").setValorDefecto("HIJO");
@@ -642,7 +643,7 @@ public class ServicioProducto {
                 + "and a.ide_inarti=" + ide_inarti + "\n"
                 + "AND a.IDE_SUCU =" + utilitario.getVariable("IDE_SUCU") + "\n"
                 + "group by a.ide_inarti,b.ide_geper,nom_geper\n"
-                + "order by 3,nom_geper desc";
+                + "order by 3 desc,nom_geper ";
     }
 
     /**
