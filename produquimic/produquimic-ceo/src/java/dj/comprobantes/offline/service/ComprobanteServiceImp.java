@@ -265,7 +265,7 @@ public class ComprobanteServiceImp implements ComprobanteService {
 
             }
         }
-        
+
         if (comprobanteActual.getCodigoestado() == EstadoComprobanteEnum.RECIBIDA.getCodigo()) {
             autorizacionService.enviarRecibidosOfflineSRI(comprobanteActual);
             if (comprobanteGuia != null) {

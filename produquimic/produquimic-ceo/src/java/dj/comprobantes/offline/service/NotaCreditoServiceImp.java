@@ -82,7 +82,7 @@ public class NotaCreditoServiceImp implements NotaCreditoService {
                     .append("                   <numDocModificado>").append(comprobante.getNumdocmodificado()).append("</numDocModificado> \n")
                     .append("                   <fechaEmisionDocSustento>").append(utilitario.getFormatoFecha(comprobante.getFechaemisiondocsustento(), "dd/MM/yyyy")).append("</fechaEmisionDocSustento> \n")
                     .append("			<totalSinImpuestos>").append(utilitario.getFormatoNumero(totalSinImpuestos)).append("</totalSinImpuestos> \n")
-                    .append("                   <valorModificacion>").append(utilitario.getFormatoNumero(comprobante.getValormodificacion())).append("</valorModificacion> \n")
+                    .append("                   <valorModificacion>").append(utilitario.getFormatoNumero(comprobante.getImportetotal())).append("</valorModificacion> \n")
                     .append("			<moneda>").append(moneda).append("</moneda> \n")
                     .append("			<totalConImpuestos> \n")
                     .append("				<totalImpuesto> \n")
