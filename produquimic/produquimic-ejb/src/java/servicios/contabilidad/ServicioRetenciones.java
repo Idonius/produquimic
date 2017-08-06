@@ -240,4 +240,47 @@ public class ServicioRetenciones extends ServicioBase {
                 + "order by ide_cpcfa desc limit 1").getValor("correo_cncre");
     }
 
+    /**
+     * Retorna consolidado de retenciones realizadas en un rango de fechas
+     *
+     * @param fechaInicio
+     * @param fechaFin
+     * @return
+     */
+    public String getSqlConsolidadoRenta(String fechaInicio, String fechaFin) {
+
+        return "SELECT  casillero_cncim AS CASILLERO,nombre_cncim as IMPUESTO ,SUM(dr.base_cndre) as BASE_IMPONIBLE,SUM(dr.valor_cndre) as valor_retenido\n"
+                + "FROM con_cabece_retenc cr \n"
+                + "LEFT JOIN con_detall_retenc dr ON (dr.ide_cncre = cr.ide_cncre) \n"
+                + "LEFT JOIN con_cabece_impues ci ON (ci.ide_cncim = dr.ide_cncim) \n"
+                + "\n"
+                + "WHERE cr.fecha_emisi_cncre BETWEEN '" + fechaInicio + "' and '" + fechaFin + "'\n"
+                + "AND ide_cnere= 0\n"
+                + "AND es_venta_cncre=false\n"
+                + "AND ide_cnimp=1 --renta\n"
+                + "GROUP BY nombre_cncim,casillero_cncim, ci.ide_cnimp\n"
+                + "ORDER BY 1";
+    }
+
+    /**
+     * Retorna consolidado de retenciones realizadas en un rango de fechas
+     *
+     * @param fechaInicio
+     * @param fechaFin
+     * @return
+     */
+    public String getSqlConsolidadoIva(String fechaInicio, String fechaFin) {
+
+        return "SELECT casillero_cncim AS CASILLERO, nombre_cncim as IMPUESTO ,SUM(dr.valor_cndre) as valor_retenido\n"
+                + "FROM con_cabece_retenc cr \n"
+                + "LEFT JOIN con_detall_retenc dr ON (dr.ide_cncre = cr.ide_cncre) \n"
+                + "LEFT JOIN con_cabece_impues ci ON (ci.ide_cncim = dr.ide_cncim) \n"
+                + "WHERE cr.fecha_emisi_cncre BETWEEN '" + fechaInicio + "' and '" + fechaFin + "'\n"
+                + "AND ide_cnere= 0 and ide_cnimp=0\n"
+                + "AND es_venta_cncre=false\n"
+                + "GROUP BY nombre_cncim,casillero_cncim, ci.ide_cnimp\n"
+                + "HAVING SUM(dr.valor_cndre) >0\n"
+                + "ORDER BY 1";
+    }
+
 }
