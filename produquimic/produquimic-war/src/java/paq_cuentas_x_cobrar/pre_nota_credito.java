@@ -698,6 +698,7 @@ public class pre_nota_credito extends Pantalla {
     public void eliminar() {
         if (mep_menu.getOpcion() == 1) {
             tab_tabla2.eliminar();
+            calcularTotalFactura();
         }
     }
 

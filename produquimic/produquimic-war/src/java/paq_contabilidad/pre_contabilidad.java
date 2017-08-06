@@ -21,6 +21,7 @@ import framework.componentes.MenuPanel;
 import framework.componentes.PanelTabla;
 import framework.componentes.Radio;
 import framework.componentes.Reporte;
+import framework.componentes.SeleccionArbol;
 import framework.componentes.SeleccionCalendario;
 import framework.componentes.SeleccionFormatoReporte;
 import framework.componentes.SeleccionTabla;
@@ -65,7 +66,7 @@ public class pre_contabilidad extends Pantalla {
     private final String p_con_lugar_haber = utilitario.getVariable("p_con_lugar_haber");
     private Reporte rep_reporte = new Reporte();
     private SeleccionFormatoReporte sel_rep = new SeleccionFormatoReporte();
-    private SeleccionTabla sel_tab = new SeleccionTabla();
+    private SeleccionArbol sel_tab = new SeleccionArbol();
     private SeleccionTabla sel_tab_nivel = new SeleccionTabla();
     private SeleccionCalendario sec_rango_reporte = new SeleccionCalendario();
     private cls_contabilidad con = new cls_contabilidad();
@@ -98,12 +99,12 @@ public class pre_contabilidad extends Pantalla {
         //Reportes
         //seleccion de las cuentas para reporte libro mayor
         sel_tab.setId("sel_tab");
-        sel_tab.setSeleccionTabla(ser_contabilidad.getSqlCuentasHijas(), "ide_cndpc");
-        sel_tab.getTab_seleccion().getColumna("nombre_cndpc").setFiltro(true);
-        sel_tab.getTab_seleccion().getColumna("codig_recur_cndpc").setFiltro(true);
-        sel_tab.getTab_seleccion().onSelectCheck("seleccionaCuentaContable");
-        sel_tab.getTab_seleccion().onUnselectCheck("deseleccionaCuentaContable");
-        sel_tab.setDynamic(false);
+        sel_tab.getArb_seleccion().setOptimiza(true);
+        sel_tab.setTitle("SELECCIONAR CUENTAS CONTABLES");
+        sel_tab.setWidth("60%");
+        sel_tab.setHeight("80%");
+        sel_tab.setSeleccionArbol("con_det_plan_cuen", "ide_cndpc", "codig_recur_cndpc||' '||nombre_cndpc as nombre_cndpc", "con_ide_cndpc");
+        sel_tab.getArb_seleccion().setCampoOrden("codig_recur_cndpc");
         agregarComponente(sel_tab);
 
         rep_reporte.setId("rep_reporte");
@@ -763,7 +764,7 @@ public class pre_contabilidad extends Pantalla {
                     parametro.put("p_patrimonio", utilitario.getVariable("p_con_tipo_cuenta_patrimonio"));
                     TablaGenerica tab_datos = utilitario.consultar("SELECT * FROM sis_empresa e, sis_sucursal s where s.ide_empr=e.ide_empr and s.ide_empr=" + utilitario.getVariable("ide_empr") + " and s.ide_sucu=" + utilitario.getVariable("ide_sucu"));
                     if (tab_datos.getTotalFilas() > 0) {
-                        parametro.put("logo", "upload/logos/logo_reporte.png");
+                        parametro.put("logo", "/upload/logos/logo_reporte.png");
                         parametro.put("empresa", tab_datos.getValor(0, "nom_empr"));
                         parametro.put("sucursal", tab_datos.getValor(0, "nom_sucu"));
                         parametro.put("direccion", tab_datos.getValor(0, "direccion_sucu"));
@@ -830,7 +831,7 @@ public class pre_contabilidad extends Pantalla {
                     parametro.put("p_patrimonio", utilitario.getVariable("p_con_tipo_cuenta_patrimonio"));
                     TablaGenerica tab_datos = utilitario.consultar("SELECT * FROM sis_empresa e, sis_sucursal s where s.ide_empr=e.ide_empr and s.ide_empr=" + utilitario.getVariable("ide_empr") + " and s.ide_sucu=" + utilitario.getVariable("ide_sucu"));
                     if (tab_datos.getTotalFilas() > 0) {
-                        parametro.put("logo", "upload/logos/logo_reporte.png");
+                        parametro.put("logo", "/upload/logos/logo_reporte.png");
                         parametro.put("empresa", tab_datos.getValor(0, "nom_empr"));
                         parametro.put("sucursal", tab_datos.getValor(0, "nom_sucu"));
                         parametro.put("direccion", tab_datos.getValor(0, "direccion_sucu"));
@@ -893,7 +894,7 @@ public class pre_contabilidad extends Pantalla {
                     parametro.put("p_costos", utilitario.getVariable("p_con_tipo_cuenta_costos"));
                     TablaGenerica tab_datos = utilitario.consultar("SELECT * FROM sis_empresa e, sis_sucursal s where s.ide_empr=e.ide_empr and s.ide_empr=" + utilitario.getVariable("ide_empr") + " and s.ide_sucu=" + utilitario.getVariable("ide_sucu"));
                     if (tab_datos.getTotalFilas() > 0) {
-                        parametro.put("logo", "upload/logos/logo_reporte.png");
+                        parametro.put("logo", "/upload/logos/logo_reporte.png");
                         parametro.put("empresa", tab_datos.getValor(0, "nom_empr"));
                         parametro.put("sucursal", tab_datos.getValor(0, "nom_sucu"));
                         parametro.put("direccion", tab_datos.getValor(0, "direccion_sucu"));
@@ -954,7 +955,7 @@ public class pre_contabilidad extends Pantalla {
                     parametro.put("p_costos", utilitario.getVariable("p_con_tipo_cuenta_costos"));
                     TablaGenerica tab_datos = utilitario.consultar("SELECT * FROM sis_empresa e, sis_sucursal s where s.ide_empr=e.ide_empr and s.ide_empr=" + utilitario.getVariable("ide_empr") + " and s.ide_sucu=" + utilitario.getVariable("ide_sucu"));
                     if (tab_datos.getTotalFilas() > 0) {
-                        parametro.put("logo", "upload/logos/logo_reporte.png");
+                        parametro.put("logo", "/upload/logos/logo_reporte.png");
                         parametro.put("empresa", tab_datos.getValor(0, "nom_empr"));
                         parametro.put("sucursal", tab_datos.getValor(0, "nom_sucu"));
                         parametro.put("direccion", tab_datos.getValor(0, "direccion_sucu"));
@@ -989,11 +990,8 @@ public class pre_contabilidad extends Pantalla {
             if (rep_reporte.isVisible()) {
                 parametro = new HashMap();
                 rep_reporte.cerrar();
-                lis_ide_cndpc_sel.clear();
-                lis_ide_cndpc_deseleccionados.clear();
-                int_count_deseleccion = 0;
-                int_count_seleccion = 0;
-                sel_tab.getTab_seleccion().setSeleccionados(null);
+                sel_tab.getArb_seleccion().setSeleccionados(null);
+                sel_tab.getArb_seleccion().ejecutarSql();
 //                utilitario.ejecutarJavaScript(sel_tab.getTab_seleccion().getId() + ".clearFilters();");
                 sel_tab.dibujar();
                 utilitario.addUpdate("rep_reporte,sel_tab");
@@ -1001,8 +999,7 @@ public class pre_contabilidad extends Pantalla {
                 if (sel_tab.isVisible()) {
 
                     if (sel_tab.getSeleccionados() != null && !sel_tab.getSeleccionados().isEmpty()) {
-                        System.out.println("nn " + sel_tab.getSeleccionados());
-                        parametro.put("ide_cndpc", sel_tab.getSeleccionados());//lista sel                     
+                        parametro.put("ide_cndpc", sel_tab.getSeleccionados().replace("null,", ""));//lista sel                     
                         sel_tab.cerrar();
                         String estado = "" + utilitario.getVariable("p_con_estado_comprobante_normal") + "," + utilitario.getVariable("p_con_estado_comp_inicial") + "," + utilitario.getVariable("p_con_estado_comp_final");
                         parametro.put("ide_cneco", estado);
@@ -1019,7 +1016,7 @@ public class pre_contabilidad extends Pantalla {
 //                    } else {
 //                        System.out.println("sel tab " + utilitario.generarComillasLista(lis_ide_cndpc_deseleccionados));
 //                        parametro.put("ide_cndpc", utilitario.generarComillasLista(lis_ide_cndpc_deseleccionados));//lista sel                     
-//                    }
+//                    } 
                 } else if (sec_rango_reporte.isVisible()) {
                     if (sec_rango_reporte.isFechasValidas()) {
                         parametro.put("fecha_inicio", sec_rango_reporte.getFecha1());
@@ -1027,6 +1024,7 @@ public class pre_contabilidad extends Pantalla {
                         parametro.put("ide_cnlap_haber", p_con_lugar_haber);
                         parametro.put("ide_cnlap_debe", p_con_lugar_debe);
                         sec_rango_reporte.cerrar();
+                        sel_rep.setDataSource(null);
                         sel_rep.setSeleccionFormatoReporte(parametro, rep_reporte.getPath());
                         sel_rep.dibujar();
                         utilitario.addUpdate("sel_rep,sec_rango_reporte");
@@ -1054,7 +1052,7 @@ public class pre_contabilidad extends Pantalla {
 
                             TablaGenerica tab_datos = utilitario.consultar("SELECT * FROM sis_empresa e, sis_sucursal s where s.ide_empr=e.ide_empr and s.ide_empr=" + utilitario.getVariable("ide_empr") + " and s.ide_sucu=" + utilitario.getVariable("ide_sucu"));
                             if (tab_datos.getTotalFilas() > 0) {
-                                parametro.put("logo", "upload/logos/logo_reporte.png");
+                                parametro.put("logo", "/upload/logos/logo_reporte.png");
                                 parametro.put("empresa", tab_datos.getValor(0, "nom_empr"));
                                 parametro.put("sucursal", tab_datos.getValor(0, "nom_sucu"));
                                 parametro.put("direccion", tab_datos.getValor(0, "direccion_sucu"));
@@ -1095,46 +1093,6 @@ public class pre_contabilidad extends Pantalla {
             }
 
         }
-    }
-    private List lis_ide_cndpc_sel = new ArrayList();
-    private int int_count_seleccion = 0;
-
-    public void seleccionaCuentaContable(SelectEvent evt) {
-        sel_tab.getTab_seleccion().seleccionarFila(evt);
-        for (Fila actual : sel_tab.getTab_seleccion().getSeleccionados()) {
-            int band = 0;
-            for (int i = 0; i < lis_ide_cndpc_sel.size(); i++) {
-                if (actual.getRowKey().equals(lis_ide_cndpc_sel.get(i))) {
-                    band = 1;
-                    break;
-                }
-            }
-            if (band == 0) {
-                lis_ide_cndpc_sel.add(actual.getRowKey());
-            }
-        }
-        if (int_count_seleccion == 0) {
-            lis_ide_cndpc_deseleccionados = lis_ide_cndpc_sel;
-        }
-        int_count_seleccion += 1;
-
-    }
-
-    public void deseleccionaCuentaContable(UnselectEvent evt) {
-        //tab_tabla2.modificar(evt);
-        for (Fila actual : sel_tab.getTab_seleccion().getSeleccionados()) {
-            int band = 0;
-            for (int i = 0; i < lis_ide_cndpc_deseleccionados.size(); i++) {
-                if (actual.getRowKey().equals(lis_ide_cndpc_deseleccionados.get(i))) {
-                    band = 1;
-                    break;
-                }
-            }
-            if (band == 0) {
-                lis_ide_cndpc_deseleccionados.add(actual.getRowKey());
-            }
-        }
-        int_count_deseleccion += 1;
     }
 
     /**
@@ -1198,11 +1156,11 @@ public class pre_contabilidad extends Pantalla {
         this.sel_rep = sel_rep;
     }
 
-    public SeleccionTabla getSel_tab() {
+    public SeleccionArbol getSel_tab() {
         return sel_tab;
     }
 
-    public void setSel_tab(SeleccionTabla sel_tab) {
+    public void setSel_tab(SeleccionArbol sel_tab) {
         this.sel_tab = sel_tab;
     }
 

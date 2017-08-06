@@ -19,6 +19,7 @@ import framework.componentes.PanelArbol;
 import framework.componentes.PanelTabla;
 import framework.componentes.Tabla;
 import framework.componentes.Tabulador;
+import framework.componentes.Texto;
 import framework.componentes.bootstrap.BotonBootstrap;
 import framework.componentes.bootstrap.ContenidoBootstrap;
 import framework.componentes.bootstrap.PanelBootstrap;
@@ -27,6 +28,7 @@ import framework.componentes.graficos.GraficoCartesiano;
 import java.util.List;
 import javax.ejb.EJB;
 import org.primefaces.component.fieldset.Fieldset;
+import org.primefaces.component.panelgrid.PanelGrid;
 import org.primefaces.component.separator.Separator;
 import org.primefaces.event.SelectEvent;
 import servicios.contabilidad.ServicioComprobanteContabilidad;
@@ -67,6 +69,7 @@ public class pre_articulos extends Pantalla {
 
     private Tabla tab_asiento_tipo;
     private Tabla tab_detalle_asiento;
+    private Texto tex_num_asiento;
 
     //Opcion 8,9
     @EJB
@@ -214,11 +217,90 @@ public class pre_articulos extends Pantalla {
     }
 
     public void dibujarTodosMasComprados() {
+        Grupo gru_grupo = new Grupo();
+        tex_num_asiento = new Texto(); //Año
+        tex_num_asiento.setSize(5);
+        tex_num_asiento.setTitle("AÑO");
+        tex_num_asiento.setMaxlength(4);
+        tex_num_asiento.setSoloEnteros();
 
+        PanelGrid pg = new PanelGrid();
+        pg.setColumns(3);
+        pg.getChildren().add(new Etiqueta("PERÍODO :"));
+        pg.getChildren().add(tex_num_asiento);
+        Boton bot = new Boton();
+        bot.setTitle("Actualizar");
+        bot.setIcon("ui-icon-search");
+        bot.setMetodo("actualizarMasComprados");
+        pg.getChildren().add(bot);
+        gru_grupo.getChildren().add(pg);
+
+        tab_tabla = new Tabla();
+        tab_tabla.setId("tab_tabla");
+        tab_tabla.setNumeroTabla(15);
+        tab_tabla.setConexion(ser_integra.getConexionEscritorio());
+        tab_tabla.setLectura(true);
+        tab_tabla.setSql(ser_integra.getSqlProductosMasComprados(null, null));
+        tab_tabla.setCampoPrimaria("COD_PROD");
+        tab_tabla.getColumna("COD_PROD").setVisible(false);
+        tab_tabla.getColumna("nom_prod").setNombreVisual("PRODUCTO");
+        tab_tabla.getColumna("CANTIDAD").alinearDerecha();
+        tab_tabla.getColumna("CANTIDAD").setDecimales(2);
+        tab_tabla.setRows(20);
+        tab_tabla.dibujar();
+        PanelTabla pat_panel = new PanelTabla();
+        pat_panel.setPanelTabla(tab_tabla);
+        gru_grupo.getChildren().add(pat_panel);
+
+        mep_menu.dibujar(16, "fa fa-sort-numeric-asc", "Cuadro estadístico de los productos más comprados.", gru_grupo, true);
+    }
+
+    public void actualizarMasComprados() {
+        tab_tabla.setSql(ser_integra.getSqlProductosMasComprados(null, String.valueOf(tex_num_asiento.getValue())));
+        tab_tabla.ejecutarSql();
+    }
+
+    public void actualizarMasVendidos() {
+        tab_tabla.setSql(ser_integra.getSqlProductosMasVendidos(null, String.valueOf(tex_num_asiento.getValue())));
+        tab_tabla.ejecutarSql();
     }
 
     public void dibujarTodosMasVendidos() {
+        Grupo gru_grupo = new Grupo();
+        tex_num_asiento = new Texto(); //Año
+        tex_num_asiento.setSize(5);
+        tex_num_asiento.setTitle("AÑO");
+        tex_num_asiento.setMaxlength(4);
+        tex_num_asiento.setSoloEnteros();
 
+        PanelGrid pg = new PanelGrid();
+        pg.setColumns(3);
+        pg.getChildren().add(new Etiqueta("PERÍODO :"));
+        pg.getChildren().add(tex_num_asiento);
+        Boton bot = new Boton();
+        bot.setTitle("Actualizar");
+        bot.setIcon("ui-icon-search");
+        bot.setMetodo("actualizarMasVendidos");
+        pg.getChildren().add(bot);
+        gru_grupo.getChildren().add(pg);
+
+        tab_tabla = new Tabla();
+        tab_tabla.setId("tab_tabla");
+        tab_tabla.setNumeroTabla(15);
+        tab_tabla.setConexion(ser_integra.getConexionEscritorio());
+        tab_tabla.setLectura(true);
+        tab_tabla.setSql(ser_integra.getSqlProductosMasVendidos(null, null));
+        tab_tabla.setCampoPrimaria("COD_PROD");
+        tab_tabla.getColumna("COD_PROD").setVisible(false);
+        tab_tabla.getColumna("nom_prod").setNombreVisual("PRODUCTO");
+        tab_tabla.getColumna("CANTIDAD").alinearDerecha();
+        tab_tabla.getColumna("CANTIDAD").setDecimales(2);
+        tab_tabla.setRows(20);
+        tab_tabla.dibujar();
+        PanelTabla pat_panel = new PanelTabla();
+        pat_panel.setPanelTabla(tab_tabla);
+        gru_grupo.getChildren().add(pat_panel);
+        mep_menu.dibujar(16, "fa fa-sort-numeric-asc", "Cuadro estadístico de los productos más vendidos.", gru_grupo, true);
     }
 
     public void dibujarTarjetaKardex() {
