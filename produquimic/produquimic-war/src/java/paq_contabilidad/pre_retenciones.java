@@ -51,6 +51,7 @@ public class pre_retenciones extends Pantalla {
     private final ServicioComprobanteElectronico ser_comElec = (ServicioComprobanteElectronico) utilitario.instanciarEJB(ServicioComprobanteElectronico.class);
 
     private Tabla tab_tabla;
+    private Tabla tab_tabla1;
 
     private Reporte rep_reporte = new Reporte();
     private SeleccionFormatoReporte sel_rep = new SeleccionFormatoReporte();
@@ -78,7 +79,7 @@ public class pre_retenciones extends Pantalla {
         bar_botones.agregarSeparador();
         bar_botones.agregarComponente(new Etiqueta("FECHA DESDE :"));
 
-        cal_fecha_inicio.setValue(utilitario.getFecha(utilitario.getAnio(utilitario.getFechaActual()) + "-01-01"));
+        cal_fecha_inicio.setValue(utilitario.getFecha(utilitario.getAnio(utilitario.getFechaActual()) + "-" + utilitario.getMes(utilitario.getFechaActual()) + "-01"));
         bar_botones.agregarComponente(cal_fecha_inicio);
         bar_botones.agregarComponente(new Etiqueta("FECHA HASTA :"));
 
@@ -96,7 +97,7 @@ public class pre_retenciones extends Pantalla {
         mep_menu.agregarItem("Retenciones Anuladas", "dibujarAnuladas", "ui-icon-cancel");//2
         mep_menu.agregarSubMenu("REPORTES");
         mep_menu.agregarItem("Consulta por Impuesto", "dibujarConsulta", "ui-icon-bookmark");//4
-        mep_menu.agregarItem("Consulta Consolidada", "dibujarConsultaConsolidada", "ui-icon-calendar");//5
+        mep_menu.agregarItem("Consulta Consolidada", "dibujarConsolidado", "ui-icon-calendar");//5
 //        mep_menu.agregarSubMenu("COMPROBANTES RETENCIONES EN VENTAS");
 //        mep_menu.agregarItem("Listado de RetencionesVentas", "dibujarListadoVentas", "ui-icon-bookmark");//3
         agregarComponente(mep_menu);
@@ -137,8 +138,31 @@ public class pre_retenciones extends Pantalla {
 
     }
 
-    public void dibujarConsultaConsolidada() {
+    public void dibujarConsolidado() {
         Grupo gru_grupo = new Grupo();
+
+        tab_tabla = new Tabla();
+        tab_tabla.setId("tab_tabla");
+        tab_tabla.setHeader("RETENCION EN LA FUENTE DE IMPUESTO A LA RENTA");
+        tab_tabla.setSql(ser_retencion.getSqlConsolidadoRenta(cal_fecha_inicio.getFecha(), cal_fecha_fin.getFecha()));
+        tab_tabla.setLectura(true);
+        tab_tabla.setColumnaSuma("BASE_IMPONIBLE,valor_retenido");
+        tab_tabla.dibujar();
+        PanelTabla pat_panel = new PanelTabla();
+        pat_panel.setPanelTabla(tab_tabla);
+
+        tab_tabla1 = new Tabla();
+        tab_tabla1.setId("tab_tabla1");
+        tab_tabla1.setHeader("RETENCION EN LA FUENTE DE IVA");
+        tab_tabla1.setSql(ser_retencion.getSqlConsolidadoIva(cal_fecha_inicio.getFecha(), cal_fecha_fin.getFecha()));
+        tab_tabla1.setLectura(true);
+        tab_tabla1.setColumnaSuma("valor_retenido");
+        tab_tabla1.dibujar();
+        PanelTabla pat_panel1 = new PanelTabla();
+        pat_panel1.setPanelTabla(tab_tabla1);
+
+        gru_grupo.getChildren().add(pat_panel);
+        gru_grupo.getChildren().add(pat_panel1);
 
         mep_menu.dibujar(6, "fa fa-list-alt", "Consulta consolidada de retenciones.", gru_grupo, true);
     }
@@ -348,6 +372,11 @@ public class pre_retenciones extends Pantalla {
             tab_tabla.ejecutarSql();
         } else if (mep_menu.getOpcion() == 4) {
             actualizarConsultar();
+        } else if (mep_menu.getOpcion() == 6) {
+            tab_tabla.setSql(ser_retencion.getSqlConsolidadoRenta(cal_fecha_inicio.getFecha(), cal_fecha_fin.getFecha()));
+            tab_tabla.ejecutarSql();
+            tab_tabla1.setSql(ser_retencion.getSqlConsolidadoIva(cal_fecha_inicio.getFecha(), cal_fecha_fin.getFecha()));
+            tab_tabla1.ejecutarSql();
         }
     }
 
@@ -626,6 +655,14 @@ public class pre_retenciones extends Pantalla {
 
     public void setRet_retencion(Retencion ret_retencion) {
         this.ret_retencion = ret_retencion;
+    }
+
+    public Tabla getTab_tabla1() {
+        return tab_tabla1;
+    }
+
+    public void setTab_tabla1(Tabla tab_tabla1) {
+        this.tab_tabla1 = tab_tabla1;
     }
 
 }
