@@ -5,6 +5,7 @@
  */
 package servicios.contabilidad;
 
+import dj.comprobantes.offline.enums.EstadoComprobanteEnum;
 import framework.aplicacion.TablaGenerica;
 import java.util.Date;
 import java.util.List;
@@ -150,6 +151,15 @@ public class ServicioRetenciones extends ServicioBase {
     public void anularComprobanteRetencion(String ide_cncre) {
         utilitario.getConexion().agregarSqlPantalla("UPDATE con_cabece_retenc set ide_cnere=" + utilitario.getVariable("p_con_estado_comprobante_rete_anulado") + " where ide_cncre=" + ide_cncre);
         utilitario.getConexion().agregarSqlPantalla("UPDATE cxp_cabece_factur set ide_cncre=null where ide_cncre=" + ide_cncre);
+
+        if (isElectronica()) {
+            TablaGenerica tab_cab = utilitario.consultar("SELECT ide_srcom,ide_cncre from con_cabece_retenc  where ide_cncre=" + ide_cncre);
+            //cambia de estado el compobante pendiente
+            if (tab_cab.getValor("ide_srcom") != null) {
+                utilitario.getConexion().agregarSql("update sri_comprobante set ide_sresc=" + EstadoComprobanteEnum.ANULADO.getCodigo() + ",reutiliza_srcom=true  where ide_srcom=" + tab_cab.getValor("ide_srcom") + " and ide_sresc=" + EstadoComprobanteEnum.PENDIENTE.getCodigo());
+            }
+        }
+
     }
 
     public String getNumeroRetencion(String autorizacion) {
