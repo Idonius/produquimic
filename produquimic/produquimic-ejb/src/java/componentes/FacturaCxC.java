@@ -1303,13 +1303,22 @@ public class FacturaCxC extends Dialogo {
         for (int i = 0; i < tab_deta_factura.getTotalFilas(); i++) {
             String iva = tab_deta_factura.getValor(i, "iva_inarti_ccdfa");
             if (iva.equals("1")) { //SI IVA
-                base_grabada = Double.parseDouble(tab_deta_factura.getValor(i, "total_ccdfa")) + base_grabada;
+                try {
+                    base_grabada = Double.parseDouble(tab_deta_factura.getValor(i, "total_ccdfa")) + base_grabada;
+                } catch (Exception e) {
+                }
                 porcentaje_iva = tarifaIVA;
                 valor_iva = base_grabada * porcentaje_iva; //0.12
             } else if (iva.equals("-1")) { // NO IVA
-                base_tarifa0 = Double.parseDouble(tab_deta_factura.getValor(i, "total_ccdfa")) + base_tarifa0;
+                try {
+                    base_tarifa0 = Double.parseDouble(tab_deta_factura.getValor(i, "total_ccdfa")) + base_tarifa0;
+                } catch (Exception e) {
+                }
             } else if (iva.equals("0")) { // NO OBJETO
-                base_no_objeto = Double.parseDouble(tab_deta_factura.getValor(i, "total_ccdfa")) + base_no_objeto;
+                try {
+                    base_no_objeto = Double.parseDouble(tab_deta_factura.getValor(i, "total_ccdfa")) + base_no_objeto;
+                } catch (Exception e) {
+                }
             }
         }
         tab_cab_factura.setValor("base_grabada_cccfa", utilitario.getFormatoNumero(base_grabada));
