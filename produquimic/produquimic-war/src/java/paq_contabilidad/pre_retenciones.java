@@ -337,6 +337,15 @@ public class pre_retenciones extends Pantalla {
 
     public void abrirAnularRetencion() {
         if (tab_tabla.getValor("ide_cncre") != null) {
+
+            if (ser_retencion.isElectronica()) {
+                //valida que este en estado PENDIENTE
+                if (tab_tabla.getValor("estado") != null && !tab_tabla.getValor("estado").equals(EstadoComprobanteEnum.PENDIENTE.getDescripcion())) {
+                    utilitario.agregarMensajeError("No se puede anular el Comprobante de Reteción seleccionado", "Solo se pueden anular  Comprobantes de Reteción en estado PENDIENTE");
+                    return;
+                }
+            }
+
             con_confirma.getBot_aceptar().setMetodo("anularRetencion");
             con_confirma.dibujar();
         } else {

@@ -1025,16 +1025,11 @@ public class pre_proveedores extends Pantalla {
 
     @Override
     public void insertar() {
-        if (mep_menu.getOpcion() == -1) {
-            //PANTALLA LIMPIA
-            dibujarProveedor();
-        }
+        aut_proveedor.limpiar();
+        dibujarProveedor();
+        tab_tabla.limpiar();
+        tab_tabla.insertar();
 
-        if (mep_menu.getOpcion() == 1) {
-            //FORMULARIO Proveedor
-            aut_proveedor.limpiar();
-            tab_tabla.insertar();
-        }
     }
 
     @Override
