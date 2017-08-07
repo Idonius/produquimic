@@ -10,7 +10,7 @@ class Conexion {
     public function __construct() {
         try {
             $this->db = new PDO('mysql:host=localhost;dbname=ceo', 'root', 'DIEGO');
-            $this->db->exec("SET CHARACTER SET utf8");
+            $this->db->exec('SET CHARACTER SET utf8');
             $this->db->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
             $this->db->setAttribute(PDO::ATTR_EMULATE_PREPARES, false);
         } catch (PDOException $e) {

@@ -3,6 +3,8 @@
 require '../lib/Slim/Slim.php';
 include_once("../persistence/Conexion.php");
 include_once("Util.php");
+include_once("../correo/EnviarCorreo.php");
+
 \Slim\Slim::registerAutoloader();
 $app = new \Slim\Slim();
 
@@ -20,9 +22,11 @@ $app->post('/getTotalComprobantes', 'getTotalComprobantes');
 
 $app->post('/getUltimosComprobantes', 'getUltimosComprobantes');
 
-$app->get('/getXML/:PK_CODIGO_COMP', 'getXML');
+$app->get('/getXML/:CLAVE_ACCESO', 'getXML');
 
-$app->get('/getPDF/:PK_CODIGO_COMP', 'getPDF');
+$app->get('/getPDF/:CLAVE_ACCESO', 'getPDF');
+
+$app->get('/getComprobantesNoEviadosMail', 'getComprobantesNoEviadosMail');
 
 $app->run();
 
@@ -95,10 +99,11 @@ function getUltimosComprobantes() {
         Util::validarResultado($response, $resultado);
     }
 }
-function getXML($PK_CODIGO_COMP) {
+
+function getXML($CLAVE_ACCESO) {
     $response = \Slim\Slim::getInstance()->response();
     if (Util::isAutorizado($response)) {
-        $sql = "select ARCHIVO_XML FROM COMPROBANTE a INNER JOIN RIDE_COMPROBANTE b on a.PK_CODIGO_COMP = b.PK_CODIGO_COMP  WHERE IDENTIFICACION='" . $_SESSION['IDENTIFICACION'] . "' AND  b.PK_CODIGO_COMP=" . $PK_CODIGO_COMP;
+        $sql = "select ARCHIVO_XML FROM COMPROBANTE a INNER JOIN RIDE_COMPROBANTE b on a.PK_CODIGO_COMP = b.PK_CODIGO_COMP  WHERE a.CLAVE_ACCESO='" . $CLAVE_ACCESO . "'";
         $db = new Conexion();
         $resultado = $db->consultarSQL($sql, false);
         $file = $resultado->getDatos()[0]->ARCHIVO_XML;
@@ -107,16 +112,33 @@ function getXML($PK_CODIGO_COMP) {
     }
 }
 
-function getPDF($PK_CODIGO_COMP) {
+function getPDF($CLAVE_ACCESO) {
     $response = \Slim\Slim::getInstance()->response();
     if (Util::isAutorizado($response)) {
-        $sql = "select ARCHIVO_PDF FROM COMPROBANTE a INNER JOIN RIDE_COMPROBANTE b on a.PK_CODIGO_COMP = b.PK_CODIGO_COMP  WHERE IDENTIFICACION='" . $_SESSION['IDENTIFICACION'] . "' AND  b.PK_CODIGO_COMP=" . $PK_CODIGO_COMP;
-        var_dump($sql);
+        $sql = "select ARCHIVO_PDF FROM COMPROBANTE a INNER JOIN RIDE_COMPROBANTE b on a.PK_CODIGO_COMP = b.PK_CODIGO_COMP  WHERE  a.CLAVE_ACCESO='" . $CLAVE_ACCESO . "'";
         $db = new Conexion();
         $resultado = $db->consultarSQL($sql, false);
         $file = $resultado->getDatos()[0]->ARCHIVO_PDF;
         $response->header('Content-Type', 'application/pdf;charset=utf-8');
         echo $file;
+    }
+}
+
+function getComprobantesNoEviadosMail() {
+    $response = \Slim\Slim::getInstance()->response();
+    $sql = "SELECT a.PK_CODIGO_COMP,NOMBRE_DOCUMENTO,CONCAT(ESTABLECIM,'-',PTO_EMISION,'-',SECUENCIAL) as SECUENCIAL,CLAVE_ACCESO,NOMBRE_USUARIO,CORREO_DOCUMENTO,ARCHIVO_XML,ARCHIVO_PDF from COMPROBANTE a inner join USUARIO b on a.IDENTIFICACION= b.IDENTIFICACION_USUARIO inner join TIPO_DOCUMENTO c on a.CODIGO_DOCUMENTO=c.CODIGO_DOCUMENTO INNER JOIN RIDE_COMPROBANTE d on a.PK_CODIGO_COMP = d.PK_CODIGO_COMP where ENVIADO = false ORDER BY FECHA_EMISION desc";
+    $db = new Conexion();
+    $resultado = $db->consultar($sql);
+
+    if ($resultado->getDatos()) {
+        foreach ($resultado->getDatos() as $param) {
+            $correo = new EnviarCorreo();
+            $correo->enviarComprobante($param);
+            $columnas = array("ENVIADO" => true);
+            $condiciones = array("PK_CODIGO_COMP" => $param->PK_CODIGO_COMP);
+            $db = new Conexion();
+            $resultado = $db->actualizar("COMPROBANTE", $columnas, $condiciones);
+        }
     }
 }
 

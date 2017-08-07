@@ -40,6 +40,7 @@ class Util {
         }
         $_response->header('Content-Type', 'application/json;charset=UTF-8');
         $_response->setStatus(401);
+        $respuesta = array();
         $respuesta['error'] = true;
         $respuesta['status'] = "error";
         $respuesta['mensaje'] = 'Token no válido';
