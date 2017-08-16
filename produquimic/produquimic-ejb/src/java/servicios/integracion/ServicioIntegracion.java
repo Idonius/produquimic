@@ -898,7 +898,7 @@ public class ServicioIntegracion extends ServicioBase {
                 String detallefactura = tab_factura.getValor(i, "nombre_inarti");
                 detallefactura = detallefactura.trim();
                 String nombreCliente = tab_factura.getValor("nom_geper");
-                String sql_1 = "INSERT INTO  KARDEXPRODUCTOS VALUES((SELECT MAX(k.CODIGOKP )+1 FROM KARDEXPRODUCTOS k where  k.COD_PROD='" + codProd + " '),'" + codProd + "','" + fechae + "','" + numFactura + "','" + nombreCliente + "'," + vpre + ",0," + vcant + "," + exnue + ")";
+                String sql_1 = "INSERT INTO  KARDEXPRODUCTOS VALUES((SELECT MAX(k.CODIGOKP )+1 FROM KARDEXPRODUCTOS k where  k.COD_PROD='" + codProd + " '),'" + codProd + "','" + fechae + "','" + numFactura + "','" + nombreCliente + "'," + vpre + "," + vcant + ",0," + exnue + ")";
                 String sql_2 = "UPDATE PRODUCTOS SET EXISTENCIA=" + exnue + " where COD_PROD='" + codProd + "'";
                 con_conecta.agregarSql(sql_1);
                 con_conecta.agregarSql(sql_2);
