@@ -893,7 +893,7 @@ public class ServicioIntegracion extends ServicioBase {
                 double vcant = Double.parseDouble(tab_factura.getValor(i, "cantidad_cpdfa"));
                 double vpre = Double.parseDouble(tab_factura.getValor(i, "precio_cpdfa"));
                 double exan = getExisteciaProducto_Escritorio(codProd);
-                double exnue = exan - vcant;
+                double exnue = exan + vcant;
                 double vtotaldetalle = Double.parseDouble(tab_factura.getValor(i, "valor_cpdfa"));
                 String detallefactura = tab_factura.getValor(i, "nombre_inarti");
                 detallefactura = detallefactura.trim();
