@@ -23,7 +23,13 @@ public class ServicioIntegracion extends ServicioBase {
 
     public Conexion getConexionEscritorio() {
         Conexion con_conecta = new Conexion();
-        con_conecta.setUnidad_persistencia("sistemaEscritotio");
+        if (utilitario.getVariable("IDE_SUCU") != null) {
+            if (utilitario.getVariable("IDE_SUCU").equals("0")) {
+                con_conecta.setUnidad_persistencia("sistemaEscritotio");
+            } else {
+                con_conecta.setUnidad_persistencia("sistemaEscritotioDJ");
+            }
+        }
         return con_conecta;
     }
 
