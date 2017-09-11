@@ -40,7 +40,7 @@ public class ServicioCuentasCxC extends ServicioBase {
      * @return
      */
     public String getSqlPuntosEmision() {
-        return "select ide_ccdaf,serie_ccdaf, autorizacion_ccdaf,observacion_ccdaf from cxc_datos_fac where ide_empr=" + utilitario.getVariable("IDE_EMPR");
+        return "select ide_ccdaf,serie_ccdaf, autorizacion_ccdaf,observacion_ccdaf from cxc_datos_fac where ide_sucu=" + utilitario.getVariable("IDE_SUCU");
     }
 
     /**
