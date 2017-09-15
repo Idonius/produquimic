@@ -717,6 +717,9 @@ public class ServicioIntegracion extends ServicioBase {
 
             //Busca tipo de contribuyente del sistema de escritorio
             String ide_cntco = getTipoCliente(tab_factura.getValor("codigo_geper"));
+            if (ide_cntco == null) {
+                ide_cntco = "2";
+            }
             switch (ide_cntco) {
                 case "2": {
                     //PERSONA NATURAL
