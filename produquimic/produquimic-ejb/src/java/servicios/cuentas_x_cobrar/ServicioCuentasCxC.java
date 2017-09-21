@@ -715,7 +715,7 @@ public class ServicioCuentasCxC extends ServicioBase {
                 + "inner join cxc_deta_factura b on a.ide_cccfa=b.ide_cccfa\n"
                 + "inner join cxc_datos_fac c on a.ide_ccdaf=c.ide_ccdaf\n"
                 + "where secuencial_cccfa='" + secuencial_cccfa + "'\n"
-                + "and serie_ccdaf='" + serie_ccdaf + "'");
+                + "and serie_ccdaf='" + serie_ccdaf + "' order by ide_ccefa ");
     }
 
     public String getSqlNotas(String ide_ccdaf, String fechaInicio, String fechaFin) {
