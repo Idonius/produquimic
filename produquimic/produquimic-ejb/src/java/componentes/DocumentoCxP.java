@@ -1293,8 +1293,14 @@ public class DocumentoCxP extends Dialogo {
                             if (haceKardex) {
                                 ser_inventario.generarComprobanteTransaccionCompra(tab_cab_documento, tab_det_documento);
                             }
+
                             if (utilitario.getConexion().guardarPantalla().isEmpty()) {
-                                ser_integracion.guardarKardexCompras(tab_cab_documento.getValor("ide_cPcfa"));
+                                if (tab_cab_documento.getValor("ide_cntdo").equals(parametros.get("p_con_tipo_documento_factura"))) {//FACTURA
+                                    ser_integracion.guardarKardexCompras(tab_cab_documento.getValor("ide_cpcfa"));
+                                } else if (tab_cab_documento.getValor("ide_cntdo").equals(parametros.get("p_con_tipo_documento_nota_credito"))) { //NOTA DE CREDITO
+                                    ser_integracion.guardarKardexNotaCreditoCompras(tab_cab_documento.getValor("ide_cpcfa"));
+                                }
+
                                 this.cerrar();
                             }
                         }

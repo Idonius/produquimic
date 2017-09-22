@@ -935,6 +935,72 @@ public class ServicioIntegracion extends ServicioBase {
      *
      * @param ide_cpcfa
      */
+    public void guardarKardexNotaCreditoCompras(String ide_cpcfa) {
+
+        TablaGenerica tab_factura = utilitario.consultar("select fecha_emisi_cpcfa,codigo_inarti,cantidad_cpdfa,precio_cpdfa,valor_cpdfa,"
+                + "codigo_geper,nom_geper, numero_cpcfa as numfactura,autorizacio_cpcfa,\n"
+                + "base_grabada_cpcfa+base_tarifa0_cpcfa+base_no_objeto_iva_cpcfa as subtotal,valor_iva_cpcfa,total_cpcfa,"
+                + "a.ide_cpcfa,base_grabada_cpcfa,base_tarifa0_cpcfa+base_no_objeto_iva_cpcfa as ventas0,"
+                + "CASE WHEN dias_credito_cpcfa=0 THEN 'CONTADO'\n" //Crear tabla o campo  dias_credito_cpcfa 
+                + "             ELSE 'CRÉDITO '||dias_credito_cpcfa||' DÍAS'\n"
+                + "       END as nombre_cndfp,COALESCE(nombre_inuni,'')  ||' '|| nombre_inarti as nombre_inarti "
+                + "from cxp_detall_factur a\n"
+                + "inner join cxp_cabece_factur b on a.ide_cpcfa=b.ide_cpcfa\n"
+                + "inner join gen_persona d on b.ide_geper=d.ide_geper\n"
+                + "inner join inv_articulo e on a.ide_inarti= e.ide_inarti\n"
+                + "left join  inv_unidad g on a.ide_inuni =g.ide_inuni\n"
+                + "where a.ide_cpcfa=" + ide_cpcfa);
+      
+        if (tab_factura.isEmpty() == false) {
+            Conexion con_conecta = getConexionEscritorio();
+            String fechae = tab_factura.getValor("fecha_emisi_cpcfa");
+            String numFactura = tab_factura.getValor("numfactura");
+
+            //Guarda Kardex de proveedores
+            String codProve = tab_factura.getValor("codigo_geper");
+            if (codProve == null) {
+                codProve = "";
+            }
+            double saldoInicialClie = getSaldoProveedor_Escritorio(codProve);
+            double saldoNuevoClie = 0;
+            double total = Double.parseDouble(tab_factura.getValor("total_cpcfa"));
+
+            saldoNuevoClie = saldoInicialClie - total;
+            String sql = "INSERT INTO kardexproveedores VALUES((SELECT MAX(k.CODIGOKPV )+1 FROM kardexproveedores k where  k.COD_PROVE='" + codProve + " '),'" + codProve + "','" + fechae + "','" + numFactura + "','NOTA CREDITO "+tab_factura.getValor("numfactura") +" (WEB)',0," + total + "," + saldoNuevoClie + ")";
+            con_conecta.agregarSql(sql);
+
+            String sql1 = "UPDATE proveedores SET EXISTENCIA=" + saldoNuevoClie + " where COD_PROVE='" + codProve + "'";
+            con_conecta.agregarSql(sql1);
+
+
+            for (int i = 0; i < tab_factura.getTotalFilas(); i++) {
+                ///Kardex Productos
+                String codProd = tab_factura.getValor(i, "codigo_inarti");
+                if (codProd == null) {
+                    codProd = "";
+                }
+                double vcant = Double.parseDouble(tab_factura.getValor(i, "cantidad_cpdfa"));
+                double vpre = Double.parseDouble(tab_factura.getValor(i, "precio_cpdfa"));
+                double exan = getExisteciaProducto_Escritorio(codProd);
+                double exnue = exan - vcant;
+                String nombreCliente = tab_factura.getValor("nom_geper");
+                String sql_1 = "INSERT INTO  KARDEXPRODUCTOS VALUES((SELECT MAX(k.CODIGOKP )+1 FROM KARDEXPRODUCTOS k where  k.COD_PROD='" + codProd + " '),'" + codProd + "','" + fechae + "','" + numFactura + "','N/C " + nombreCliente + "'," + vpre + ",0," + vcant + "," + exnue + ")";
+                String sql_2 = "UPDATE PRODUCTOS SET EXISTENCIA=" + exnue + " where COD_PROD='" + codProd + "'";
+                con_conecta.agregarSql(sql_1);
+                con_conecta.agregarSql(sql_2);
+            }
+            if (con_conecta.ejecutarListaSql().isEmpty()) {
+                System.out.println("OK guardo Kardex NC");
+            }
+        }
+
+    }
+
+    /**
+     * Guarda en kardex de proveedores y de productos
+     *
+     * @param ide_cpcfa
+     */
     public void guardarKardexRetencionCompras(String ide_cpcfa) {
 
         TablaGenerica tab_factura = utilitario.consultar("select codigo_geper,fecha_emisi_cncre,numero_cpcfa,nombre_cncim,valor_cndre from con_detall_retenc a \n"
