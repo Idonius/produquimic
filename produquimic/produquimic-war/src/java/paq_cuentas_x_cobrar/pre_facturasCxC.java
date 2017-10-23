@@ -21,6 +21,7 @@ import framework.componentes.Espacio;
 import framework.componentes.Etiqueta;
 import framework.componentes.Grid;
 import framework.componentes.Grupo;
+import framework.componentes.ItemMenu;
 import framework.componentes.Link;
 import framework.componentes.Mascara;
 import framework.componentes.Mensaje;
@@ -41,7 +42,6 @@ import javax.ejb.EJB;
 import javax.faces.event.ActionEvent;
 import org.primefaces.component.fieldset.Fieldset;
 import org.primefaces.component.panel.Panel;
-import org.primefaces.component.separator.Separator;
 import servicios.ceo.ServicioComprobanteElectronico;
 import servicios.cuentas_x_cobrar.ServicioCuentasCxC;
 import servicios.integracion.ServicioIntegracion;
@@ -100,6 +100,9 @@ public class pre_facturasCxC extends Pantalla {
     private final Texto tex_correo = new Texto();
 
     private Combo com_vendedor;
+
+    //Modifica vendedor
+    private Dialogo dia_vendedor = new Dialogo();
 
     public pre_facturasCxC() {
 
@@ -186,6 +189,13 @@ public class pre_facturasCxC extends Pantalla {
         gri.getChildren().add(tex_correo);
         dia_correo.setDialogo(gri);
         agregarComponente(dia_correo);
+
+        dia_vendedor.setId("dia_vendedor");
+        dia_vendedor.setTitle("MODIFICAR VENDEDOR");
+        dia_vendedor.setWidth("35%");
+        dia_vendedor.setHeight("40%");
+        dia_vendedor.getBot_aceptar().setMetodo("aceptarModificarVendedor");
+        agregarComponente(dia_vendedor);
 
     }
 
@@ -491,6 +501,13 @@ public class pre_facturasCxC extends Pantalla {
         tab_tabla.dibujar();
         PanelTabla pat_panel = new PanelTabla();
         pat_panel.setPanelTabla(tab_tabla);
+
+        ItemMenu itemedita = new ItemMenu();
+        itemedita.setValue("Modificar Vendedor");
+        itemedita.setIcon("ui-icon-pencil");
+        itemedita.setMetodo("abrirModificarVendedor");
+        pat_panel.getMenuTabla().getChildren().add(itemedita);
+
         Grupo gru = new Grupo();
 
         dibujarDashboard();
@@ -507,6 +524,44 @@ public class pre_facturasCxC extends Pantalla {
         gru.getChildren().add(pat_panel);
 
         mep_menu.dibujar(1, "LISTADO DE FACTURAS", gru);
+    }
+
+    public void abrirModificarVendedor() {
+
+        if (tab_tabla.getValor("ide_cccfa") != null) {
+            com_vendedor = new Combo();
+            com_vendedor.setCombo(ser_factura.getSqlComboVendedores());
+            Grid gri = new Grid();
+
+            //  gri1.getChildren().add(new Etiqueta("<strong>CLIENTE : </strong><span style='color:red;font-weight: bold;'>*</span>"));
+            //    gri1.getChildren().add(new Etiqueta("<strong>&nbsp;&nbsp;&nbsp;FECHA : </strong><span style='color:red;font-weight: bold;'>*</span>"));
+            gri.setColumns(2);
+            gri.getChildren().add(new Etiqueta("<strong>FACTURA N. : </strong>"));
+            gri.getChildren().add(new Etiqueta(tab_tabla.getValor("secuencial_cccfa")));
+            gri.getChildren().add(new Etiqueta("<strong>CLIENTE : </strong>"));
+            gri.getChildren().add(new Etiqueta(tab_tabla.getValor("nom_geper")));
+            gri.getChildren().add(new Etiqueta("<strong>FECHA : </strong>"));
+            gri.getChildren().add(new Etiqueta(tab_tabla.getValor("fecha_emisi_cccfa")));
+            gri.getChildren().add(new Etiqueta("<strong>NUEVO VENDEDOR : </strong>"));
+            gri.getChildren().add(com_vendedor);
+
+            dia_vendedor.setTitle("MODIFICAR VENDEDOR - FACTURA N. " + tab_tabla.getValor("secuencial_cccfa"));
+            dia_vendedor.getGri_cuerpo().getChildren().clear();
+            dia_vendedor.setDialogo(gri);
+            dia_vendedor.dibujar();
+        } else {
+            utilitario.agregarMensajeInfo("Seleccione una factura", "");
+        }
+
+    }
+
+    public void aceptarModificarVendedor() {
+        if (com_vendedor.getValue() != null) {
+            ser_integra.actualizarVendedorFactura(tab_tabla.getValor("ide_cccfa"), String.valueOf(com_vendedor.getValue()));
+            dia_vendedor.cerrar();
+        } else {
+            utilitario.agregarMensajeInfo("Seleccione un vendedor", "");
+        }
     }
 
     public void reenviarFactura() {
