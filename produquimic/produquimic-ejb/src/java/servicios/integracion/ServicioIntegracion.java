@@ -836,6 +836,18 @@ public class ServicioIntegracion extends ServicioBase {
     }
 
     /**
+     * Actualiza el nombre del vendedor de una factura electrónica
+     *
+     * @param ide_cccfa
+     * @param nombre_vgven
+     */
+    public void actualizarVendedorFactura(String ide_cccfa, String nombre_vgven) {
+        String sql = "update facturas_fe set VENDEDOR='" + nombre_vgven + "' where  ide_cccfa=" + ide_cccfa;
+        Conexion con_conecta = getConexionEscritorio();
+        con_conecta.ejecutarSql(sql);
+    }
+
+    /**
      * Guarda en kardex de proveedores y de productos
      *
      * @param ide_cpcfa
@@ -950,7 +962,7 @@ public class ServicioIntegracion extends ServicioBase {
                 + "inner join inv_articulo e on a.ide_inarti= e.ide_inarti\n"
                 + "left join  inv_unidad g on a.ide_inuni =g.ide_inuni\n"
                 + "where a.ide_cpcfa=" + ide_cpcfa);
-      
+
         if (tab_factura.isEmpty() == false) {
             Conexion con_conecta = getConexionEscritorio();
             String fechae = tab_factura.getValor("fecha_emisi_cpcfa");
@@ -966,12 +978,11 @@ public class ServicioIntegracion extends ServicioBase {
             double total = Double.parseDouble(tab_factura.getValor("total_cpcfa"));
 
             saldoNuevoClie = saldoInicialClie - total;
-            String sql = "INSERT INTO kardexproveedores VALUES((SELECT MAX(k.CODIGOKPV )+1 FROM kardexproveedores k where  k.COD_PROVE='" + codProve + " '),'" + codProve + "','" + fechae + "','" + numFactura + "','NOTA CREDITO "+tab_factura.getValor("numfactura") +" (WEB)',0," + total + "," + saldoNuevoClie + ")";
+            String sql = "INSERT INTO kardexproveedores VALUES((SELECT MAX(k.CODIGOKPV )+1 FROM kardexproveedores k where  k.COD_PROVE='" + codProve + " '),'" + codProve + "','" + fechae + "','" + numFactura + "','NOTA CREDITO " + tab_factura.getValor("numfactura") + " (WEB)',0," + total + "," + saldoNuevoClie + ")";
             con_conecta.agregarSql(sql);
 
             String sql1 = "UPDATE proveedores SET EXISTENCIA=" + saldoNuevoClie + " where COD_PROVE='" + codProve + "'";
             con_conecta.agregarSql(sql1);
-
 
             for (int i = 0; i < tab_factura.getTotalFilas(); i++) {
                 ///Kardex Productos
