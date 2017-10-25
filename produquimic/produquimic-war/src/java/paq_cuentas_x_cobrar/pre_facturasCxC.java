@@ -42,6 +42,7 @@ import javax.ejb.EJB;
 import javax.faces.event.ActionEvent;
 import org.primefaces.component.fieldset.Fieldset;
 import org.primefaces.component.panel.Panel;
+import org.primefaces.component.separator.Separator;
 import servicios.ceo.ServicioComprobanteElectronico;
 import servicios.cuentas_x_cobrar.ServicioCuentasCxC;
 import servicios.integracion.ServicioIntegracion;
@@ -542,12 +543,22 @@ public class pre_facturasCxC extends Pantalla {
             gri.getChildren().add(new Etiqueta(tab_tabla.getValor("nom_geper")));
             gri.getChildren().add(new Etiqueta("<strong>FECHA : </strong>"));
             gri.getChildren().add(new Etiqueta(tab_tabla.getValor("fecha_emisi_cccfa")));
-            gri.getChildren().add(new Etiqueta("<strong>NUEVO VENDEDOR : </strong>"));
-            gri.getChildren().add(com_vendedor);
+            gri.getChildren().add(new Etiqueta("<strong>VENDEDOR : </strong>"));
+            gri.getChildren().add(new Etiqueta(ser_factura.getNombreVendedorFactura(tab_tabla.getValor("ide_cccfa"))));
+
+            Grid gri1 = new Grid();
+            gri1.setColumns(2);
+            gri1.getChildren().add(new Etiqueta("<strong>NUEVO VENDEDOR : </strong>"));
+            gri1.getChildren().add(com_vendedor);
+
+            Grid g = new Grid();
+            g.getChildren().add(gri);
+            g.getChildren().add(new Separator());
+            g.getChildren().add(gri1);
 
             dia_vendedor.setTitle("MODIFICAR VENDEDOR - FACTURA N. " + tab_tabla.getValor("secuencial_cccfa"));
             dia_vendedor.getGri_cuerpo().getChildren().clear();
-            dia_vendedor.setDialogo(gri);
+            dia_vendedor.setDialogo(g);
             dia_vendedor.dibujar();
         } else {
             utilitario.agregarMensajeInfo("Seleccione una factura", "");
@@ -557,8 +568,9 @@ public class pre_facturasCxC extends Pantalla {
 
     public void aceptarModificarVendedor() {
         if (com_vendedor.getValue() != null) {
-            ser_integra.actualizarVendedorFactura(tab_tabla.getValor("ide_cccfa"), String.valueOf(com_vendedor.getValue()));
+            ser_factura.actualizarVendedorFactura(tab_tabla.getValor("ide_cccfa"), String.valueOf(com_vendedor.getValue()));
             dia_vendedor.cerrar();
+            utilitario.agregarMensaje("Se guardo correctamente", "");
         } else {
             utilitario.agregarMensajeInfo("Seleccione un vendedor", "");
         }
