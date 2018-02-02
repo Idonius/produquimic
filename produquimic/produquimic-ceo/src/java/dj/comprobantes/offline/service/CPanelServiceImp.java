@@ -67,7 +67,7 @@ public class CPanelServiceImp implements CPanelService {
         params.put("ESTABLECIM", comprobante.getEstab());
         params.put("PTO_EMISION", comprobante.getPtoemi());
         params.put("TOTAL", comprobante.getImportetotal());
-        params.put("CODIGO_EMPR", ParametrosSistemaEnum.CODIGO_EMPR.getCodigo());
+        params.put("CODIGO_EMPR", comprobante.getOficina()); //02-02-2018  //Sucursal 
         params.put("CORREO_DOCUMENTO", comprobante.getCorreo()); //Para guardar el correo que se envio el comprobante
         byte[] bxml = archivoService.getXml(comprobante);
         StringBuilder postData = new StringBuilder();

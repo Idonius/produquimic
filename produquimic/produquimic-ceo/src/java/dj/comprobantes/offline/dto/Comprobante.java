@@ -111,7 +111,15 @@ public final class Comprobante implements Serializable {
             if (resultado.getString("en_nube_srcom") != null) {
                 this.enNube = resultado.getBoolean("en_nube_srcom");
             }
-            this.oficina = "1";// SUCURSAL 1 
+            //inicio 02-02-2018 
+            if (resultado.getString("ide_sucu") != null) {
+                this.oficina = resultado.getString("ide_sucu"); 
+            } else {
+                this.oficina = "1";// SUCURSAL 1 
+            }
+            //fin
+
+            
             this.motivo = resultado.getString("motivo_srcom");
             if (resultado.getString("ide_srfid") != null) {
                 this.codigofirma = new Firma(resultado.getInt("ide_srfid"));
@@ -262,7 +270,7 @@ public final class Comprobante implements Serializable {
                             + "inner join con_cabece_retenc d on a.ide_cncre=d.ide_cncre\n"
                             + "inner join cxp_cabece_factur e on d.ide_cncre=e.ide_cncre\n"
                             + "inner join con_tipo_document g on e.ide_cntdo=g.ide_cntdo\n"
-                            + "where  ide_srcom=" + this.codigocomprobante;                    
+                            + "where  ide_srcom=" + this.codigocomprobante;
                     Statement sentensia = con.getConnection().createStatement();
                     ResultSet res = sentensia.executeQuery(sql);
                     while (res.next()) {
