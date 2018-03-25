@@ -7,7 +7,7 @@ app.controller('ComprobanteCtrl', function($scope, $routeParams, $location, $htt
 
 
     $scope.getXML = function(row) {
-        $http.get('framework/servicios/ServicioComprobante.php/getXML/' + row.PK_CODIGO_COMP, {
+        $http.get('framework/servicios/ServicioComprobante.php/getXML/' + row.NUM_AUTORIZACION, {
             responseType: 'arraybuffer'
         }).success(function(data) {
 
@@ -26,7 +26,7 @@ app.controller('ComprobanteCtrl', function($scope, $routeParams, $location, $htt
 
 
     $scope.getPDF = function(row) {
-        $http.get('framework/servicios/ServicioComprobante.php/getPDF/' + row.PK_CODIGO_COMP, {
+        $http.get('framework/servicios/ServicioComprobante.php/getPDF/' + row.NUM_AUTORIZACION, {
             responseType: 'arraybuffer'
         }).success(function(data) {
             var file = new Blob([data], {

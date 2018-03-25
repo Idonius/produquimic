@@ -2,7 +2,7 @@ app.controller('RegistroCtrl', function($scope, $location, Utilitario) {
 
 	$scope.identificacion = "";
 	$scope.confirmaEmail = "";
-	$scope.procesa = false;
+	
 
 	$scope.usuario = {
 		CODIGO_USUARIO: null,
@@ -56,11 +56,9 @@ app.controller('RegistroCtrl', function($scope, $location, Utilitario) {
 			CONTACTO_USUARIO: null,
 			DIRECCION_USUARIO: null
 		};
-		$scope.procesa = false;
 	};
 
-	$scope.registrarUsuario = function() {
-		$scope.procesa = true;
+	$scope.registrarUsuario = function() {		
 		if ($scope.usuario.CORREO_USUARIO == $scope.confirmaEmail) {
 			if ($scope.usuario.CODIGO_USUARIO) {
 				$scope.usuario.REGISTRADO_USUARIO = 1; //true

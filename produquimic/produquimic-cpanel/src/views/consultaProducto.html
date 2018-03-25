@@ -1,0 +1,55 @@
+<div layout="column" class="card">
+
+    <div layout="row" layout-align="center center" >
+        <form name="frmConsulta">
+            <md-input-container style="width: 495px; height:20px;">
+            <label>Producto</label>
+            
+      <input ng-model="producto" required type="text" placeholder="NOMBRE DEL PRODUCTO" ng-required="true" fw-mayusculas>
+
+            </md-input-container>
+            <md-input-container style="padding-left:15px;height:40px;">
+            <md-button class="md-raised md-primary" ng-click="buscar()" aria-label="Buscar" data-ng-disabled="frmConsulta.$invalid">
+            <i class="ion-android-search"></i>
+            Buscar
+            </md-button>
+
+            <md-button class="md-raised md-primary" ng-click="borrar()" aria-label="Borrar" >
+            <i class="ion-ios-trash-outline"></i>            
+            Borrar
+            </md-button>
+            </md-input-container>
+        </form>
+    </div>
+
+
+    <div class="table-responsive" >
+        <md-content layout-xs="column" layout="row" ng-style="{background:'white', padding : '10px'}">
+        <table st-table="ultimosComprobantes" class="table table-striped">
+            <thead>
+                <tr>
+                    <th>FECHA</th>
+                    <th>PRODUCTO</th>
+                    <th>CANTIDAD</th>                    
+                    <th>PRECIO</th>
+                    <th>TOTAL</th>
+                    <th>N.FACTURA</th>
+                    <th>CLIENTE</th>
+            
+                </tr>
+            </thead>
+            <tbody>
+                <tr ng-repeat="row in ultimosComprobantes">
+                    <td>{{row.FECHA_EMISION}}</td>
+                    <td>{{row.DESCRIPCION}}</td>
+                    <td>{{row.CANTIDAD}}</td>                    
+                    <td>{{row.PRECIO}}</td>
+                    <td>{{row.TOTAL}}</td>
+                    <td>{{row.SECUENCIAL}}</td>
+                    <td>{{row.CLIENTE}}</td>                    
+                </tr>
+            </tbody>
+        </table>
+        </md-content>
+    </div>
+</div>

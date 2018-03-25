@@ -8,6 +8,8 @@ include_once("../correo/EnviarCorreo.php");
 \Slim\Slim::registerAutoloader();
 $app = new \Slim\Slim();
 
+$app->post('/getPreciosProductos', 'getPreciosProductos');
+
 $app->post('/getFacturas/:FECHA_DESDE/:FECHA_HASTA', 'getFacturas');
 
 $app->post('/getNotasCredito/:FECHA_DESDE/:FECHA_HASTA', 'getNotasCredito');
@@ -29,6 +31,23 @@ $app->get('/getPDF/:CLAVE_ACCESO', 'getPDF');
 $app->get('/getComprobantesNoEviadosMail', 'getComprobantesNoEviadosMail');
 
 $app->run();
+
+function getPreciosProductos() {    
+    $response = \Slim\Slim::getInstance()->response();
+    if (Util::isToken($response)) {
+        $request = \Slim\Slim::getInstance()->request();
+        $param = json_decode($request->getBody()); 
+        $sql = "SELECT DATE_FORMAT(FECHA_EMISION,'%d/%m/%Y') AS FECHA_EMISION, SECUENCIAL, CLIENTE, IDENTIFICACION,
+                CODIGO_PRINCIPAL,CODIGO_AUXILIAR,CANTIDAD,DESCRIPCION,PRECIO,DC.TOTAL,PORCENTAJE_IVA
+                FROM DETALLE_COMPROBANTE DC
+                INNER JOIN COMPROBANTE  CO ON DC.PK_CODIGO_COMP=CO.PK_CODIGO_COMP
+                WHERE UPPER(DESCRIPCION) LIKE  UPPER(:producto) ORDER BY DC.PK_CODIGO_COMP DESC";    
+        $db = new Conexion();
+        $valoresSql = array(":producto" => "%".$param->producto."%");    
+        $resultado = $db->consultar($sql, $valoresSql);
+        Util::validarResultado($response, $resultado);
+    }
+}
 
 function getFacturas($FECHA_DESDE, $FECHA_HASTA) {
     $response = \Slim\Slim::getInstance()->response();
@@ -93,7 +112,7 @@ function getRetenciones($FECHA_DESDE, $FECHA_HASTA) {
 function getUltimosComprobantes() {
     $response = \Slim\Slim::getInstance()->response();
     if (Util::isAutorizado($response)) {
-        $sql = "SELECT PK_CODIGO_COMP,NOMBRE_DOCUMENTO,DATE_FORMAT(FECHA_EMISION,'%d/%m/%Y') as FECHA_EMISION,concat(ESTABLECIM , '-' , PTO_EMISION , '-' , SECUENCIAL) as SECUENCIAL,NUM_AUTORIZACION,TOTAL FROM COMPROBANTE a INNER JOIN TIPO_DOCUMENTO b on a.CODIGO_DOCUMENTO=b.CODIGO_DOCUMENTO WHERE IDENTIFICACION='" . $_SESSION['IDENTIFICACION'] . "' ORDER BY FECHA_EMISION desc LIMIT 10";
+        $sql = "SELECT PK_CODIGO_COMP,NOMBRE_DOCUMENTO,DATE_FORMAT(FECHA_EMISION,'%d/%m/%Y') as FECHA_EMISION,concat(ESTABLECIM , '-' , PTO_EMISION , '-' , SECUENCIAL) as SECUENCIAL,NUM_AUTORIZACION,TOTAL FROM COMPROBANTE a INNER JOIN TIPO_DOCUMENTO b on a.CODIGO_DOCUMENTO=b.CODIGO_DOCUMENTO WHERE IDENTIFICACION='" . $_SESSION['IDENTIFICACION'] . "' ORDER BY PK_CODIGO_COMP desc LIMIT 10";
         $db = new Conexion();
         $resultado = $db->consultar($sql);
         Util::validarResultado($response, $resultado);
@@ -141,5 +160,6 @@ function getComprobantesNoEviadosMail() {
         }
     }
 }
+   
 
 ?>

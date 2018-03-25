@@ -47,6 +47,16 @@ app.config(['$routeProvider',
                     title: 'Preguntas',
                     templateUrl: 'views/preguntas.html'
                 })
+                .when('/consultaPrecios', {
+                    title: 'consultaPrecios',
+                    templateUrl: 'views/consultaProducto.html',
+                    controller: 'ConsultaProductoCtrl'
+                })
+                .when('/empresasMuni', {
+                    title: 'empresasMuni',
+                    templateUrl: 'views/empresas.html',
+                    controller: 'ConsultaEmpresasCtrl'
+                })
                 .when('/acerca', {
                     title: 'Acerca',
                     templateUrl: 'views/acercaDe.html'
@@ -74,6 +84,10 @@ app.config(['$routeProvider',
                     $location.path('/acerca');
                 } else if ($location.path() == '/recordarClave') {
                     $location.path('/recordarClave');
+                } else if ($location.path() == '/consultaPrecios') {
+                    $location.path('/consultaPrecios');
+                } else if ($location.path() == '/empresasMuni') {
+                    $location.path('/empresasMuni');
                 } else if ($location.path() !== '/login' && !$rootScope.globals.currentUser) {
                     $location.path('/login');
                 }

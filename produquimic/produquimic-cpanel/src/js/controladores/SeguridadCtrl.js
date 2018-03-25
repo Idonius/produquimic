@@ -156,7 +156,7 @@ app.controller('SeguridadCtrl', function($scope, $location, ServicioAutenticacio
               color: 'purple'
           }, {
               nombre: 'Comprobantes de Retención',
-              state:  '/comprobantes/Retenciones',
+              state:  '/comprobantes/Comprobantes de Retención',
               icono: 'ion-ios-paper s24',
               color: 'light-blue'
           }];

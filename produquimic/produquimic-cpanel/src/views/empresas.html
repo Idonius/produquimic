@@ -1,0 +1,177 @@
+<div ng-cloak>
+    <md-content class="card">
+
+        <md-tabs md-dynamic-height md-border-bottom>
+
+            <md-tab label="BUSCAR EMPRESAS">
+<md-content layout-sm="row" layout-padding layout-align="center center"  ng-style="{background:'white', padding : '10px'}">
+
+    <div layout="row" >
+        <form name="frmConsulta">
+            <md-input-container style="width: 495px; height:20px;">
+            <label>Actividad Económica</label>            
+      		<input ng-model="actividad"  type="text" placeholder="ACTIVIDAD ECONOMICA"  fw-mayusculas>
+            </md-input-container>
+
+            <md-input-container style="width: 495px; height:20px;">
+            <label>Nombre de la Empresa</label>            
+      		<input ng-model="empresa"  type="text" placeholder="RAZÓN SOCIAL / NOMBRE COMERCIAL"  fw-mayusculas>
+            </md-input-container>
+
+            <md-input-container style="padding-left:15px;height:40px;">
+            <md-button class="md-raised md-primary" ng-click="buscar()" aria-label="Buscar" data-ng-disabled="frmConsulta.$invalid">
+            <i class="ion-android-search"></i>
+            Buscar
+            </md-button>
+
+            <md-button class="md-raised md-primary" ng-click="borrar()" aria-label="Borrar" >
+            <i class="ion-ios-trash-outline"></i>            
+            Borrar
+            </md-button>
+            </md-input-container>
+        </form>
+	</div>
+
+        <div class="table-responsive" >
+        <md-content layout-xs="column" layout="row" ng-style="{background:'white', padding : '10px'}">
+        <table st-table="listaEmpresas" class="table table-striped" style="font-size: 11px;">
+            <thead>
+                <tr>
+                	<th></th>
+                    <th>RUC</th>
+                    <th>RAZON SOCIAL</th>
+                    <th>NOMBRE COMERCIAL</th>                    
+                    <th>ACTIVIDAD ECONOMICA</th>
+                    <th>PARROQUIA</th>
+                    <th>TELEFONO</th>                    
+                    <th>MAIL</th>
+                    <th>SEGUIMIENTO</th>
+
+            
+                </tr>
+            </thead>
+            <tbody>
+                <tr ng-repeat="row in listaEmpresas">
+                	<td>
+                	<md-button class="md-fab md-mini md-primary" aria-label="llamar" ng-click="abrirDialogoLlamar(row)" >
+          				<i class="ion-android-call"></i> 
+        			</md-button>
+                	</td>	
+                    <td>{{row.RUC_EM}}</td>
+                    <td>{{row.RAZON_SOCIAL_EM}}</td>
+                    <td>{{row.NOMBRE_COMERCIAL_EM}}</td>                    
+                    <td>{{row.ACTIVIDAD_ECONOMICA_EM}}</td>
+                    <td>{{row.PARROQUIA_EM}}</td>
+                    <td>{{row.TELEFONO1_EM}}</td>                    
+                    <td>{{row.MAIL_EM}}</td>
+                    <td>
+	                    <p align="center">{{row.FECHA_LLAMA_EM}} <br/> <md-icon md-font-icon="ion-checkmark s24" md-colors=" {color: 'green'}" ng-show="row.FECHA_LLAMA_EM != NULL" md-menu-align-target></md-icon>  
+						</p>
+					</td>               
+                </tr>
+            </tbody>
+        </table>
+        </md-content>
+    </div>
+
+
+      </md-content>
+</md-tab>
+
+
+<md-tab label="BUSCAR ACTIVIDADES ECONÓMICAS">
+<md-content layout-sm="row" layout-padding layout-align="center center"  ng-style="{background:'white', padding : '10px'}">
+    <div layout="row" >
+        <form name="frmActividad">
+            <md-input-container style="width: 495px; height:20px;">
+            <label>Actividad Económica</label>            
+      		<input ng-model="actividad1"  type="text" placeholder="ACTIVIDAD ECONOMICA"  fw-mayusculas>
+            </md-input-container>
+
+            <md-input-container style="padding-left:15px;height:40px;">
+            <md-button class="md-raised md-primary" ng-click="buscarActividad()" aria-label="Buscar">
+            <i class="ion-android-search"></i>
+            Buscar
+            </md-button>
+
+            <md-button class="md-raised md-primary" ng-click="borrarActividad()" aria-label="Borrar" >
+            <i class="ion-ios-trash-outline"></i>            
+            Borrar
+            </md-button>
+            </md-input-container>
+        </form>
+	</div>
+
+        <div class="table-responsive" >
+        <md-content layout-xs="column" layout="row" ng-style="{background:'white', padding : '10px'}">
+        <table st-table="listaActividades" class="table table-striped">
+            <thead>
+                <tr>
+                    <th>ACTIVIDAD ECONÓMICA</th>
+                    <th>NUM. EMPRESAS</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr ng-repeat="row in listaActividades">
+                    <td>{{row.ACTIVIDAD_ECONOMICA_EM}}</td>
+                    <td>{{row.NUMERO}}</td>                    
+                </tr>
+            </tbody>
+        </table>
+        </md-content>
+    </div>
+
+
+</md-content>
+</md-tab>
+
+
+<md-tab label="SEGUIMIENTO EMPRESAS" ng-click="buscarEmpresasActualizadas()">
+<md-content layout-sm="row" layout-padding layout-align="center center"  ng-style="{background:'white', padding : '10px'}">
+
+        <div class="table-responsive" >
+        <md-content layout-xs="column" layout="row" ng-style="{background:'white', padding : '10px'}">
+        <table st-table="listaEmpresasActualizadas" class="table table-striped" style="font-size: 11px;">
+            <thead>
+                <tr>
+                	<th></th>
+                	<th>FECHA</th>
+                    <th>RAZON SOCIAL</th>
+                    <th>NOMBRE COMERCIAL</th>                   
+                    <th>OBSERVACIONES</th> 
+                    <th>TELEFONO</th>                    
+                    <th>MAIL</th>
+                    <th>LLAMA</th>
+                    <th>COTIZA</th>
+                    <th>COMPRA</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr ng-repeat="row in listaEmpresasActualizadas">
+                	<td>
+                	<md-button class="md-fab md-mini md-warn" aria-label="llamar" ng-click="abrirDialogoLlamar(row)" >
+          				<i class="ion-android-create"></i> 
+        			</md-button>
+                	</td>	
+                    <td>{{row.FECHA_LLAMA_EM}}</td>
+                    <td>{{row.RAZON_SOCIAL_EM}}</td>
+                    <td>{{row.NOMBRE_COMERCIAL_EM}}</td>                    
+                    <td>{{row.OBSERVACIONES_LLAMA_EM}}</td>                    
+                    <td>{{row.TELEFONO1_EM}}</td>                    
+                    <td>{{row.MAIL_EM}}</td>
+         			<td>{{row.LLAMA_EM == true ?"SI" : "NO" }}</td>
+         			<td>{{row.COTIZA_EM == true ?"SI" : "NO" }}</td>              
+         			<td>{{row.COMPRA_EM == true ?"SI" : "NO" }}</td>                            
+                </tr>
+            </tbody>
+        </table>
+        </md-content>
+    </div>
+
+
+</md-content>
+</md-tab>
+
+    </md-tabs>
+</md-content>
+</div>
